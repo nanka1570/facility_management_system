@@ -1,4 +1,4 @@
-import './globals.css'
+import '../globals.css'
 
 export const metadata = {
     title: '施設管理システム',
