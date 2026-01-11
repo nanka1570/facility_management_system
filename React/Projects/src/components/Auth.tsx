@@ -41,7 +41,7 @@ export default function Auth() {
         <>
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-                    <h1 className="text2-xl font-bold text-center mb-6">
+                    <h1 className="text-2xl font-bold text-center mb-6">
                         施設管理システム
                     </h1>
 
@@ -92,9 +92,9 @@ export default function Auth() {
                         </button>
                     </form>
                     
-                    <div className="mt-4 text-center text-sm text-red-500">
-                        {message}
-                    </div>
+                    {message &&(
+                        <p className="mt-4 text-center text-sm text-red-500">{message}</p>
+                    )}
 
                 </div>
             </div>
