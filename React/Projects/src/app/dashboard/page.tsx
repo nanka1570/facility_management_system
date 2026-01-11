@@ -2,6 +2,7 @@
 
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation" //next.jsの画面遷移
+import { useEffect } from "react"
 
 export default function Dashboard() {
     const router = useRouter()
@@ -13,16 +14,20 @@ export default function Dashboard() {
         }
     }
 
-    const isLogin = async () => {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session) {
-            router.push('/')
+    useEffect(() => {
+        const checkSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (!session) {
+                router.push('/')
+            }
+            
         }
-    }
+        checkSession()
+    }, [])
 
     return (
         <>
-            {isLogin}
+            <div>ダッシュボード</div>
             <div>
                 <p>こんにちは、ゲストさん</p>
                 <button
