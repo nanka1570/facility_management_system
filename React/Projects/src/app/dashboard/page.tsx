@@ -12,12 +12,23 @@ export default function Dashboard() {
             router.push('/')
         }
     }
+
+    const isLogin = async () => {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+            router.push('/')
+        }
+    }
+
     return (
-        <div>
-            <p>こんにちは、ゲストさん</p>
-            <button
-             onClick={handleLogout}
-             >ログアウト</button>
-        </div>
+        <>
+            {isLogin}
+            <div>
+                <p>こんにちは、ゲストさん</p>
+                <button
+                onClick={handleLogout}
+                >ログアウト</button>
+            </div>
+        </>
     )
 }
