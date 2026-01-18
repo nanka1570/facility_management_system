@@ -7,10 +7,10 @@ import Header from "@/components/Header"
 
 export default function Dashboard() {
     const [ displayName, setDisplayName ] = useState('')
+    const router = useRouter();
 
     useEffect(() => {
         const checkSession = async () => {
-            const router = useRouter();
             const { data: { session } } = await supabase.auth.getSession()
             
             if (!session) {
