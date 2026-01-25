@@ -27,7 +27,7 @@ export default function Categories() {
         //カテゴリ一覧を表示
         const loadCategories = async () => {
             const {data, error} = await supabase
-                    .from('categories')
+                    .from('facilities')
                     .select('*')
                     .order('sort_order', { ascending: true })
             
@@ -43,7 +43,7 @@ export default function Categories() {
     //カテゴリ追加
     const handleInsertCategories = async () => {
         const { error } = await supabase
-            .from('categories')
+            .from('facilities')
             .insert({ name, sort_order: sortOrder })
         if (!error) {
             setRefreshKey(prev => prev + 1)
@@ -62,7 +62,7 @@ export default function Categories() {
     //カテゴリ更新
     const handleUpdateCategories = async (categoryId: number) => {
         const { error } = await supabase
-            .from('categories')
+            .from('facilities')
             .update({ name: editName, sort_order: editSortOrder })
             .eq('id', categoryId)
         if (!error){
@@ -74,7 +74,7 @@ export default function Categories() {
     //カテゴリ削除
     const handleDeleteCategories = async (categoryId: number) => {
         const { error } = await supabase
-            .from('categories')
+            .from('facilities')
             .delete()
             .eq('id', categoryId)
         if (!error) {
