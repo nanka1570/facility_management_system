@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-export default function reservations() {
+export default function Reservations() {
     const router = useRouter()
     const [reservations, setReservations] = useState<any[]>([])
     const [refreshKey, setRefreshKey] = useState(0)
@@ -36,7 +36,7 @@ export default function reservations() {
             <div>
                 <Header />
             </div>
-            <main>
+            <main className="p-6">
                 <h1>予約管理</h1>
 
                 <div className="bg-white rounded shadow overflow-hidden">
@@ -51,7 +51,7 @@ export default function reservations() {
                             </tr>
                         </thead>
                         <tbody>
-                            {reservations.map((reservation) => {
+                            {reservations.map((reservation) => (
                                 <tr key={reservation.id} className="border-t">
                                     <td className="px-4 py-3">{reservation.id}</td>
                                     <td className="px-4 py-3">{reservation.facility_id}</td>
@@ -59,7 +59,7 @@ export default function reservations() {
                                     <td className="px-4 py-3">{reservation.end_time}</td>
                                     <td className="px-4 py-3">{reservation.status}</td>
                                 </tr>
-                            })}
+                            ))}
                         </tbody>
                     </table>
                 </div>
