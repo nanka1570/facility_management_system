@@ -8,6 +8,7 @@ import { useEffect, useState } from "react"
 export default function Reservations() {
     const router = useRouter()
     const [reservations, setReservations] = useState<any[]>([])
+    const [facilities, setFacilities] = useState<any[]>([])
     const [refreshKey, setRefreshKey] = useState(0)
 
    useEffect(() => {
@@ -30,6 +31,34 @@ export default function Reservations() {
     checkSession()
     loadReservations()
    }, [refreshKey])
+
+   //施設名を取得
+   const getFacilityName = (facilityId: number | null) => {
+    const facility = facilities.find((f) => f.id === facilityId)
+    return facility ? facility.name : '未設定'
+   }
+
+   //日時をフォーマットする関数
+   const formatDateTime = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    })
+   }
+
+   //ステータスを日本語に直す関数
+   const getStatusLabel = (status: string) => {
+    const statusMap: { [key: string]: string} = {
+        'confirmed': '確定',
+        'canceled': 'キャンセル',
+        'completed': '完了'
+    }
+    return statusMap[status] || status
+   }
 
     return (
         <>
@@ -54,10 +83,10 @@ export default function Reservations() {
                             {reservations.map((reservation) => (
                                 <tr key={reservation.id} className="border-t">
                                     <td className="px-4 py-3">{reservation.id}</td>
-                                    <td className="px-4 py-3">{reservation.facility_id}</td>
-                                    <td className="px-4 py-3">{reservation.start_time}</td>
-                                    <td className="px-4 py-3">{reservation.end_time}</td>
-                                    <td className="px-4 py-3">{reservation.status}</td>
+                                    <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
+                                    <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
+                                    <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
+                                    <td className="px-4 py-3">{getStatusLabel(reservation.status)}</td>
                                 </tr>
                             ))}
                         </tbody>
