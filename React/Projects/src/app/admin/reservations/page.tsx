@@ -28,12 +28,23 @@ export default function Reservations() {
             setReservations(data)
         }
     }
+    //予約一覧をロード
+    const loadFacilities = async () => {
+        const { data, error } = await supabase
+            .from('facilities')
+            .select('*')
+        if (data){
+            setFacilities(data)
+        }
+    }
     checkSession()
     loadReservations()
+    loadFacilities()
    }, [refreshKey])
 
    //施設名を取得
    const getFacilityName = (facilityId: number | null) => {
+    if (!facilityId) return '未設定'    //無駄にこの関数を呼び出すことを抑制
     const facility = facilities.find((f) => f.id === facilityId)
     return facility ? facility.name : '未設定'
    }
@@ -54,7 +65,7 @@ export default function Reservations() {
    const getStatusLabel = (status: string) => {
     const statusMap: { [key: string]: string} = {
         'confirmed': '確定',
-        'canceled': 'キャンセル',
+        'cancelled': 'キャンセル',
         'completed': '完了'
     }
     return statusMap[status] || status
