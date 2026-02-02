@@ -120,51 +120,55 @@ export default function Reservations() {
                 </div>
                 {isModalOpen ? (
                     <>
-                        <div className="">
-                            <select>
-                                <option value="">選択してください</option>
-                            </select>
-                            <label>
-                                開始日時
-                                <input
-                                type="datetime-local"
-                                value={newStartTime}
-                                onChange={(e) => setNewStartTime(e.target.value)}
-                                />
-                            </label>
-                            <label>
-                                終了日時
-                                <input 
-                                type="datetime-local"
-                                value={newEndTime}
-                                onChange={(e) => setNewEndTime(e.target.value)}
-                                />
-                            </label>
-                            <label>
-                                利用人数
-                                <input
-                                type="number"
-                                value={newNumPeople}
-                                onChange={(e) => setNewNumPeople(Number(e.target.value))}
-                                />
-                            </label>
-                            <label>
-                                利用目的
-                                <input
-                                type="text"
-                                value={newPurpose}
-                                onChange={(e) => setNewPurpose(e.target.value)}
-                                />
-                            </label>
+                        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
+                            <div className="bg-white rounded shadow p-6 w-125">
+                                <select>
+                                    <option value="">選択してください</option>
+                                </select>
+                                <label>
+                                    開始日時
+                                    <input
+                                    type="datetime-local"
+                                    value={newStartTime}
+                                    onChange={(e) => setNewStartTime(e.target.value)}
+                                    />
+                                </label>
+                                <label>
+                                    終了日時
+                                    <input 
+                                    type="datetime-local"
+                                    value={newEndTime}
+                                    onChange={(e) => setNewEndTime(e.target.value)}
+                                    />
+                                </label>
+                                <label>
+                                    利用人数
+                                    <input
+                                    type="number"
+                                    value={newNumPeople}
+                                    onChange={(e) => setNewNumPeople(Number(e.target.value))}
+                                    />
+                                </label>
+                                <label>
+                                    利用目的
+                                    <input
+                                    type="text"
+                                    value={newPurpose}
+                                    onChange={(e) => setNewPurpose(e.target.value)}
+                                    />
+                                </label>
+                            <button
+                             onClick={() => setIsModalOpen(false)}
+                             >
+                                キャンセル
+                            </button>
+                            <button>
+                                予約する
+                            </button>
+                            </div>
                         </div>
-                        <button>
-                            キャンセル
-                        </button>
-                        <button>
-                            予約する
-                        </button>
                     </>
-                ):null}
+                    ):null}
             </main>
         </>
     )
