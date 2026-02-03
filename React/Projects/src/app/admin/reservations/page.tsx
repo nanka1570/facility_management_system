@@ -17,6 +17,7 @@ export default function Reservations() {
     const [newEndTime, setNewEndTime] = useState('')
     const [newNumPeople, setNewNumPeople] = useState(1)
     const [newPurpose, setNewPurpose] = useState('')
+    const [userId, setUserId] = useState('')
 
 
    useEffect(() => {
@@ -25,6 +26,9 @@ export default function Reservations() {
         const {data: { session } } = await supabase.auth.getSession()
         if (!session){
             router.push('/')
+        }else{
+            //sessionからUUIDを取り出す
+            setUserId(session.user.id)
         }
     }
     //予約一覧をロード
@@ -36,7 +40,7 @@ export default function Reservations() {
             setReservations(data)
         }
     }
-    //予約一覧をロード
+    //施設一覧をロード
     const loadFacilities = async () => {
         const { data, error } = await supabase
             .from('facilities')
@@ -55,6 +59,29 @@ export default function Reservations() {
     if (!facilityId) return '未設定'    //無駄にこの関数を呼び出すことを抑制（勉強のため記載）
     const facility = facilities.find((f) => f.id === facilityId)
     return facility ? facility.name : '未設定'
+   }
+
+   //予約処理
+   const handleInsertReservations = async () => {
+    const { error } = await supabase
+        .from('reservations')
+        .insert({
+            user_id: userId,
+            facility_id: newFacilityId,
+            start_time: newStartTime,
+            end_time: newEndTime,
+            num_people: newNumPeople,
+            purpose: newPurpose,
+        })
+        if (!error) {
+            setRefreshKey(prev => prev + 1)
+            setNewFacilityId(null)
+            setNewStartTime('')
+            setNewEndTime('')
+            setNewNumPeople(1)
+            setNewPurpose('')
+            setIsModalOpen(false)
+        }
    }
 
    //日時をフォーマットする関数
@@ -122,49 +149,65 @@ export default function Reservations() {
                     <>
                         <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
                             <div className="bg-white rounded shadow p-6 w-125">
-                                <select>
-                                    <option value="">選択してください</option>
-                                </select>
-                                <label>
-                                    開始日時
-                                    <input
-                                    type="datetime-local"
-                                    value={newStartTime}
-                                    onChange={(e) => setNewStartTime(e.target.value)}
-                                    />
-                                </label>
-                                <label>
-                                    終了日時
-                                    <input 
-                                    type="datetime-local"
-                                    value={newEndTime}
-                                    onChange={(e) => setNewEndTime(e.target.value)}
-                                    />
-                                </label>
-                                <label>
-                                    利用人数
-                                    <input
-                                    type="number"
-                                    value={newNumPeople}
-                                    onChange={(e) => setNewNumPeople(Number(e.target.value))}
-                                    />
-                                </label>
-                                <label>
-                                    利用目的
-                                    <input
-                                    type="text"
-                                    value={newPurpose}
-                                    onChange={(e) => setNewPurpose(e.target.value)}
-                                    />
-                                </label>
-                            <button
-                             onClick={() => setIsModalOpen(false)}
-                             >
-                                キャンセル
-                            </button>
-                            <button>
-                                予約する
-                            </button>
+                                <div className="flex flex-col gap-4">
+                                    <select 
+                                     value={newFacilityId}
+                                     onChange={(e) => setNewFacilityId(Number(e.target.value))}
+                                     >
+                                        <option value="">選択してください</option>
+                                        {facilities.map((f) => (
+                                            <option key={f.id} value={f.id}>
+                                                {f.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <label>
+                                        開始日時
+                                        <input
+                                        type="datetime-local"
+                                        value={newStartTime}
+                                        onChange={(e) => setNewStartTime(e.target.value)}
+                                        />
+                                    </label>
+                                    <label>
+                                        終了日時
+                                        <input 
+                                        type="datetime-local"
+                                        value={newEndTime}
+                                        onChange={(e) => setNewEndTime(e.target.value)}
+                                        />
+                                    </label>
+                                    <label>
+                                        利用人数
+                                        <input
+                                        type="number"
+                                        value={newNumPeople}
+                                        onChange={(e) => setNewNumPeople(Number(e.target.value))}
+                                        />
+                                    </label>
+                                    <label>
+                                        利用目的
+                                        <input
+                                        type="text"
+                                        value={newPurpose}
+                                        onChange={(e) => setNewPurpose(e.target.value)}
+                                        />
+                                    </label>
+                                </div>
+                                <div>
+                                    <button
+                                     onClick={() => setIsModalOpen(false)}
+                                     className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
+                                     >
+                                        キャンセル
+                                    </button>
+                                    <button
+                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
+                                     onClick={handleInsertReservations}
+                                     >
+                                        予約する
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </>
