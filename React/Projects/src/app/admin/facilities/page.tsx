@@ -55,7 +55,7 @@ export default function Categories() {
     
     //カテゴリ名を取得
     const getCategoryName = (categoryId: number | null) => {
-        if (!categoryId) return '未設定'
+        if (!categoryId) return '未設定'    //無駄にこの関数を呼び出すことを抑制（勉強のため記載）
         const category = categories.find((cat) => cat.id === categoryId)
         return category ? category.name : '未設定'
     }
@@ -174,16 +174,16 @@ export default function Categories() {
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <button
-                                                     onClick={() => handleUpdateFacilities(facility.id)}
-                                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
-                                                     >
-                                                        保存
-                                                    </button>
-                                                    <button
                                                      onClick={() => setEditingId(null)}
                                                      className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
                                                      >
                                                         キャンセル
+                                                    </button>
+                                                    <button
+                                                     onClick={() => handleUpdateFacilities(facility.id)}
+                                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
+                                                     >
+                                                        保存
                                                     </button>
                                                 </td>
                                             </>
