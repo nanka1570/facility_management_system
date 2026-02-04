@@ -114,12 +114,26 @@ export default function Reservations() {
             <main className="p-6">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold">予約管理</h1>
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-                    >
-                        新規予約
-                    </button>
+                    <div>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
+                        >
+                            新規予約
+                        </button>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
+                        >
+                            編集
+                        </button>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
+                        >
+                            削除
+                        </button>
+                    </div>
                 </div>
                 <div className="bg-white rounded shadow overflow-hidden">
                     <table className="w-full">
@@ -160,10 +174,10 @@ export default function Reservations() {
                              onClick={(e) => (e.stopPropagation())}
                              >
                                 <div className="flex flex-col gap-4">
-                                    <div className="flex-col gap-1">
+                                    <div className="flex flex-col gap-1">
                                         <select 
-                                        value={newFacilityId}
-                                        onChange={(e) => setNewFacilityId(Number(e.target.value))}
+                                         value={newFacilityId}
+                                         onChange={(e) => setNewFacilityId(Number(e.target.value))}
                                         >
                                             <option value="">選択してください</option>
                                             {facilities.map((f) => (
@@ -173,44 +187,44 @@ export default function Reservations() {
                                             ))}
                                         </select>
                                     </div>
-                                    <div className="flex-col gap-1">
+                                    <div className="flex flex-col gap-1">
                                         <label>
                                             開始日時
                                         </label>
                                         <input
-                                            type="datetime-local"
-                                            value={newStartTime}
-                                            onChange={(e) => setNewStartTime(e.target.value)}
+                                         type="datetime-local"
+                                         value={newStartTime}
+                                         onChange={(e) => setNewStartTime(e.target.value)}
                                         />
                                     </div>
-                                    <div className="flex-col gap-1">
+                                    <div className="flex flex-col gap-1">
                                         <label>
                                             終了日時
                                         </label>
                                         <input 
-                                            type="datetime-local"
-                                            value={newEndTime}
-                                            onChange={(e) => setNewEndTime(e.target.value)}
+                                         type="datetime-local"
+                                         value={newEndTime}
+                                         onChange={(e) => setNewEndTime(e.target.value)}
                                         />
                                     </div>
-                                    <div className="flex-col gap-1">
+                                    <div className="flex flex-col gap-1">
                                         <label>
                                             利用人数
                                         </label>
                                         <input
-                                            type="number"
-                                            value={newNumPeople}
-                                            onChange={(e) => setNewNumPeople(Number(e.target.value))}
+                                         type="number"
+                                         value={newNumPeople}
+                                         onChange={(e) => setNewNumPeople(Number(e.target.value))}
                                         />
                                     </div>
-                                    <div className="flex-col gap-1">
+                                    <div className="flex flex-col gap-1">
                                         <label>
                                             利用目的
                                         </label>
                                         <input
-                                            type="text"
-                                            value={newPurpose}
-                                            onChange={(e) => setNewPurpose(e.target.value)}
+                                         type="text"
+                                         value={newPurpose}
+                                         onChange={(e) => setNewPurpose(e.target.value)}
                                         />
                                     </div>
                                 </div>

@@ -175,13 +175,13 @@ export default function Categories() {
                                                 <td className="px-4 py-3">
                                                     <button
                                                      onClick={() => setEditingId(null)}
-                                                     className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
+                                                     className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
                                                      >
                                                         キャンセル
                                                     </button>
                                                     <button
                                                      onClick={() => handleUpdateFacilities(facility.id)}
-                                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
+                                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
                                                      >
                                                         保存
                                                     </button>
