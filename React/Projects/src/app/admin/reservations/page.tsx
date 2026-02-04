@@ -129,6 +129,8 @@ export default function Reservations() {
                                 <th className="px-4 py-3 text-left">施設名</th>
                                 <th className="px-4 py-3 text-left">開始日時</th>
                                 <th className="px-4 py-3 text-left">終了日時</th>
+                                <th className="px-4 py-3 text-left">利用人数</th>
+                                <th className="px-4 py-3 text-left">利用目的</th>
                                 <th className="px-4 py-3 text-left">ステータス</th>
                             </tr>
                         </thead>
@@ -139,6 +141,8 @@ export default function Reservations() {
                                     <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
                                     <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
                                     <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
+                                    <td className="px-4 py-3">{getStatusLabel(reservation.num_people)}</td>
+                                    <td className="px-4 py-3">{getStatusLabel(reservation.purpose)}</td>
                                     <td className="px-4 py-3">{getStatusLabel(reservation.status)}</td>
                                 </tr>
                             ))}
@@ -147,8 +151,14 @@ export default function Reservations() {
                 </div>
                 {isModalOpen ? (
                     <>
-                        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
-                            <div className="bg-white rounded shadow p-6 w-125">
+                        <div 
+                         className="fixed inset-0 bg-black/50 flex justify-center items-center"
+                         onClick={() => (setIsModalOpen(false))}
+                         >
+                            <div
+                             className="bg-white rounded shadow p-6 w-125"
+                             onClick={(e) => (e.stopPropagation())}
+                             >
                                 <div className="flex flex-col gap-4">
                                     <select 
                                      value={newFacilityId}
@@ -197,12 +207,12 @@ export default function Reservations() {
                                 <div>
                                     <button
                                      onClick={() => setIsModalOpen(false)}
-                                     className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
+                                     className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
                                      >
                                         キャンセル
                                     </button>
                                     <button
-                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
+                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
                                      onClick={handleInsertReservations}
                                      >
                                         予約する
