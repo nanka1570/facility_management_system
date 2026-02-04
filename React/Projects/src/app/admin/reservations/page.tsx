@@ -141,8 +141,8 @@ export default function Reservations() {
                                     <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
                                     <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
                                     <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
-                                    <td className="px-4 py-3">{getStatusLabel(reservation.num_people)}</td>
-                                    <td className="px-4 py-3">{getStatusLabel(reservation.purpose)}</td>
+                                    <td className="px-4 py-3">{reservation.num_people}</td>
+                                    <td className="px-4 py-3">{reservation.purpose}</td>
                                     <td className="px-4 py-3">{getStatusLabel(reservation.status)}</td>
                                 </tr>
                             ))}
@@ -160,51 +160,61 @@ export default function Reservations() {
                              onClick={(e) => (e.stopPropagation())}
                              >
                                 <div className="flex flex-col gap-4">
-                                    <select 
-                                     value={newFacilityId}
-                                     onChange={(e) => setNewFacilityId(Number(e.target.value))}
-                                     >
-                                        <option value="">選択してください</option>
-                                        {facilities.map((f) => (
-                                            <option key={f.id} value={f.id}>
-                                                {f.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <label>
-                                        開始日時
+                                    <div className="flex-col gap-1">
+                                        <select 
+                                        value={newFacilityId}
+                                        onChange={(e) => setNewFacilityId(Number(e.target.value))}
+                                        >
+                                            <option value="">選択してください</option>
+                                            {facilities.map((f) => (
+                                                <option key={f.id} value={f.id}>
+                                                    {f.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="flex-col gap-1">
+                                        <label>
+                                            開始日時
+                                        </label>
                                         <input
-                                        type="datetime-local"
-                                        value={newStartTime}
-                                        onChange={(e) => setNewStartTime(e.target.value)}
+                                            type="datetime-local"
+                                            value={newStartTime}
+                                            onChange={(e) => setNewStartTime(e.target.value)}
                                         />
-                                    </label>
-                                    <label>
-                                        終了日時
+                                    </div>
+                                    <div className="flex-col gap-1">
+                                        <label>
+                                            終了日時
+                                        </label>
                                         <input 
-                                        type="datetime-local"
-                                        value={newEndTime}
-                                        onChange={(e) => setNewEndTime(e.target.value)}
+                                            type="datetime-local"
+                                            value={newEndTime}
+                                            onChange={(e) => setNewEndTime(e.target.value)}
                                         />
-                                    </label>
-                                    <label>
-                                        利用人数
+                                    </div>
+                                    <div className="flex-col gap-1">
+                                        <label>
+                                            利用人数
+                                        </label>
                                         <input
-                                        type="number"
-                                        value={newNumPeople}
-                                        onChange={(e) => setNewNumPeople(Number(e.target.value))}
+                                            type="number"
+                                            value={newNumPeople}
+                                            onChange={(e) => setNewNumPeople(Number(e.target.value))}
                                         />
-                                    </label>
-                                    <label>
-                                        利用目的
+                                    </div>
+                                    <div className="flex-col gap-1">
+                                        <label>
+                                            利用目的
+                                        </label>
                                         <input
-                                        type="text"
-                                        value={newPurpose}
-                                        onChange={(e) => setNewPurpose(e.target.value)}
+                                            type="text"
+                                            value={newPurpose}
+                                            onChange={(e) => setNewPurpose(e.target.value)}
                                         />
-                                    </label>
+                                    </div>
                                 </div>
-                                <div>
+                                <div className="mt-4">
                                     <button
                                      onClick={() => setIsModalOpen(false)}
                                      className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
