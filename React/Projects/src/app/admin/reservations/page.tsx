@@ -18,6 +18,8 @@ export default function Reservations() {
     const [newNumPeople, setNewNumPeople] = useState(1)
     const [newPurpose, setNewPurpose] = useState('')
     const [userId, setUserId] = useState('')
+    //編集
+    const [selectedReservation, setSelectedReservation] = useState<any | null>(null)
 
 
    useEffect(() => {
@@ -96,6 +98,30 @@ export default function Reservations() {
     })
    }
 
+   //同じ日ならendの日にちを表示せず時間だけ表示する関数
+   const formatDateTimeRange = (startTime: string, endTime: string) => {
+    const start = new Date(startTime)
+    const end = new Date(endTime)
+    if (start.getFullYear() === end.getFullYear() &&
+        start.getMonth() === end.getMonth() &&
+        start.getDate() === end.getDate()){
+            return (
+                formatDateTime(startTime)
+                + "-" +
+                (end.toLocaleString('ja-JP', {
+                hour: '2-digit',
+                minute: '2-digit'
+                }))
+            )
+        }else{
+            return(
+                formatDateTime(startTime)
+                +
+                formatDateTime(endTime)
+            )
+        }
+   }
+
    //ステータスを日本語に直す関数
    const getStatusLabel = (status: string) => {
     const statusMap: { [key: string]: string} = {
@@ -131,26 +157,59 @@ export default function Reservations() {
                                 <th className="px-4 py-3 text-left">施設名</th>
                                 <th className="px-4 py-3 text-left">開始日時</th>
                                 <th className="px-4 py-3 text-left">終了日時</th>
+                                <th className="px-4 py-3 text-left">ステータス</th>
                                 <th className="px-4 py-3 text-left">利用人数</th>
                                 <th className="px-4 py-3 text-left">利用目的</th>
-                                <th className="px-4 py-3 text-left">ステータス</th>
                             </tr>
                         </thead>
                         <tbody>
                             {reservations.map((reservation) => (
-                                <tr key={reservation.id} className="border-t">
+                                <tr 
+                                 key={reservation.id}
+                                 className="border-t"
+                                 onClick={() => (setSelectedReservation(reservation))}
+                                 >
                                     <td className="px-4 py-3">{reservation.id}</td>
                                     <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
                                     <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
                                     <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
+                                    <td className="px-4 py-3">{getStatusLabel(reservation.status)}</td>
                                     <td className="px-4 py-3">{reservation.num_people}</td>
                                     <td className="px-4 py-3">{reservation.purpose}</td>
-                                    <td className="px-4 py-3">{getStatusLabel(reservation.status)}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
+                {selectedReservation && (
+                    <>
+                        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
+                            <div className="bg-white rounded shadow p-6">
+                                <p>選択した予約ID: {selectedReservation.id}</p>
+                                <p>施設名: {getFacilityName(selectedReservation.facility_id)}</p>
+                                <p>日時: {formatDateTimeRange(selectedReservation.start_time,selectedReservation.end_time)}</p>
+                                <p>ステータス: {selectedReservation.status}</p>
+                                <p>利用人数: {selectedReservation.num_people}</p>
+                                <p>利用目的: {selectedReservation.purpose}</p>
+                                <div>
+                                    <button
+                                     className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
+                                     >
+                                        予約をキャンセル</button>
+                                    <button
+                                     onClick={() => (setSelectedReservation(null))}
+                                     className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                                     >
+                                        閉じる</button>
+                                    <button
+                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
+                                     >
+                                        更新</button>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                )}
                 {isModalOpen ? (
                     <>
                         <div 
