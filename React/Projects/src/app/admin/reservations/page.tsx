@@ -116,7 +116,7 @@ export default function Reservations() {
         }else{
             return(
                 formatDateTime(startTime)
-                +
+                + "-" +
                 formatDateTime(endTime)
             )
         }
@@ -183,12 +183,18 @@ export default function Reservations() {
                 </div>
                 {selectedReservation && (
                     <>
-                        <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
-                            <div className="bg-white rounded shadow p-6">
+                        <div
+                         className="fixed inset-0 bg-black/50 flex justify-center items-center"
+                         onClick={() => {setSelectedReservation(null)}}
+                         >
+                            <div
+                             className="bg-white rounded shadow p-6"
+                             onClick={(e) => {e.stopPropagation()}}
+                             >
                                 <p>選択した予約ID: {selectedReservation.id}</p>
                                 <p>施設名: {getFacilityName(selectedReservation.facility_id)}</p>
                                 <p>日時: {formatDateTimeRange(selectedReservation.start_time,selectedReservation.end_time)}</p>
-                                <p>ステータス: {selectedReservation.status}</p>
+                                <p>ステータス: {getStatusLabel(selectedReservation.status)}</p>
                                 <p>利用人数: {selectedReservation.num_people}</p>
                                 <p>利用目的: {selectedReservation.purpose}</p>
                                 <div>
