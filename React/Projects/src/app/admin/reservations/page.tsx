@@ -121,18 +121,6 @@ export default function Reservations() {
                         >
                             新規予約
                         </button>
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
-                        >
-                            編集
-                        </button>
-                        <button
-                            onClick={() => setIsModalOpen(true)}
-                            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-                        >
-                            削除
-                        </button>
                     </div>
                 </div>
                 <div className="bg-white rounded shadow overflow-hidden">
