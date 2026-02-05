@@ -27,12 +27,12 @@
 ## 📊 プロジェクト進捗
 
 ```
-■■□□□□□□□□ 5% - 要件定義完了、環境構築中
+■■■■■■■□□□ 70% - Phase 1 進行中（M-RESERVE実装中）
 ```
 
 | フェーズ | 内容 | 時間 | 進捗 |
 |---------|------|------|------|
-| Phase 1 | コア機能 | 50h | 🔄 進行中 |
+| Phase 1 | コア機能 | 50h | 🔄 70% |
 | Phase 2 | 拡張機能 | 40h | ⏳ 予定 |
 | Phase 3 | 高度な機能 | 30h | ⏳ 予定 |
 
@@ -56,7 +56,7 @@
 | データベース | **PostgreSQL** | Supabase標準 |
 | 認証 | **Supabase Auth** | メール認証 |
 | ホスティング | **Vercel** | Next.jsと相性◎ |
-| カレンダーUI | **react-big-calendar** | 予約表示 |
+| カレンダーUI | **react-big-calendar** | 予約表示（予定） |
 
 ---
 
@@ -97,18 +97,20 @@
 
 ## 📦 モジュール構成
 
-| モジュール | 説明 | デフォルト | フェーズ |
-|-----------|------|-----------|---------|
-| **M-CORE** | コアシステム（認証・基本設定） | ON（固定） | Phase 1 |
-| **M-USER** | ユーザー管理 | ON（固定） | Phase 1 |
-| **M-FACILITY** | 施設管理 | ON（固定） | Phase 1 |
-| M-RESERVE | 予約機能 | ON/OFF | Phase 1 |
-| M-DISPLAY | デジタルサイネージ | ON/OFF | Phase 2 |
-| M-PRICE | 料金計算 | ON/OFF | Phase 2 |
-| M-ITEM | 備品管理 | ON/OFF | Phase 2 |
-| M-INQUIRY | 問い合わせ | ON/OFF | Phase 2 |
-| M-NOTIFY | 通知機能 | ON/OFF | Phase 3 |
-| M-TENANT | マルチテナント | ON/OFF | Phase 3 |
+| モジュール | 説明 | デフォルト | フェーズ | 進捗 |
+|-----------|------|-----------|---------|------|
+| **M-CORE** | コアシステム（認証・基本設定） | ON（固定） | Phase 1 | ⏳ |
+| **M-USER** | ユーザー管理 | ON（固定） | Phase 1 | ✅ |
+| **M-FACILITY** | 施設管理 | ON（固定） | Phase 1 | ✅ |
+| M-RESERVE | 予約機能 | ON/OFF | Phase 1 | 🔄 |
+| M-EXTEND | 時間延長 | ON/OFF | Phase 2 | ⏳ |
+| M-DISPLAY | デジタルサイネージ | ON/OFF | Phase 2 | ⏳ |
+| M-PRICE | 料金計算 | ON/OFF | Phase 2 | ⏳ |
+| M-ITEM | 備品管理 | ON/OFF | Phase 2 | ⏳ |
+| M-INQUIRY | 問い合わせ | ON/OFF | Phase 2 | ⏳ |
+| M-NOTIFY | 通知機能 | ON/OFF | Phase 3 | ⏳ |
+| M-THEME | テーマカスタマイズ | ON/OFF | Phase 2 | ⏳ |
+| M-TENANT | マルチテナント | ON/OFF | Phase 3 | ⏳ |
 
 ### モジュール依存関係
 
@@ -117,11 +119,13 @@ M-CORE（必須）
   └── M-USER（必須）
         └── M-FACILITY（必須）
               ├── M-RESERVE（任意）
+              │     ├── M-EXTEND（任意）
               │     ├── M-PRICE（任意）
               │     └── M-ITEM（任意）
               ├── M-DISPLAY（任意）
               └── M-INQUIRY（任意）
   └── M-NOTIFY（任意）
+  └── M-THEME（任意）
   └── M-TENANT（任意）
 ```
 
@@ -133,16 +137,17 @@ M-CORE（必須）
 
 | 項目 | 時間 | 内容 | 進捗 |
 |------|------|------|------|
-| 環境構築・DB設計 | 10h | Supabase設定、テーブル作成、RLS設定 | 🔄 |
-| M-USER | 10h | ログイン/ログアウト、ユーザー登録 | ⏳ |
-| M-FACILITY | 10h | 施設CRUD、カテゴリCRUD | ⏳ |
-| M-RESERVE | 15h | 予約カレンダー、予約CRUD、重複チェック | ⏳ |
+| 環境構築・DB設計 | 10h | Supabase設定、テーブル作成、RLS設定 | ✅ |
+| M-USER | 10h | ログイン/ログアウト、ユーザー登録 | ✅ |
+| M-FACILITY | 10h | 施設CRUD、カテゴリCRUD | ✅ |
+| M-RESERVE | 15h | 予約カレンダー、予約CRUD、重複チェック | 🔄 |
 | M-CORE | 5h | モジュール設定画面、基本設定 | ⏳ |
 
 ### Phase 2: 拡張機能（40時間）
 
 | 項目 | 時間 | 内容 |
 |------|------|------|
+| M-EXTEND | 5h | 時間延長機能 |
 | M-DISPLAY | 10h | サイネージ画面、自動更新 |
 | M-PRICE | 8h | 料金設定、予約時料金表示 |
 | M-ITEM | 10h | 備品CRUD、予約時の備品選択 |
@@ -173,14 +178,12 @@ M-CORE（必須）
 
 ## 🚀 セットアップ
 
-> ⚠️ **準備中**: 環境構築完了後に更新します
-
 ```bash
 # リポジトリをクローン
 git clone https://github.com/nanka1570/facility_reservation_system.git
 
 # ディレクトリに移動
-cd facility_reservation_system/React
+cd facility_reservation_system/React/Projects
 
 # 依存関係をインストール
 npm install
@@ -202,12 +205,37 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ## 📄 ドキュメント
 
-| ドキュメント | 状態 |
-|-------------|------|
-| [要件定義書](./docs/01_要件定義書_v2.md) | ✅ 完成 |
-| 画面設計書 | ⏳ 作成予定 |
-| DB設計書 | ⏳ 作成予定 |
-| API設計書 | ⏳ 作成予定 |
+| ドキュメント | バージョン | 状態 |
+|-------------|-----------|------|
+| [要件定義書](./docs/01_要件定義書_v2_3.md) | v2.3 | ✅ 完成 |
+| [DB設計書](./docs/02_DB設計書_v1_0.md) | v1.0 | ✅ 完成 |
+| [画面設計書](./docs/03_画面設計書_v1_2.md) | v1.2 | ✅ 完成 |
+| API設計書 | - | ⏳ 作成予定 |
+
+---
+
+## 🔧 習得した技術パターン
+
+### React / Next.js
+- `useState`, `useEffect`, `useRouter`
+- App Router でのルーティング
+- Client Components (`'use client'`)
+
+### Supabase
+- 認証（signUp, signIn, signOut, getSession）
+- CRUD操作（select, insert, update, delete）
+- RLS（Row Level Security）
+
+### UIパターン
+- インライン編集
+- モーダル（外側クリックで閉じる、`stopPropagation`）
+- refreshKeyによる再取得
+- `find()`でID→名前変換
+
+### Tailwind CSS
+- Flexbox（`flex`, `flex-col`, `gap`, `justify-between`）
+- レスポンシブ対応
+- hover, rounded, shadow
 
 ---
 
@@ -224,10 +252,18 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 | 日付 | 内容 |
 |------|------|
+| 2026/2/5 | M-RESERVE: 新規予約モーダル完成、詳細モーダル実装中 |
+| 2026/2/4 | 画面設計書v1.2作成、モーダル外クリックで閉じる機能実装 |
+| 2026/2/3 | M-RESERVE: 予約一覧表示、新規予約INSERT機能 |
+| 2026/2/2 | M-RESERVE: 予約管理画面の基本実装開始 |
+| 2026/1/26 | M-FACILITY: 施設管理CRUD完成 |
+| 2026/1/19 | M-FACILITY: カテゴリ管理CRUD完成 |
+| 2026/1/12 | M-USER: 認証機能完成、ダッシュボード実装 |
+| 2026/1/9 | DB設計書v1.0、画面設計書v1.0作成 |
 | 2026/1/7 | 要件定義書v2完成（モジュール構成、技術学習目標追加） |
 | 2026/1/6 | 要件定義完了、README作成、環境構築準備 |
 | 2026/1/4 | PHP版コードをGitHubにアップロード |
 
 ---
 
-*Last Updated: 2026/1/7*
+*Last Updated: 2026/2/5*
