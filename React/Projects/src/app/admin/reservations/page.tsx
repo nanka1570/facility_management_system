@@ -20,6 +20,11 @@ export default function Reservations() {
     const [userId, setUserId] = useState('')
     //編集
     const [selectedReservation, setSelectedReservation] = useState<any | null>(null)
+    const [editFacilityId, setEditFacilityId] = useState<number | null>(null)
+    const [editStartTime, setEditStartTime] = useState('')
+    const [editEndTime, setEditEndTime] = useState('')
+    const [editNumPeople, setEditNumPeople] = useState(1)
+    const [editPurpose, setEditPurpose] = useState('')
 
 
    useEffect(() => {
@@ -86,6 +91,49 @@ export default function Reservations() {
         }
    }
 
+   //詳細モーダルクリック処理
+   const handleReservationClick = async (reservation) => {
+        setSelectedReservation(reservation)
+        //selecttedReservationは次のレンダリングまで更新されないためreservationを参照している
+        setEditFacilityId(reservation.facility_id)
+        setEditStartTime(reservation.start_time)
+        setEditEndTime(reservation.end_time)
+        setEditNumPeople(reservation.num_people)
+        setEditPurpose(reservation.purpose)
+   }
+
+   //更新処理
+   const handleUpdateReservation = async () => {
+    const { error } = await supabase
+        .from('reservations')
+        .update({ 
+            facility_id: editFacilityId,
+            start_time: editStartTime,
+            end_time: editEndTime,
+            num_people: editNumPeople,
+            purpose: editPurpose,
+        })
+        .eq('id', selectedReservation.id)
+        if (!error) {
+            setRefreshKey(prev => prev + 1)
+            setSelectedReservation(null)
+        } 
+   }
+
+   //キャンセル処理
+   const handleCancelReservation = async () => {
+    const { error } = await supabase
+        .from('reservations')
+        .update({ 
+            status: 'cancelled' 
+        })
+        .eq('id', selectedReservation.id)
+        if (!error) {
+            setRefreshKey(prev => prev + 1)
+            setSelectedReservation(null)
+        }
+   }
+
    //日時をフォーマットする関数
    const formatDateTime = (dateString: string) => {
     const date = new Date(dateString)
@@ -120,6 +168,22 @@ export default function Reservations() {
                 formatDateTime(endTime)
             )
         }
+   }
+
+   //timeをdatetime-localに変換
+   const formatDateTimeLocal = (time : string) => {
+        const timeLocal = new Date(time)
+        return (
+            (timeLocal.getFullYear())
+            + '-' +
+            ((timeLocal.getMonth() + 1).toString().padStart(2, '0'))
+            + '-' +
+            ((timeLocal.getDate() + 1).toString().padStart(2, '0'))
+            + 'T' +
+            (timeLocal.getHours().toString().padStart(2, '0'))
+            + ':' +
+            (timeLocal.getMinutes().toString().padStart(2, '0'))
+        )
    }
 
    //ステータスを日本語に直す関数
@@ -167,7 +231,7 @@ export default function Reservations() {
                                 <tr 
                                  key={reservation.id}
                                  className="border-t"
-                                 onClick={() => (setSelectedReservation(reservation))}
+                                 onClick={() => (handleReservationClick(reservation))}
                                  >
                                     <td className="px-4 py-3">{reservation.id}</td>
                                     <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
@@ -191,15 +255,91 @@ export default function Reservations() {
                              className="bg-white rounded shadow p-6"
                              onClick={(e) => {e.stopPropagation()}}
                              >
-                                <p>選択した予約ID: {selectedReservation.id}</p>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            選択した予約ID
+                                        </label>
+                                        <input
+                                         type="text"
+                                         value={selectedReservation.id}
+                                         readOnly
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <select 
+                                         value={editFacilityId}
+                                         onChange={(e) => setEditFacilityId(Number(e.target.value))}
+                                        >
+                                            <option value="">選択してください</option>
+                                            {facilities.map((f) => (
+                                                <option key={f.id} value={f.id}>
+                                                    {f.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            開始日時
+                                        </label>
+                                        <input
+                                         type="datetime-local"
+                                         value={formatDateTimeLocal(editStartTime)}
+                                         onChange={(e) => setEditStartTime(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            終了日時
+                                        </label>
+                                        <input 
+                                         type="datetime-local"
+                                         value={formatDateTimeLocal(editEndTime)}
+                                         onChange={(e) => setEditEndTime(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            ステータス
+                                        </label>
+                                        <input 
+                                         type="text"
+                                         value={getStatusLabel(selectedReservation.status)}
+                                         readOnly
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            利用人数
+                                        </label>
+                                        <input
+                                         type="number"
+                                         value={editNumPeople}
+                                         onChange={(e) => setEditNumPeople(Number(e.target.value))}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            利用目的
+                                        </label>
+                                        <input
+                                         type="text"
+                                         value={editPurpose}
+                                         onChange={(e) => setEditPurpose(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+                                {/* <p>選択した予約ID: {selectedReservation.id}</p>
                                 <p>施設名: {getFacilityName(selectedReservation.facility_id)}</p>
                                 <p>日時: {formatDateTimeRange(selectedReservation.start_time,selectedReservation.end_time)}</p>
                                 <p>ステータス: {getStatusLabel(selectedReservation.status)}</p>
                                 <p>利用人数: {selectedReservation.num_people}</p>
-                                <p>利用目的: {selectedReservation.purpose}</p>
+                                <p>利用目的: {selectedReservation.purpose}</p> */}
                                 <div>
                                     <button
                                      className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
+                                     onClick={handleCancelReservation}
                                      >
                                         予約をキャンセル</button>
                                     <button
@@ -209,6 +349,7 @@ export default function Reservations() {
                                         閉じる</button>
                                     <button
                                      className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
+                                     onClick={handleUpdateReservation}
                                      >
                                         更新</button>
                                 </div>
