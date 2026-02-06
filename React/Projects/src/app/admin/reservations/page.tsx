@@ -178,7 +178,7 @@ export default function Reservations() {
             + '-' +
             ((timeLocal.getMonth() + 1).toString().padStart(2, '0'))
             + '-' +
-            ((timeLocal.getDate() + 1).toString().padStart(2, '0'))
+            (timeLocal.getDate().toString().padStart(2, '0'))
             + 'T' +
             (timeLocal.getHours().toString().padStart(2, '0'))
             + ':' +
