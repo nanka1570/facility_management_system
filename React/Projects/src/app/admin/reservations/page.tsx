@@ -25,6 +25,7 @@ export default function Reservations() {
     const [editEndTime, setEditEndTime] = useState('')
     const [editNumPeople, setEditNumPeople] = useState(1)
     const [editPurpose, setEditPurpose] = useState('')
+    const isEditable = selectedReservation?.status === 'confirmed'
 
 
    useEffect(() => {
@@ -270,6 +271,7 @@ export default function Reservations() {
                                         <select 
                                          value={editFacilityId}
                                          onChange={(e) => setEditFacilityId(Number(e.target.value))}
+                                         disabled={!isEditable}
                                         >
                                             <option value="">選択してください</option>
                                             {facilities.map((f) => (
@@ -287,6 +289,7 @@ export default function Reservations() {
                                          type="datetime-local"
                                          value={formatDateTimeLocal(editStartTime)}
                                          onChange={(e) => setEditStartTime(e.target.value)}
+                                         disabled={!isEditable}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -297,6 +300,7 @@ export default function Reservations() {
                                          type="datetime-local"
                                          value={formatDateTimeLocal(editEndTime)}
                                          onChange={(e) => setEditEndTime(e.target.value)}
+                                         disabled={!isEditable}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -317,6 +321,7 @@ export default function Reservations() {
                                          type="number"
                                          value={editNumPeople}
                                          onChange={(e) => setEditNumPeople(Number(e.target.value))}
+                                         disabled={!isEditable}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -327,6 +332,7 @@ export default function Reservations() {
                                          type="text"
                                          value={editPurpose}
                                          onChange={(e) => setEditPurpose(e.target.value)}
+                                         disabled={!isEditable}
                                         />
                                     </div>
                                 </div>
@@ -336,23 +342,38 @@ export default function Reservations() {
                                 <p>ステータス: {getStatusLabel(selectedReservation.status)}</p>
                                 <p>利用人数: {selectedReservation.num_people}</p>
                                 <p>利用目的: {selectedReservation.purpose}</p> */}
-                                <div>
-                                    <button
-                                     className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
-                                     onClick={handleCancelReservation}
-                                     >
-                                        予約をキャンセル</button>
-                                    <button
-                                     onClick={() => (setSelectedReservation(null))}
-                                     className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
-                                     >
-                                        閉じる</button>
-                                    <button
-                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-                                     onClick={handleUpdateReservation}
-                                     >
-                                        更新</button>
-                                </div>
+                                {isEditable ? (
+                                    <>
+                                        <div>
+                                            <button
+                                            className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
+                                            onClick={handleCancelReservation}
+                                            >
+                                                予約をキャンセル</button>
+                                            <button
+                                            onClick={() => (setSelectedReservation(null))}
+                                            className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                                            >
+                                                閉じる</button>
+                                            <button
+                                            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
+                                            onClick={handleUpdateReservation}
+                                            >
+                                                更新</button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div>
+                                            <button
+                                                onClick={() => (setSelectedReservation(null))}
+                                                className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                                                >
+                                                    閉じる
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </>
