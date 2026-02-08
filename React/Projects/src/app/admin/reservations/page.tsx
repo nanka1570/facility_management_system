@@ -25,8 +25,7 @@ export default function Reservations() {
     const [editEndTime, setEditEndTime] = useState('')
     const [editNumPeople, setEditNumPeople] = useState(1)
     const [editPurpose, setEditPurpose] = useState('')
-    const isEditable = selectedReservation?.status === 'confirmed'
-
+    const isEditable = selectedReservation.status === 'confirmed'   //詳細モーダル
 
    useEffect(() => {
     //ログインチェック
@@ -93,7 +92,7 @@ export default function Reservations() {
    }
 
    //詳細モーダルクリック処理
-   const handleReservationClick = async (reservation) => {
+   const handleReservationClick = (reservation) => {
         setSelectedReservation(reservation)
         //selecttedReservationは次のレンダリングまで更新されないためreservationを参照している
         setEditFacilityId(reservation.facility_id)
@@ -336,12 +335,6 @@ export default function Reservations() {
                                         />
                                     </div>
                                 </div>
-                                {/* <p>選択した予約ID: {selectedReservation.id}</p>
-                                <p>施設名: {getFacilityName(selectedReservation.facility_id)}</p>
-                                <p>日時: {formatDateTimeRange(selectedReservation.start_time,selectedReservation.end_time)}</p>
-                                <p>ステータス: {getStatusLabel(selectedReservation.status)}</p>
-                                <p>利用人数: {selectedReservation.num_people}</p>
-                                <p>利用目的: {selectedReservation.purpose}</p> */}
                                 {isEditable ? (
                                     <>
                                         <div>
