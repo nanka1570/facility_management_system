@@ -19,18 +19,20 @@ export default function Reservations() {
     const [newPurpose, setNewPurpose] = useState('')
     const [userId, setUserId] = useState('')
     //編集
-    // const [selectedReservation, setSelectedReservation] = useState<any | null>(null)
     const [selectedReservationId, setSelectedReservationId] = useState<number | null>(null)
     const selectedReservation = reservations.find(r => r.id === selectedReservationId)
-    const [editingId, setEditingId] = useState<number | null>(null)
 
     const [editFacilityId, setEditFacilityId] = useState<number | null>(null)
     const [editStartTime, setEditStartTime] = useState('')
     const [editEndTime, setEditEndTime] = useState('')
     const [editNumPeople, setEditNumPeople] = useState(1)
     const [editPurpose, setEditPurpose] = useState('')
-    const isEditable = selectedReservation?.status === 'confirmed'   //詳細モーダル
     const [isEditClick, setIsEditClick] = useState(false)   //編集ボタンクリック
+    //予約キャンセル
+    const [isCancelClick, setIsCancelClick] = useState(false)   //予約キャンセルボタンクリック
+    const [selectedCheckboxReservationId, setSelectedCheckboxReservationId] = useState<number[]>([])
+    //予約復元
+    const [isRestoreClick, setIsRestoreClick] = useState(false) //予約復元ボタンクリック
 
    useEffect(() => {
     //ログインチェック
@@ -48,6 +50,7 @@ export default function Reservations() {
         const { data, error } = await supabase
             .from('reservations')
             .select('*')
+            .order('id', { ascending: true })
         if (data){
             setReservations(data)
         }
@@ -75,7 +78,7 @@ export default function Reservations() {
    }
 
 
-   //予約処理
+   //新規予約
    const handleInsertReservations = async () => {
     const { error } = await supabase
         .from('reservations')
@@ -97,21 +100,6 @@ export default function Reservations() {
             setIsModalOpen(false)
         }
    }
-
-
-//    //詳細モーダルクリック処理
-//    const handleReservationClick = (reservation) => {
-//         setSelectedReservationId(reservation.id)
-//         //selecttedReservationは次のレンダリングまで更新されないためreservationを参照している
-//         setEditFacilityId(reservation.facility_id)
-//         setEditStartTime(reservation.start_time)
-//         setEditEndTime(reservation.end_time)
-//         setEditNumPeople(reservation.num_people)
-//         setEditPurpose(reservation.purpose)
-//    }
-
-
-
 
    //更新処理
    const handleUpdateReservation = async () => {
@@ -138,10 +126,24 @@ export default function Reservations() {
         .update({ 
             status: 'cancelled' 
         })
-        .eq('id', selectedReservation.id)
+        .in('id', selectedCheckboxReservationId)
         if (!error) {
             setRefreshKey(prev => prev + 1)
-            setSelectedReservationId(null)
+            setSelectedCheckboxReservationId([])
+        }
+   }
+
+   //復元処理
+   const handleRestoreReservation = async () => {
+    const { error } = await supabase
+        .from('reservations')
+        .update({
+            status: 'confirmed'
+        })
+        .in('id', selectedCheckboxReservationId)
+        if (!error) {
+            setRefreshKey(prev => prev + 1)
+            setSelectedCheckboxReservationId([])
         }
    }
 
@@ -155,30 +157,6 @@ export default function Reservations() {
         hour: '2-digit',
         minute: '2-digit'
     })
-   }
-
-   //同じ日ならendの日にちを表示せず時間だけ表示する関数
-   const formatDateTimeRange = (startTime: string, endTime: string) => {
-    const start = new Date(startTime)
-    const end = new Date(endTime)
-    if (start.getFullYear() === end.getFullYear() &&
-        start.getMonth() === end.getMonth() &&
-        start.getDate() === end.getDate()){
-            return (
-                formatDateTime(startTime)
-                + "-" +
-                (end.toLocaleString('ja-JP', {
-                hour: '2-digit',
-                minute: '2-digit'
-                }))
-            )
-        }else{
-            return(
-                formatDateTime(startTime)
-                + "-" +
-                formatDateTime(endTime)
-            )
-        }
    }
 
    //timeをdatetime-localに変換
@@ -229,10 +207,16 @@ export default function Reservations() {
                             編集
                         </button>
                         <button
-
+                            onClick={() => setIsCancelClick(true)}
                             className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
                         >
-                            削除
+                            予約キャンセル
+                        </button>
+                        <button
+                            onClick={() => setIsRestoreClick(true)}
+                            className="bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500"
+                        >
+                            予約復元
                         </button>
                     </div>
                 </div>
@@ -251,142 +235,157 @@ export default function Reservations() {
                             </tr>
                         </thead>
                         <tbody>
-                            {isEditClick === true ? (
-                                reservations.map((reservation) => (
+                                {reservations.map((reservation) => (
                                     <tr 
-                                     key={reservation.id}
-                                     className="border-t"
-                                     >
-                                        <td className="px-4 py-3">
-                                            <input
-                                             type="radio"
-                                             name="editTarget"
-                                             checked={selectedReservationId === reservation.id}
-                                             onChange={() => {
-                                                setSelectedReservationId(reservation.id)
-                                                setEditFacilityId(reservation.facility_id)
-                                                setEditStartTime(formatDateTimeLocal(reservation.start_time))
-                                                setEditEndTime(formatDateTimeLocal(reservation.end_time))
-                                                setEditNumPeople(reservation.num_people)
-                                                setEditPurpose(reservation.purpose || '')
-                                             }}
-                                             />
-                                        </td>
-                                        <td className="px-4 py-3">{reservation.id}</td>
-                                        <td className="px-4 py-3">
-                                            <select 
-                                            value={editFacilityId}
-                                            onChange={(e) => setEditFacilityId(Number(e.target.value))}
-                                            disabled={!isEditable}
-                                            >
-                                                <option value="">選択してください</option>
-                                                {facilities.map((f) => (
-                                                    <option key={f.id} value={f.id}>
-                                                        {f.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <input
-                                            type="datetime-local"
-                                            value={formatDateTimeLocal(editStartTime)}
-                                            onChange={(e) => setEditStartTime(e.target.value)}
-                                            disabled={!isEditable}
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <input 
-                                            type="datetime-local"
-                                            value={formatDateTimeLocal(editEndTime)}
-                                            onChange={(e) => setEditEndTime(e.target.value)}
-                                            disabled={!isEditable}
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <input 
-                                            type="text"
-                                            value={getStatusLabel(reservation.status)}
-                                            readOnly
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <input
-                                            type="number"
-                                            value={editNumPeople}
-                                            onChange={(e) => setEditNumPeople(Number(e.target.value))}
-                                            disabled={!isEditable}
-                                            />
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <input
-                                            type="text"
-                                            value={editPurpose}
-                                            onChange={(e) => setEditPurpose(e.target.value)}
-                                            disabled={!isEditable}
-                                            />
-                                        </td>
-                                    </tr>
-                                ))
-                            ):(
-                                reservations.map((reservation) => (
-                                    <tr 
-                                     key={reservation.id}
-                                     className="border-t"
-                                     >
-                                        <td className="px-4 py-3">{reservation.id}</td>
-                                        <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
-                                        <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
-                                        <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
-                                        <td className="px-4 py-3">{getStatusLabel(reservation.status)}</td>
-                                        <td className="px-4 py-3">{reservation.num_people}</td>
-                                        <td className="px-4 py-3">{reservation.purpose}</td>
-                                    </tr>
-                                ))
-                            )}
+                                        key={reservation.id}
+                                        //ステータスが'cancelled'ならグレーアウトする
+                                        className={`border-t ${(isEditClick && reservation.status === 'cancelled') || 
+                                                               (isCancelClick && reservation.status === 'cancelled') ||
+                                                               (isRestoreClick && reservation.status !== 'cancelled') ? 'opacity-40' : ''}`}
+                                        >
+                                            {/* 編集のラジオボタン */}
+                                            {isEditClick &&(
+                                                <>
+                                                    <td className="px-4 py-3">
+                                                        <input
+                                                        type="radio"
+                                                        name="editTarget"
+                                                        checked={selectedReservationId === reservation.id}
+                                                        onChange={() => {
+                                                            setSelectedReservationId(reservation.id)
+                                                            setEditFacilityId(reservation.facility_id)
+                                                            setEditStartTime(reservation.start_time)
+                                                            setEditEndTime(reservation.end_time)
+                                                            setEditNumPeople(reservation.num_people)
+                                                            setEditPurpose(reservation.purpose || '')
+                                                        }}
+                                                        disabled={reservation.status !== 'confirmed'}
+                                                        />
+                                                    </td>
+                                                </>
+                                            )}
+
+                                            {/* 予約キャンセルのチェックボックス */}
+                                            {(isCancelClick) && (
+                                                <>
+                                                    <td>
+                                                        <input
+                                                        type="checkbox"
+                                                        checked={selectedCheckboxReservationId.includes(reservation.id)}
+                                                        onChange={() => {
+                                                            if (selectedCheckboxReservationId.includes(reservation.id)) {
+                                                                setSelectedCheckboxReservationId(
+                                                                    selectedCheckboxReservationId.filter((id) => id !== reservation.id)
+                                                                )
+                                                            } else {
+                                                                setSelectedCheckboxReservationId(
+                                                                    [...selectedCheckboxReservationId, reservation.id]
+                                                                )
+                                                            }
+                                                        }}
+                                                        disabled={reservation.status !== 'confirmed'}
+                                                        />
+                                                    </td>
+                                                </>
+                                            )}
+
+                                            {/* 予約復元のチェックボックス */}
+                                            {(isRestoreClick) && (
+                                                <>
+                                                    <td>
+                                                        <input
+                                                        type="checkbox"
+                                                        checked={selectedCheckboxReservationId.includes(reservation.id)}
+                                                        onChange={() => {
+                                                            if (selectedCheckboxReservationId.includes(reservation.id)) {
+                                                                setSelectedCheckboxReservationId(
+                                                                    selectedCheckboxReservationId.filter((id) => id !== reservation.id)
+                                                                )
+                                                            } else {
+                                                                setSelectedCheckboxReservationId(
+                                                                    [...selectedCheckboxReservationId, reservation.id]
+                                                                )
+                                                            }
+                                                        }}
+                                                        disabled={reservation.status !== 'cancelled'}
+                                                        />
+                                                    </td>
+                                                </>
+                                            )}
+    
+                                                    <td className="px-4 py-3">{reservation.id}</td>
+                                                    
+                                                    {/* ステータスが'cancelled'以外 かつ ラジオボタンが押されたとき */}
+                                                    {reservation.status !== 'cancelled' &&  selectedReservationId === reservation.id ? (
+                                                        <>
+                                                            <td className="px-4 py-3">
+                                                                <select 
+                                                                value={editFacilityId}
+                                                                onChange={(e) => setEditFacilityId(Number(e.target.value))}
+                                                                >
+                                                                    <option value="">選択してください</option>
+                                                                    {facilities.map((f) => (
+                                                                        <option key={f.id} value={f.id}>
+                                                                            {f.name}
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                            </td>
+                                                            <td className="px-4 py-3">
+                                                                <input
+                                                                type="datetime-local"
+                                                                value={formatDateTimeLocal(editStartTime)}
+                                                                onChange={(e) => setEditStartTime(e.target.value)}
+                                                                />
+                                                            </td>
+                                                            <td className="px-4 py-3">
+                                                                <input 
+                                                                type="datetime-local"
+                                                                value={formatDateTimeLocal(editEndTime)}
+                                                                onChange={(e) => setEditEndTime(e.target.value)}
+                                                                />
+                                                            </td>
+                                                            <td className="px-4 py-3">
+                                                                <input 
+                                                                type="text"
+                                                                value={getStatusLabel(reservation.status)}
+                                                                readOnly
+                                                                />
+                                                            </td>
+                                                            <td className="px-4 py-3">
+                                                                <input
+                                                                type="number"
+                                                                value={editNumPeople}
+                                                                onChange={(e) => setEditNumPeople(Number(e.target.value))}
+                                                                />
+                                                            </td>
+                                                            <td className="px-4 py-3">
+                                                                <input
+                                                                type="text"
+                                                                value={editPurpose}
+                                                                onChange={(e) => setEditPurpose(e.target.value)}
+                                                                />
+                                                            </td>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            {/* 予約一覧 */}
+                                                            <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
+                                                            <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
+                                                            <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
+                                                            <td className="px-4 py-3">{getStatusLabel(reservation.status)}</td>
+                                                            <td className="px-4 py-3">{reservation.num_people}</td>
+                                                            <td className="px-4 py-3">{reservation.purpose}</td>
+                                                        </>
+                                                    )}
+
+                                            
+                                    </tr>                                        
+                                ))}
                         </tbody>
                     </table>
                 </div>
-                {isEditClick && (
-                    <>
-                        <div
-                            className="bg-white rounded shadow p-6"
-                            >
-                            {isEditable ? (
-                                <>
-                                    <div>
-                                        <button
-                                        className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
-                                        onClick={handleCancelReservation}
-                                        >
-                                            予約をキャンセル</button>
-                                        <button
-                                        onClick={() => (setIsEditClick(false))}
-                                        className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
-                                        >
-                                            閉じる</button>
-                                        <button
-                                        className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-                                        onClick={handleUpdateReservation}
-                                        >
-                                            更新</button>
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <div>
-                                        <button
-                                            onClick={() => (setIsEditClick(false))}
-                                            className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
-                                            >
-                                                閉じる
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </>
-                )}
+                {/* 新規登録モーダル */}
                 {isModalOpen ? (
                     <>
                         <div 
@@ -469,7 +468,80 @@ export default function Reservations() {
                             </div>
                         </div>
                     </>
-                    ):null}
+                ):null}
+
+                {/* 予約編集 */}
+                {isEditClick && (
+                    <>
+                        <div
+                            className="bg-white rounded shadow p-6"
+                            >
+                                <>
+                                    <div>
+                                        <button
+                                        onClick={() => {
+                                            setIsEditClick(false)
+                                            setSelectedReservationId(null)   
+                                        }}
+                                        className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                                        >
+                                            閉じる</button>
+                                        <button
+                                        className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
+                                        onClick={handleUpdateReservation}
+                                        >
+                                            更新</button>
+                                    </div>
+                                </>
+                        </div>
+                    </>
+                )}
+
+                {/* 予約キャンセル */}
+                {isCancelClick && (
+                    <>
+                        <div>
+                            <button
+                            className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
+                            onClick={handleCancelReservation}
+                            >
+                                予約をキャンセル
+                            </button>
+                            <button
+                            onClick={() => {
+                                setIsCancelClick(false)
+                                setSelectedCheckboxReservationId([])   
+                            }}
+                            className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                            >
+                                閉じる
+                            </button>
+                        </div>
+                    </>
+                )}
+
+                {/* 予約復元 */}
+                {isRestoreClick && (
+                    <>
+                        <div>
+                            <button
+                            onClick={() => {
+                                setIsRestoreClick(false)
+                                setSelectedCheckboxReservationId([])   
+                            }}
+                            className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                            >
+                                閉じる
+                            </button>
+                            <button
+                            className="bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500 mr-2"
+                            onClick={handleRestoreReservation}
+                            >
+                                予約を復元
+                            </button>
+                        </div>
+                    </>
+                )}
             </main>
         </>
     )
