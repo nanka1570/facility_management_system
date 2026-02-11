@@ -258,7 +258,7 @@ export default function Facilities() {
                                 className="border rounded px-3 py-2 w-24"
                             />
                             <button
-                             onClick={handleInsertFacilities}
+                             onClick={() => handleInsertFacilities()}
                              className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
                              >
                                 追加

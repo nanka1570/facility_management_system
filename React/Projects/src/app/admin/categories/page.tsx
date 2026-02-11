@@ -180,7 +180,7 @@ export default function Categories() {
                                 className="border rounded px-3 py-2 w-24"
                             />
                             <button
-                             onClick={handleInsertCategories}
+                             onClick={() => handleInsertCategories()}
                              className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
                              >
                                 追加
