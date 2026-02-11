@@ -132,6 +132,7 @@ export default function Facilities() {
                                     <th className="px-4 py-3 text-left">カテゴリ名</th>
                                     <th className="px-4 py-3 text-left">最大人数</th>
                                     <th className="px-4 py-3 text-left">利用可否</th>
+                                    <th className="px-4 py-3 text-left">操作</th>
                                 </tr>
                             </thead>
                             <tbody>
