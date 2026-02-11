@@ -34,7 +34,6 @@ export default function Categories() {
             if (data) {    
                 setCategories(data)
             }
-               console.log(data);
         }
         checkSession()
         loadCategories()
@@ -115,7 +114,7 @@ export default function Categories() {
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <input 
-                                                    type="text" 
+                                                    type="number" 
                                                     value={editSortOrder}
                                                     onChange={(e) => setEditSortOrder(Number(e.target.value))}
                                                     className="border rounded px-2 py-1 w-20"
