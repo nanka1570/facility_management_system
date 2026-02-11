@@ -476,7 +476,7 @@ export default function Reservations() {
                                 <div className="mt-4">
                                     <button
                                      onClick={() => setIsModalOpen(false)}
-                                     className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                                     className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 mr-2"
                                      >
                                         閉じる
                                     </button>
@@ -498,14 +498,14 @@ export default function Reservations() {
                         <div>
                             <button
                             onClick={() => resetAllModes()}
-                            className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 mr-2"
                             >
                                 閉じる</button>
                             <button
                             className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
                             onClick={() => handleUpdateReservation()}
                             >
-                                更新</button>
+                                更新する</button>
                         </div>
                     </>
                 )}
@@ -516,7 +516,7 @@ export default function Reservations() {
                         <div>
                             <button
                             onClick={() => resetAllModes()}
-                            className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 mr-2"
                             >
                                 閉じる
                             </button>
@@ -524,7 +524,7 @@ export default function Reservations() {
                             className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
                             onClick={() => handleCancelReservation()}
                             >
-                                予約をキャンセル
+                                予約をキャンセルする
                             </button>
                         </div>
                     </>
@@ -536,7 +536,7 @@ export default function Reservations() {
                         <div>
                             <button
                             onClick={() => resetAllModes()}
-                            className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 mr-2"
                             >
                                 閉じる
                             </button>
@@ -544,7 +544,7 @@ export default function Reservations() {
                             className="bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500 mr-2"
                             onClick={() => handleRestoreReservation()}
                             >
-                                予約を復元
+                                予約を復元する
                             </button>
                         </div>
                     </>
