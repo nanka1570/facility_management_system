@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-export default function Categories() {
+export default function Facilities() {
     const router = useRouter()
     const [facilities, setFacilities] = useState<any[]>([])
     const [name, setName] = useState('')
@@ -14,8 +14,9 @@ export default function Categories() {
     const [maxCapacity, setMaxCapacity] = useState(0)
     const [isActive, setIsActive] = useState(true)
     const [refreshKey, setRefreshKey] = useState(0)
-
+    //編集
     const [editingId, setEditingId] = useState<number | null>(null)
+    const [editCategoryId, setEditCategoryId] = useState<number | null>(null)
     const [editName, setEditName] = useState('')
     const [editMaxCapacity, setEditMaxCapacity] = useState(0)
     const [editIsActive, setEditIsActive] = useState(true)
@@ -81,16 +82,22 @@ export default function Categories() {
     //施設編集
     const handleEditStart = (facility: any) => {
         setEditingId(facility.id)   //施設IDをセット
+        setEditCategoryId(facility.category_id) //カテゴリIDをセット
         setEditName(facility.name)  //施設名をセット
         setEditMaxCapacity(facility.max_capacity)   //施設の最大人数をセット
         setEditIsActive(facility.is_active)     //施設の利用可否をセット
     }
 
-    //カテゴリ更新
+    //施設更新
     const handleUpdateFacilities = async (facilityId: number) => {
         const { error } = await supabase
             .from('facilities')
-            .update({ name: editName, max_capacity: editMaxCapacity })
+            .update({ 
+                name: editName, 
+                category_id: editCategoryId,
+                max_capacity: editMaxCapacity,
+                is_active: editIsActive
+            })
             .eq('id', facilityId)
         if (!error){
             setEditingId(null)
@@ -98,7 +105,7 @@ export default function Categories() {
         }
     }
 
-    //カテゴリ削除
+    //施設削除
     const handleDeleteFacilities = async (facilityId: number) => {
         const { error } = await supabase
             .from('facilities')
@@ -144,7 +151,7 @@ export default function Categories() {
                                                 <td className="px-4 py-3">
                                                     <select
                                                         value={categoryId}
-                                                        onChange={(e) => setCategoryId(Number(e.target.value))}
+                                                        onChange={(e) => setEditCategoryId(Number(e.target.value))}
                                                         className="border rounded px-2 py-1 w-full"
                                                     >
                                                         <option value="">選択してください</option>
@@ -240,7 +247,7 @@ export default function Categories() {
                                 type="number"
                                 value={maxCapacity}
                                 onChange={(e) => setMaxCapacity(Number(e.target.value))}
-                                placeholder="表示順"
+                                placeholder="最大人数"
                                 className="border rounded px-3 py-2 w-24"
                             />
                             <input
