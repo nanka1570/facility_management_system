@@ -480,7 +480,7 @@ export default function Reservations() {
                                 <div className="mt-4">
                                     <button
                                      onClick={() => setIsModalOpen(false)}
-                                     className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                                     className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 mr-2"
                                      >
                                         閉じる
                                     </button>
@@ -502,7 +502,7 @@ export default function Reservations() {
                         <div>
                             <button
                             onClick={() => resetAllModes()}
-                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 mr-2"
                             >
                                 閉じる</button>
                             <button
@@ -520,7 +520,7 @@ export default function Reservations() {
                         <div>
                             <button
                             onClick={() => resetAllModes()}
-                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 mr-2"
                             >
                                 閉じる
                             </button>
@@ -540,7 +540,7 @@ export default function Reservations() {
                         <div>
                             <button
                             onClick={() => resetAllModes()}
-                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 mr-2"
+                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 mr-2"
                             >
                                 閉じる
                             </button>
