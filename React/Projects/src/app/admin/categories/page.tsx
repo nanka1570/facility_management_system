@@ -15,36 +15,46 @@ export default function Categories() {
     const [editingId, setEditingId] = useState<number | null>(null)
     const [editName, setEditName] = useState('')
     const [editSortOrder, setEditSortOrder] = useState(0)
-    
+
+    //ボタンのスタイル
+    const BUTTON_PRIMARY = "bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
+    const BUTTON_DANGER = "bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
+    const BUTTON_SECONDARY = "bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+    const BUTTON_SUCCESS = "bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500"
+
     useEffect(() => {
         //ログインチェック
         const checkSession = async () => {
-            const { data:{ session } } = await supabase.auth.getSession()
-            if (!session){
+            const { data: { session } } = await supabase.auth.getSession()
+            if (!session) {
                 router.push('/')
-            } 
+            }
         }
         //カテゴリ一覧を表示
         const loadCategories = async () => {
-            const {data, error} = await supabase
-                    .from('categories')
-                    .select('*')
-                    .order('sort_order', { ascending: true })
-            
-            if (data) {    
+            const { data, error } = await supabase
+                .from('categories')
+                .select('*')
+                .order('sort_order', { ascending: true })
+
+            if (error) {
+                alert('カテゴリ一覧の取得に失敗しました')
+            } else {
                 setCategories(data)
             }
         }
         checkSession()
         loadCategories()
     }, [refreshKey])
-    
+
     //カテゴリ追加
     const handleInsertCategories = async () => {
         const { error } = await supabase
             .from('categories')
             .insert({ name, sort_order: sortOrder })
-        if (!error) {
+        if (error) {
+            alert('カテゴリの追加に失敗しました')
+        } else {
             setRefreshKey(prev => prev + 1)
             setName('')
             setSortOrder(0)
@@ -64,7 +74,9 @@ export default function Categories() {
             .from('categories')
             .update({ name: editName, sort_order: editSortOrder })
             .eq('id', categoryId)
-        if (!error){
+        if (error) {
+            alert('カテゴリの更新に失敗しました')
+        } else {
             setEditingId(null)
             setRefreshKey(prev => prev + 1)
         }
@@ -76,17 +88,19 @@ export default function Categories() {
             .from('categories')
             .delete()
             .eq('id', categoryId)
-        if (!error) {
+        if (error) {
+            alert('カテゴリの削除に失敗しました')
+        } else {
             setRefreshKey(prev => prev + 1)
         }
     }
-    return(
+    return (
         <>
             <div>
                 <Header />
                 <main className="p-6">
                     <h1 className="text-2xl font-bold mb-6">カテゴリ管理</h1>
-                    
+
                     {/* テーブル */}
                     <div className="bg-white rounded shadow overflow-hidden">
                         <table className="w-full">
@@ -105,51 +119,51 @@ export default function Categories() {
                                         {editingId === category.id ? (
                                             <>
                                                 <td className="px-4 py-3">
-                                                    <input 
-                                                    type="text"
-                                                    value={editName}
-                                                    onChange={(e) => setEditName(e.target.value)}
-                                                    className="border rounded px-2 py-1 w-full"
+                                                    <input
+                                                        type="text"
+                                                        value={editName}
+                                                        onChange={(e) => setEditName(e.target.value)}
+                                                        className="border rounded px-2 py-1 w-full"
                                                     />
                                                 </td>
                                                 <td className="px-4 py-3">
-                                                    <input 
-                                                    type="number" 
-                                                    value={editSortOrder}
-                                                    onChange={(e) => setEditSortOrder(Number(e.target.value))}
-                                                    className="border rounded px-2 py-1 w-20"
+                                                    <input
+                                                        type="number"
+                                                        value={editSortOrder}
+                                                        onChange={(e) => setEditSortOrder(Number(e.target.value))}
+                                                        className="border rounded px-2 py-1 w-20"
                                                     />
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <button
-                                                     onClick={() => setEditingId(null)}
-                                                     className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 mr-2"
-                                                     >
+                                                        onClick={() => setEditingId(null)}
+                                                        className={`${BUTTON_SECONDARY} mr-2`}
+                                                    >
                                                         キャンセル
                                                     </button>
                                                     <button
-                                                     onClick={() => handleUpdateCategories(category.id)}
-                                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-                                                     >
+                                                        onClick={() => handleUpdateCategories(category.id)}
+                                                        className={BUTTON_PRIMARY}
+                                                    >
                                                         保存
                                                     </button>
                                                 </td>
                                             </>
-                                        ):(
+                                        ) : (
                                             <>
                                                 <td className="px-4 py-3">{category.name}</td>
                                                 <td className="px-4 py-3">{category.sort_order}</td>
                                                 <td className="px-4 py-3">
                                                     <button
-                                                     onClick={() => handleEditStart(category)}
-                                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
-                                                     >
+                                                        onClick={() => handleEditStart(category)}
+                                                        className={`${BUTTON_PRIMARY} mr-2`}
+                                                    >
                                                         編集
                                                     </button>
                                                     <button
-                                                     onClick={() => handleDeleteCategories(category.id)}
-                                                     className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
-                                                     >
+                                                        onClick={() => handleDeleteCategories(category.id)}
+                                                        className={BUTTON_DANGER}
+                                                    >
                                                         削除
                                                     </button>
                                                 </td>
@@ -180,9 +194,9 @@ export default function Categories() {
                                 className="border rounded px-3 py-2 w-24"
                             />
                             <button
-                             onClick={() => handleInsertCategories()}
-                             className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-                             >
+                                onClick={() => handleInsertCategories()}
+                                className={BUTTON_PRIMARY}
+                            >
                                 追加
                             </button>
                         </div>

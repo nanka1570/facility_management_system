@@ -20,32 +20,42 @@ export default function Facilities() {
     const [editName, setEditName] = useState('')
     const [editMaxCapacity, setEditMaxCapacity] = useState(0)
     const [editIsActive, setEditIsActive] = useState(true)
-    
+
+    //ボタンのスタイル
+    const BUTTON_PRIMARY = "bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
+    const BUTTON_DANGER = "bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
+    const BUTTON_SECONDARY = "bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+    const BUTTON_SUCCESS = "bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500"
+
     useEffect(() => {
         //ログインチェック
         const checkSession = async () => {
-            const { data:{ session } } = await supabase.auth.getSession()
-            if (!session){
+            const { data: { session } } = await supabase.auth.getSession()
+            if (!session) {
                 router.push('/')
-            } 
+            }
         }
         //施設一覧をロード
         const loadFacilities = async () => {
-            const {data, error} = await supabase
-                    .from('facilities')
-                    .select('*')
-            
-            if (data) {    
+            const { data, error } = await supabase
+                .from('facilities')
+                .select('*')
+
+            if (error) {
+                alert('施設一覧の取得に失敗しました')
+            } else {
                 setFacilities(data)
             }
         }
         //カテゴリ一覧をロード
         const loadCategories = async () => {
-            const {data, error} = await supabase
-                    .from('categories')
-                    .select('*')
-            
-            if (data) {    
+            const { data, error } = await supabase
+                .from('categories')
+                .select('*')
+
+            if (error) {
+                alert('カテゴリ一覧の取得に失敗しました')
+            } else {
                 setCategories(data)
             }
         }
@@ -53,7 +63,7 @@ export default function Facilities() {
         loadFacilities()
         loadCategories()
     }, [refreshKey])
-    
+
     //カテゴリ名を取得
     const getCategoryName = (categoryId: number | null) => {
         if (!categoryId) return '未設定'    //無駄にこの関数を呼び出すことを抑制（勉強のため記載）
@@ -65,13 +75,15 @@ export default function Facilities() {
     const handleInsertFacilities = async () => {
         const { error } = await supabase
             .from('facilities')
-            .insert({ 
-                name, 
+            .insert({
+                name,
                 category_id: categoryId,
-                max_capacity: maxCapacity, 
-                is_active: isActive 
+                max_capacity: maxCapacity,
+                is_active: isActive
             })
-        if (!error) {
+        if (error) {
+            alert('施設の追加に失敗しました')
+        } else {
             setRefreshKey(prev => prev + 1)
             setName('')
             setMaxCapacity(0)
@@ -92,14 +104,16 @@ export default function Facilities() {
     const handleUpdateFacilities = async (facilityId: number) => {
         const { error } = await supabase
             .from('facilities')
-            .update({ 
-                name: editName, 
+            .update({
+                name: editName,
                 category_id: editCategoryId,
                 max_capacity: editMaxCapacity,
                 is_active: editIsActive
             })
             .eq('id', facilityId)
-        if (!error){
+        if (error) {
+            alert('施設の更新に失敗しました')
+        } else {
             setEditingId(null)
             setRefreshKey(prev => prev + 1)
         }
@@ -111,17 +125,19 @@ export default function Facilities() {
             .from('facilities')
             .delete()
             .eq('id', facilityId)
-        if (!error) {
+        if (error) {
+            alert('施設の削除に失敗しました')
+        } else {
             setRefreshKey(prev => prev + 1)
         }
     }
-    return(
+    return (
         <>
             <div>
                 <Header />
                 <main className="p-6">
                     <h1 className="text-2xl font-bold mb-6">施設管理</h1>
-                    
+
                     {/* テーブル */}
                     <div className="bg-white rounded shadow overflow-hidden">
                         <table className="w-full">
@@ -144,11 +160,11 @@ export default function Facilities() {
                                             <>
                                                 {/* 施設名 */}
                                                 <td className="px-4 py-3">
-                                                    <input 
-                                                     type="text"
-                                                     value={editName}
-                                                     onChange={(e) => setEditName(e.target.value)}
-                                                     className="border rounded px-2 py-1 w-full"
+                                                    <input
+                                                        type="text"
+                                                        value={editName}
+                                                        onChange={(e) => setEditName(e.target.value)}
+                                                        className="border rounded px-2 py-1 w-full"
                                                     />
                                                 </td>
                                                 {/* カテゴリ名 */}
@@ -164,43 +180,43 @@ export default function Facilities() {
                                                                 {cat.name}
                                                             </option>
                                                         ))}
-                                                        
+
                                                     </select>
                                                 </td>
                                                 {/* 最大人数 */}
                                                 <td className="px-4 py-3">
-                                                    <input 
-                                                     type="number" 
-                                                     value={editMaxCapacity}
-                                                     onChange={(e) => setEditMaxCapacity(Number(e.target.value))}
-                                                     className="border rounded px-2 py-1 w-20"
+                                                    <input
+                                                        type="number"
+                                                        value={editMaxCapacity}
+                                                        onChange={(e) => setEditMaxCapacity(Number(e.target.value))}
+                                                        className="border rounded px-2 py-1 w-20"
                                                     />
                                                 </td>
                                                 {/* 利用可否 */}
                                                 <td className="px-4 py-3">
-                                                    <input 
-                                                     type="checkbox" 
-                                                     checked={editIsActive}
-                                                     onChange={(e) => setEditIsActive(e.target.checked)}
-                                                     className="border rounded px-2 py-1 w-20"
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={editIsActive}
+                                                        onChange={(e) => setEditIsActive(e.target.checked)}
+                                                        className="border rounded px-2 py-1 w-20"
                                                     />
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <button
-                                                     onClick={() => setEditingId(null)}
-                                                     className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 mr-2"
-                                                     >
+                                                        onClick={() => setEditingId(null)}
+                                                        className={`${BUTTON_SECONDARY} mr-2`}
+                                                    >
                                                         キャンセル
                                                     </button>
                                                     <button
-                                                     onClick={() => handleUpdateFacilities(facility.id)}
-                                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-                                                     >
+                                                        onClick={() => handleUpdateFacilities(facility.id)}
+                                                        className={BUTTON_PRIMARY}
+                                                    >
                                                         保存
                                                     </button>
                                                 </td>
                                             </>
-                                        ):(
+                                        ) : (
                                             <>
                                                 <td className="px-4 py-3">{facility.name}</td>
                                                 <td className="px-4 py-3">{getCategoryName(facility.category_id)}</td>
@@ -208,15 +224,15 @@ export default function Facilities() {
                                                 <td className="px-4 py-3">{facility.is_active ? '利用可' : '利用停止中'}</td>
                                                 <td className="px-4 py-3">
                                                     <button
-                                                     onClick={() => handleEditStart(facility)}
-                                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
-                                                     >
+                                                        onClick={() => handleEditStart(facility)}
+                                                        className={`${BUTTON_PRIMARY} mr-2`}
+                                                    >
                                                         編集
                                                     </button>
                                                     <button
-                                                     onClick={() => handleDeleteFacilities(facility.id)}
-                                                     className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
-                                                     >
+                                                        onClick={() => handleDeleteFacilities(facility.id)}
+                                                        className={BUTTON_DANGER}
+                                                    >
                                                         削除
                                                     </button>
                                                 </td>
@@ -264,9 +280,9 @@ export default function Facilities() {
                                 className="border rounded px-3 py-2 w-24"
                             />
                             <button
-                             onClick={() => handleInsertFacilities()}
-                             className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-                             >
+                                onClick={() => handleInsertFacilities()}
+                                className={BUTTON_PRIMARY}
+                            >
                                 追加
                             </button>
                         </div>
