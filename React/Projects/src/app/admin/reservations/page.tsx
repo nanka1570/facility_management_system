@@ -265,9 +265,8 @@ export default function Reservations() {
                                     <tr 
                                         key={reservation.id}
                                         //ステータスが'cancelled'ならグレーアウトする
-                                        className={`border-t ${(isEditClick && reservation.status === 'cancelled') || 
-                                                               (isCancelClick && reservation.status === 'cancelled') ||
-                                                               (isRestoreClick && reservation.status !== 'cancelled') ? 'opacity-40' : ''}`}
+                                        className={`border-t ${((isEditClick || isCancelClick) && reservation.status === 'cancelled') || 
+                                                               (isRestoreClick && reservation.status === 'confirmed') ? 'opacity-40' : ''}`}
                                         >
                                             {/* 編集のラジオボタン */}
                                             {isEditClick &&(
@@ -291,8 +290,8 @@ export default function Reservations() {
                                                 </>
                                             )}
 
-                                            {/* 予約キャンセルのチェックボックス */}
-                                            {(isCancelClick) && (
+                                            {/* 予約キャンセル・予約復元のチェックボックス */}
+                                            {(isCancelClick || isRestoreClick ) && (
                                                 <>
                                                     <td className="px-4 py-3">
                                                         <input
@@ -309,36 +308,15 @@ export default function Reservations() {
                                                                 )
                                                             }
                                                         }}
-                                                        disabled={reservation.status !== 'confirmed'}
+                                                        disabled={
+                                                            isCancelClick 
+                                                            ? reservation.status !== 'confirmed'
+                                                            : reservation.status !== 'cancelled'
+                                                        }
                                                         />
                                                     </td>
                                                 </>
                                             )}
-
-                                            {/* 予約復元のチェックボックス */}
-                                            {(isRestoreClick) && (
-                                                <>
-                                                    <td className="px-4 py-3">
-                                                        <input
-                                                        type="checkbox"
-                                                        checked={selectedCheckboxReservationId.includes(reservation.id)}
-                                                        onChange={() => {
-                                                            if (selectedCheckboxReservationId.includes(reservation.id)) {
-                                                                setSelectedCheckboxReservationId(
-                                                                    selectedCheckboxReservationId.filter((id) => id !== reservation.id)
-                                                                )
-                                                            } else {
-                                                                setSelectedCheckboxReservationId(
-                                                                    [...selectedCheckboxReservationId, reservation.id]
-                                                                )
-                                                            }
-                                                        }}
-                                                        disabled={reservation.status !== 'cancelled'}
-                                                        />
-                                                    </td>
-                                                </>
-                                            )}
-    
                                                     <td className="px-4 py-3">{reservation.id}</td>
                                                     
                                             {/* ステータスが'cancelled'以外 かつ ラジオボタンが押されたとき */}
