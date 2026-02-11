@@ -8,18 +8,24 @@ import { useEffect, useState } from "react"
 export default function Facilities() {
     const router = useRouter()
     const [facilities, setFacilities] = useState<any[]>([])
-    const [name, setName] = useState('')
     const [categories, setCategories] = useState<any[]>([])
-    const [categoryId, setCategoryId] = useState<number | null>(null)
-    const [maxCapacity, setMaxCapacity] = useState(0)
-    const [isActive, setIsActive] = useState(true)
     const [refreshKey, setRefreshKey] = useState(0)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    //新規登録
+    const [newName, setNewName] = useState('')
+    const [newCategoryId, setNewCategoryId] = useState<number | null>(null)
+    const [newMaxCapacity, setNewMaxCapacity] = useState(0)
+    const [newIsActive, setNewIsActive] = useState(true)
     //編集
-    const [editingId, setEditingId] = useState<number | null>(null)
+    const [selectedFacilityId, setSelectedFacilityId] = useState<number | null>(null)
     const [editCategoryId, setEditCategoryId] = useState<number | null>(null)
     const [editName, setEditName] = useState('')
     const [editMaxCapacity, setEditMaxCapacity] = useState(0)
     const [editIsActive, setEditIsActive] = useState(true)
+    const [isEditClick, setIsEditClick] = useState(false)   //編集ボタンクリック
+    //削除
+    const [isDeleteClick, setIsDeleteClick] = useState(false)   //削除ボタンクリック
+    const [selectedCheckboxFacilityId, setSelectedCheckboxFacilityId] = useState<number[]>([])
 
     //ボタンのスタイル
     const BUTTON_PRIMARY = "bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
@@ -76,32 +82,27 @@ export default function Facilities() {
         const { error } = await supabase
             .from('facilities')
             .insert({
-                name,
-                category_id: categoryId,
-                max_capacity: maxCapacity,
-                is_active: isActive
+                name: newName,
+                category_id: newCategoryId,
+                max_capacity: newMaxCapacity,
+                is_active: newIsActive
             })
         if (error) {
             alert('施設の追加に失敗しました')
         } else {
             setRefreshKey(prev => prev + 1)
-            setName('')
-            setMaxCapacity(0)
-            setIsActive(true)
+            setNewName('')
+            setNewCategoryId(null)
+            setNewMaxCapacity(0)
+            setNewIsActive(true)
+            setIsModalOpen(false)
         }
     }
 
-    //施設編集
-    const handleEditStart = (facility: any) => {
-        setEditingId(facility.id)   //施設IDをセット
-        setEditCategoryId(facility.category_id) //カテゴリIDをセット
-        setEditName(facility.name)  //施設名をセット
-        setEditMaxCapacity(facility.max_capacity)   //施設の最大人数をセット
-        setEditIsActive(facility.is_active)     //施設の利用可否をセット
-    }
-
     //施設更新
-    const handleUpdateFacilities = async (facilityId: number) => {
+    const handleUpdateFacilities = async () => {
+        if (!selectedFacilityId) return
+
         const { error } = await supabase
             .from('facilities')
             .update({
@@ -110,185 +111,310 @@ export default function Facilities() {
                 max_capacity: editMaxCapacity,
                 is_active: editIsActive
             })
-            .eq('id', facilityId)
+            .eq('id', selectedFacilityId)
         if (error) {
             alert('施設の更新に失敗しました')
         } else {
-            setEditingId(null)
             setRefreshKey(prev => prev + 1)
+            setSelectedFacilityId(null)
         }
     }
 
-    //施設削除
-    const handleDeleteFacilities = async (facilityId: number) => {
+    //施設削除（一括）
+    const handleDeleteFacilities = async () => {
         const { error } = await supabase
             .from('facilities')
             .delete()
-            .eq('id', facilityId)
+            .in('id', selectedCheckboxFacilityId)
         if (error) {
             alert('施設の削除に失敗しました')
         } else {
             setRefreshKey(prev => prev + 1)
+            setSelectedCheckboxFacilityId([])
         }
     }
+
+    //ボタンのONをすべてリセットする関数
+    const resetAllModes = () => {
+        setIsEditClick(false)
+        setIsDeleteClick(false)
+        setSelectedFacilityId(null)
+        setSelectedCheckboxFacilityId([])
+    }
+
     return (
         <>
             <div>
                 <Header />
-                <main className="p-6">
-                    <h1 className="text-2xl font-bold mb-6">施設管理</h1>
-
-                    {/* テーブル */}
-                    <div className="bg-white rounded shadow overflow-hidden">
-                        <table className="w-full">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-3 text-left">ID</th>
-                                    <th className="px-4 py-3 text-left">施設名</th>
-                                    <th className="px-4 py-3 text-left">カテゴリ名</th>
-                                    <th className="px-4 py-3 text-left">最大人数</th>
-                                    <th className="px-4 py-3 text-left">利用可否</th>
-                                    <th className="px-4 py-3 text-left">操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {facilities.map((facility) => (
-                                    <tr key={facility.id} className="border-t">
-                                        {/* ID */}
-                                        <td className="px-4 py-3">{facility.id}</td>
-                                        {editingId === facility.id ? (
-                                            <>
-                                                {/* 施設名 */}
-                                                <td className="px-4 py-3">
-                                                    <input
-                                                        type="text"
-                                                        value={editName}
-                                                        onChange={(e) => setEditName(e.target.value)}
-                                                        className="border rounded px-2 py-1 w-full"
-                                                    />
-                                                </td>
-                                                {/* カテゴリ名 */}
-                                                <td className="px-4 py-3">
-                                                    <select
-                                                        value={editCategoryId}
-                                                        onChange={(e) => setEditCategoryId(Number(e.target.value))}
-                                                        className="border rounded px-2 py-1 w-full"
-                                                    >
-                                                        <option value="">選択してください</option>
-                                                        {categories.map((cat) => (
-                                                            <option key={cat.id} value={cat.id}>
-                                                                {cat.name}
-                                                            </option>
-                                                        ))}
-
-                                                    </select>
-                                                </td>
-                                                {/* 最大人数 */}
-                                                <td className="px-4 py-3">
-                                                    <input
-                                                        type="number"
-                                                        value={editMaxCapacity}
-                                                        onChange={(e) => setEditMaxCapacity(Number(e.target.value))}
-                                                        className="border rounded px-2 py-1 w-20"
-                                                    />
-                                                </td>
-                                                {/* 利用可否 */}
-                                                <td className="px-4 py-3">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={editIsActive}
-                                                        onChange={(e) => setEditIsActive(e.target.checked)}
-                                                        className="border rounded px-2 py-1 w-20"
-                                                    />
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <button
-                                                        onClick={() => setEditingId(null)}
-                                                        className={`${BUTTON_SECONDARY} mr-2`}
-                                                    >
-                                                        キャンセル
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleUpdateFacilities(facility.id)}
-                                                        className={BUTTON_PRIMARY}
-                                                    >
-                                                        保存
-                                                    </button>
-                                                </td>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <td className="px-4 py-3">{facility.name}</td>
-                                                <td className="px-4 py-3">{getCategoryName(facility.category_id)}</td>
-                                                <td className="px-4 py-3">{facility.max_capacity}</td>
-                                                <td className="px-4 py-3">{facility.is_active ? '利用可' : '利用停止中'}</td>
-                                                <td className="px-4 py-3">
-                                                    <button
-                                                        onClick={() => handleEditStart(facility)}
-                                                        className={`${BUTTON_PRIMARY} mr-2`}
-                                                    >
-                                                        編集
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDeleteFacilities(facility.id)}
-                                                        className={BUTTON_DANGER}
-                                                    >
-                                                        削除
-                                                    </button>
-                                                </td>
-                                            </>
-                                        )}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+            </div>
+            <main className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-2xl font-bold">施設管理</h1>
+                    <div>
+                        <button
+                            onClick={() => {
+                                resetAllModes()
+                                setIsModalOpen(true)
+                            }}
+                            className={`${BUTTON_PRIMARY} mr-2`}
+                        >
+                            新規登録
+                        </button>
+                        <button
+                            onClick={() => {
+                                resetAllModes()
+                                setIsEditClick(true)
+                            }}
+                            className={`${BUTTON_PRIMARY} mr-2`}
+                        >
+                            編集
+                        </button>
+                        <button
+                            onClick={() => {
+                                resetAllModes()
+                                setIsDeleteClick(true)
+                            }}
+                            className={BUTTON_DANGER}
+                        >
+                            削除
+                        </button>
                     </div>
+                </div>
 
-                    {/* 新規登録フォーム */}
-                    <div className="mt-6 bg-white rounded shadow p-4">
-                        <h2 className="font-bold mb-4">新規登録</h2>
-                        <div className="flex gap-4">
-                            <input
-                                type="text"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="施設名"
-                                className="border rounded px-3 py-2 flex-1"
-                            />
-                            <select
-                                value={categoryId}
-                                onChange={(e) => setCategoryId(Number(e.target.value))}
-                                className="border rounded px-2 py-1 w-full"
+                {/* テーブル */}
+                <div className="bg-white rounded shadow overflow-hidden">
+                    <table className="w-full">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                {(isEditClick || isDeleteClick) && <th className="px-4 py-3"></th>}
+                                <th className="px-4 py-3 text-left">ID</th>
+                                <th className="px-4 py-3 text-left">施設名</th>
+                                <th className="px-4 py-3 text-left">カテゴリ名</th>
+                                <th className="px-4 py-3 text-left">最大人数</th>
+                                <th className="px-4 py-3 text-left">利用可否</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {facilities.map((facility) => (
+                                <tr key={facility.id} className="border-t">
+                                    {/* 編集のラジオボタン */}
+                                    {isEditClick && (
+                                        <>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="radio"
+                                                    name="editTarget"
+                                                    checked={selectedFacilityId === facility.id}
+                                                    onChange={() => {
+                                                        setSelectedFacilityId(facility.id)
+                                                        setEditName(facility.name)
+                                                        setEditCategoryId(facility.category_id)
+                                                        setEditMaxCapacity(facility.max_capacity)
+                                                        setEditIsActive(facility.is_active)
+                                                    }}
+                                                />
+                                            </td>
+                                        </>
+                                    )}
+
+                                    {/* 削除のチェックボックス */}
+                                    {isDeleteClick && (
+                                        <>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedCheckboxFacilityId.includes(facility.id)}
+                                                    onChange={() => {
+                                                        if (selectedCheckboxFacilityId.includes(facility.id)) {
+                                                            setSelectedCheckboxFacilityId(
+                                                                selectedCheckboxFacilityId.filter((id) => id !== facility.id)
+                                                            )
+                                                        } else {
+                                                            setSelectedCheckboxFacilityId(
+                                                                [...selectedCheckboxFacilityId, facility.id]
+                                                            )
+                                                        }
+                                                    }}
+                                                />
+                                            </td>
+                                        </>
+                                    )}
+
+                                    <td className="px-4 py-3">{facility.id}</td>
+
+                                    {/* ラジオボタンが押されたとき → インライン編集 */}
+                                    {selectedFacilityId === facility.id ? (
+                                        <>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="text"
+                                                    value={editName}
+                                                    onChange={(e) => setEditName(e.target.value)}
+                                                    className="border rounded px-2 py-1 w-full"
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <select
+                                                    value={editCategoryId ?? ''}
+                                                    onChange={(e) => setEditCategoryId(Number(e.target.value))}
+                                                    className="border rounded px-2 py-1 w-full"
+                                                >
+                                                    <option value="">選択してください</option>
+                                                    {categories.map((cat) => (
+                                                        <option key={cat.id} value={cat.id}>
+                                                            {cat.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="number"
+                                                    value={editMaxCapacity}
+                                                    onChange={(e) => setEditMaxCapacity(Number(e.target.value))}
+                                                    className="border rounded px-2 py-1 w-20"
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={editIsActive}
+                                                    onChange={(e) => setEditIsActive(e.target.checked)}
+                                                />
+                                            </td>
+                                        </>
+                                    ) : (
+                                        <>
+                                            {/* 施設一覧 */}
+                                            <td className="px-4 py-3">{facility.name}</td>
+                                            <td className="px-4 py-3">{getCategoryName(facility.category_id)}</td>
+                                            <td className="px-4 py-3">{facility.max_capacity}</td>
+                                            <td className="px-4 py-3">{facility.is_active ? '利用可' : '利用停止中'}</td>
+                                        </>
+                                    )}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* 新規登録モーダル */}
+                {isModalOpen ? (
+                    <>
+                        <div
+                            className="fixed inset-0 bg-black/50 flex justify-center items-center"
+                            onClick={() => (setIsModalOpen(false))}
+                        >
+                            <div
+                                className="bg-white rounded shadow p-6 w-125"
+                                onClick={(e) => (e.stopPropagation())}
                             >
-                                <option value="">選択してください</option>
-                                {categories.map((cat) => (
-                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                ))}
-                            </select>
-                            <input
-                                type="number"
-                                value={maxCapacity}
-                                onChange={(e) => setMaxCapacity(Number(e.target.value))}
-                                placeholder="最大人数"
-                                className="border rounded px-3 py-2 w-24"
-                            />
-                            <input
-                                type="checkbox"
-                                checked={isActive}
-                                onChange={(e) => setIsActive(e.target.checked)}
-                                placeholder="利用可否"
-                                className="border rounded px-3 py-2 w-24"
-                            />
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            施設名
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={newName}
+                                            onChange={(e) => setNewName(e.target.value)}
+                                            placeholder="施設名"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            カテゴリ
+                                        </label>
+                                        <select
+                                            value={newCategoryId ?? ''}
+                                            onChange={(e) => setNewCategoryId(Number(e.target.value))}
+                                        >
+                                            <option value="">選択してください</option>
+                                            {categories.map((cat) => (
+                                                <option key={cat.id} value={cat.id}>
+                                                    {cat.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            最大人数
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={newMaxCapacity}
+                                            onChange={(e) => setNewMaxCapacity(Number(e.target.value))}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            利用可否
+                                        </label>
+                                        <input
+                                            type="checkbox"
+                                            checked={newIsActive}
+                                            onChange={(e) => setNewIsActive(e.target.checked)}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="mt-4">
+                                    <button
+                                        onClick={() => setIsModalOpen(false)}
+                                        className={`${BUTTON_SECONDARY} mr-2`}
+                                    >
+                                        閉じる
+                                    </button>
+                                    <button
+                                        className={BUTTON_PRIMARY}
+                                        onClick={() => handleInsertFacilities()}
+                                    >
+                                        追加する
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                ) : null}
+
+                {/* 施設編集 */}
+                {isEditClick && (
+                    <>
+                        <div>
                             <button
-                                onClick={() => handleInsertFacilities()}
-                                className={BUTTON_PRIMARY}
+                                onClick={() => resetAllModes()}
+                                className={`${BUTTON_SECONDARY} mr-2`}
                             >
-                                追加
+                                閉じる</button>
+                            <button
+                                className={BUTTON_PRIMARY}
+                                onClick={() => handleUpdateFacilities()}
+                            >
+                                更新する</button>
+                        </div>
+                    </>
+                )}
+
+                {/* 施設削除 */}
+                {isDeleteClick && (
+                    <>
+                        <div>
+                            <button
+                                onClick={() => resetAllModes()}
+                                className={`${BUTTON_SECONDARY} mr-2`}
+                            >
+                                閉じる
+                            </button>
+                            <button
+                                className={BUTTON_DANGER}
+                                onClick={() => handleDeleteFacilities()}
+                            >
+                                削除する
                             </button>
                         </div>
-                    </div>
-                </main>
-            </div>
+                    </>
+                )}
+            </main>
         </>
     )
 }
