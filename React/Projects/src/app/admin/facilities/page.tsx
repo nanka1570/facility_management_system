@@ -205,7 +205,7 @@ export default function Facilities() {
                                                 <td className="px-4 py-3">{facility.name}</td>
                                                 <td className="px-4 py-3">{getCategoryName(facility.category_id)}</td>
                                                 <td className="px-4 py-3">{facility.max_capacity}</td>
-                                                <td className="px-4 py-3">{facility.is_active ? '有効' : '無効'}</td>
+                                                <td className="px-4 py-3">{facility.is_active ? '利用可' : '利用停止中'}</td>
                                                 <td className="px-4 py-3">
                                                     <button
                                                      onClick={() => handleEditStart(facility)}
