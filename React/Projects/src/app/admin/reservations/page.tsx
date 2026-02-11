@@ -34,6 +34,11 @@ export default function Reservations() {
     //予約復元
     const [isRestoreClick, setIsRestoreClick] = useState(false) //予約復元ボタンクリック
 
+    //ボタンのスタイル
+    const BUTTON_PRIMARY = "bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
+    const BUTTON_DANGER = "bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
+    const BUTTON_SECONDARY = "bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+
    useEffect(() => {
     //ログインチェック
     const checkSession = async () => {
@@ -213,7 +218,7 @@ export default function Reservations() {
                                 resetAllModes()
                                 setIsModalOpen(true)
                             }}
-                            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
+                            className={BUTTON_PRIMARY}
                         >
                             新規予約
                         </button>
@@ -222,7 +227,7 @@ export default function Reservations() {
                                 resetAllModes()
                                 setIsEditClick(true)
                             }}
-                            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
+                            className={BUTTON_PRIMARY}
                         >
                             編集
                         </button>
@@ -231,7 +236,7 @@ export default function Reservations() {
                                 resetAllModes()
                                 setIsCancelClick(true)
                             }}
-                            className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
+                            className={BUTTON_DANGER}
                         >
                             予約キャンセル
                         </button>
@@ -240,7 +245,7 @@ export default function Reservations() {
                                 resetAllModes()
                                 setIsRestoreClick(true)
                             }}
-                            className="bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500"
+                            className={BUTTON_PRIMARY}
                         >
                             予約復元
                         </button>
@@ -326,6 +331,7 @@ export default function Reservations() {
                                                         <select 
                                                         value={editFacilityId}
                                                         onChange={(e) => setEditFacilityId(Number(e.target.value))}
+                                                        className="border rounded px-2 py-1"
                                                         >
                                                             <option value="">選択してください</option>
                                                             {facilities.map((f) => (
@@ -458,12 +464,12 @@ export default function Reservations() {
                                 <div className="mt-4">
                                     <button
                                      onClick={() => setIsModalOpen(false)}
-                                     className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 mr-2"
+                                     className={BUTTON_SECONDARY}
                                      >
                                         閉じる
                                     </button>
                                     <button
-                                     className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
+                                     className={BUTTON_PRIMARY}
                                      onClick={() => handleInsertReservations()}
                                      >
                                         予約する
@@ -480,11 +486,11 @@ export default function Reservations() {
                         <div>
                             <button
                             onClick={() => resetAllModes()}
-                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 mr-2"
+                            className={BUTTON_SECONDARY}
                             >
                                 閉じる</button>
                             <button
-                            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
+                            className={BUTTON_PRIMARY}
                             onClick={() => handleUpdateReservation()}
                             >
                                 更新する</button>
@@ -498,12 +504,12 @@ export default function Reservations() {
                         <div>
                             <button
                             onClick={() => resetAllModes()}
-                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 mr-2"
+                            className={BUTTON_SECONDARY}
                             >
                                 閉じる
                             </button>
                             <button
-                            className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
+                            className={BUTTON_DANGER}
                             onClick={() => handleCancelReservation()}
                             >
                                 予約をキャンセルする
@@ -518,12 +524,12 @@ export default function Reservations() {
                         <div>
                             <button
                             onClick={() => resetAllModes()}
-                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 mr-2"
+                            className={BUTTON_SECONDARY}
                             >
                                 閉じる
                             </button>
                             <button
-                            className="bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500 mr-2"
+                            className={BUTTON_PRIMARY}
                             onClick={() => handleRestoreReservation()}
                             >
                                 予約を復元する
