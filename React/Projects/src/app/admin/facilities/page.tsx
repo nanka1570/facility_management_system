@@ -131,15 +131,17 @@ export default function Facilities() {
                                     <th className="px-4 py-3 text-left">施設名</th>
                                     <th className="px-4 py-3 text-left">カテゴリ名</th>
                                     <th className="px-4 py-3 text-left">最大人数</th>
-                                    <th className="px-4 py-3 text-left">操作</th>
+                                    <th className="px-4 py-3 text-left">利用可否</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {facilities.map((facility) => (
                                     <tr key={facility.id} className="border-t">
+                                        {/* ID */}
                                         <td className="px-4 py-3">{facility.id}</td>
                                         {editingId === facility.id ? (
                                             <>
+                                                {/* 施設名 */}
                                                 <td className="px-4 py-3">
                                                     <input 
                                                      type="text"
@@ -148,6 +150,7 @@ export default function Facilities() {
                                                      className="border rounded px-2 py-1 w-full"
                                                     />
                                                 </td>
+                                                {/* カテゴリ名 */}
                                                 <td className="px-4 py-3">
                                                     <select
                                                         value={editCategoryId}
@@ -163,6 +166,7 @@ export default function Facilities() {
                                                         
                                                     </select>
                                                 </td>
+                                                {/* 最大人数 */}
                                                 <td className="px-4 py-3">
                                                     <input 
                                                      type="number" 
@@ -171,6 +175,7 @@ export default function Facilities() {
                                                      className="border rounded px-2 py-1 w-20"
                                                     />
                                                 </td>
+                                                {/* 利用可否 */}
                                                 <td className="px-4 py-3">
                                                     <input 
                                                      type="checkbox" 
