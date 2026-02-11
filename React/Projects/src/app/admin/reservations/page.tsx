@@ -56,7 +56,10 @@ export default function Reservations() {
             .from('reservations')
             .select('*')
             .order('id', { ascending: true })
-        if (data){
+
+        if (error) {
+            alert('予約一覧の取得に失敗しました')
+        }else{
             setReservations(data)
         }
     }
@@ -65,7 +68,9 @@ export default function Reservations() {
         const { data, error } = await supabase
             .from('facilities')
             .select('*')
-        if (data){
+        if (error) {
+            alert('施設一覧の取得に失敗しました')
+        } else {
             setFacilities(data)
         }
     }
@@ -95,15 +100,17 @@ export default function Reservations() {
             num_people: newNumPeople,
             purpose: newPurpose,
         })
-        if (!error) {
-            setRefreshKey(prev => prev + 1)
-            setNewFacilityId(null)
-            setNewStartTime('')
-            setNewEndTime('')
-            setNewNumPeople(1)
-            setNewPurpose('')
-            setIsModalOpen(false)
-        }
+    if (error) {
+        alert('新規予約に失敗しました')
+    } else {
+        setRefreshKey(prev => prev + 1)
+        setNewFacilityId(null)
+        setNewStartTime('')
+        setNewEndTime('')
+        setNewNumPeople(1)
+        setNewPurpose('')
+        setIsModalOpen(false)
+    }
    }
 
    //更新処理
@@ -121,8 +128,9 @@ export default function Reservations() {
             purpose: editPurpose,
         })
         .eq('id', selectedReservation.id)
-
-    if (!error) {
+    if (error) {
+        alert('予約の更新に失敗しました')
+    } else {
         setRefreshKey(prev => prev + 1)
         setSelectedReservationId(null)
     } 
@@ -136,10 +144,12 @@ export default function Reservations() {
             status: 'cancelled' 
         })
         .in('id', selectedCheckboxReservationId)
-        if (!error) {
-            setRefreshKey(prev => prev + 1)
-            setSelectedCheckboxReservationId([])
-        }
+    if (error) {
+        alert('予約のキャンセルに失敗しました')
+    } else {
+        setRefreshKey(prev => prev + 1)
+        setSelectedCheckboxReservationId([])
+    }
    }
 
    //復元処理
@@ -150,10 +160,12 @@ export default function Reservations() {
             status: 'confirmed'
         })
         .in('id', selectedCheckboxReservationId)
-        if (!error) {
-            setRefreshKey(prev => prev + 1)
-            setSelectedCheckboxReservationId([])
-        }
+    if (error) {
+        alert('予約の復元に失敗しました')
+    } else {
+        setRefreshKey(prev => prev + 1)
+        setSelectedCheckboxReservationId([])
+    }
    }
 
    //日時をフォーマットする関数
