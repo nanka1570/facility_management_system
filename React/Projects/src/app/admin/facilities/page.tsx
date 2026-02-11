@@ -150,7 +150,7 @@ export default function Facilities() {
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <select
-                                                        value={categoryId}
+                                                        value={editCategoryId}
                                                         onChange={(e) => setEditCategoryId(Number(e.target.value))}
                                                         className="border rounded px-2 py-1 w-full"
                                                     >
