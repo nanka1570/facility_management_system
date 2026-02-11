@@ -38,6 +38,7 @@ export default function Reservations() {
     const BUTTON_PRIMARY = "bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
     const BUTTON_DANGER = "bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
     const BUTTON_SECONDARY = "bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+    const BUTTON_SUCCESS = "bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500"
 
    useEffect(() => {
     //ログインチェック
@@ -230,7 +231,7 @@ export default function Reservations() {
                                 resetAllModes()
                                 setIsModalOpen(true)
                             }}
-                            className={BUTTON_PRIMARY}
+                            className={`${BUTTON_PRIMARY} mr-2`}
                         >
                             新規予約
                         </button>
@@ -239,7 +240,7 @@ export default function Reservations() {
                                 resetAllModes()
                                 setIsEditClick(true)
                             }}
-                            className={BUTTON_PRIMARY}
+                            className={`${BUTTON_PRIMARY} mr-2`}
                         >
                             編集
                         </button>
@@ -248,7 +249,7 @@ export default function Reservations() {
                                 resetAllModes()
                                 setIsCancelClick(true)
                             }}
-                            className={BUTTON_DANGER}
+                            className={`${BUTTON_DANGER} mr-2`}
                         >
                             予約キャンセル
                         </button>
@@ -257,7 +258,7 @@ export default function Reservations() {
                                 resetAllModes()
                                 setIsRestoreClick(true)
                             }}
-                            className={BUTTON_PRIMARY}
+                            className={BUTTON_SUCCESS}
                         >
                             予約復元
                         </button>
@@ -395,7 +396,13 @@ export default function Reservations() {
                                                     <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
                                                     <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
                                                     <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
-                                                    <td className="px-4 py-3">{getStatusLabel(reservation.status)}</td>
+                                                    <td
+                                                     className={`px-4 py-3 ${
+                                                        reservation.status === 'completed' ? 'text-green-600 font-semibold' :
+                                                        reservation.status === 'cancelled' ? 'text-red-400' : ''
+                                                     }`}>
+                                                        {getStatusLabel(reservation.status)}
+                                                    </td>
                                                     <td className="px-4 py-3">{reservation.num_people}</td>
                                                     <td className="px-4 py-3">{reservation.purpose}</td>
                                                 </>
@@ -476,7 +483,7 @@ export default function Reservations() {
                                 <div className="mt-4">
                                     <button
                                      onClick={() => setIsModalOpen(false)}
-                                     className={BUTTON_SECONDARY}
+                                     className={`${BUTTON_SECONDARY} mr-2`}
                                      >
                                         閉じる
                                     </button>
@@ -498,7 +505,7 @@ export default function Reservations() {
                         <div>
                             <button
                             onClick={() => resetAllModes()}
-                            className={BUTTON_SECONDARY}
+                            className={`${BUTTON_SECONDARY} mr-2`}
                             >
                                 閉じる</button>
                             <button
@@ -516,7 +523,7 @@ export default function Reservations() {
                         <div>
                             <button
                             onClick={() => resetAllModes()}
-                            className={BUTTON_SECONDARY}
+                            className={`${BUTTON_SECONDARY} mr-2`}
                             >
                                 閉じる
                             </button>
@@ -536,12 +543,12 @@ export default function Reservations() {
                         <div>
                             <button
                             onClick={() => resetAllModes()}
-                            className={BUTTON_SECONDARY}
+                            className={`${BUTTON_SECONDARY} mr-2`}
                             >
                                 閉じる
                             </button>
                             <button
-                            className={BUTTON_PRIMARY}
+                            className={BUTTON_SUCCESS}
                             onClick={() => handleRestoreReservation()}
                             >
                                 予約を復元する
