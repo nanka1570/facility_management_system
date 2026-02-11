@@ -103,6 +103,9 @@ export default function Reservations() {
 
    //更新処理
    const handleUpdateReservation = async () => {
+    // nullチェック
+    if (!selectedReservation) return
+    
     const { error } = await supabase
         .from('reservations')
         .update({ 
@@ -113,10 +116,11 @@ export default function Reservations() {
             purpose: editPurpose,
         })
         .eq('id', selectedReservation.id)
-        if (!error) {
-            setRefreshKey(prev => prev + 1)
-            setSelectedReservationId(null)
-        } 
+
+    if (!error) {
+        setRefreshKey(prev => prev + 1)
+        setSelectedReservationId(null)
+    } 
    }
 
    //キャンセル処理
