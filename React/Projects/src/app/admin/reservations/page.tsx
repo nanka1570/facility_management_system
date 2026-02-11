@@ -185,6 +185,16 @@ export default function Reservations() {
     return statusMap[status] || status
    }
 
+   //ボタンのONをすべてリセットする関数
+   const resetAllModes = () => {
+    setIsEditClick(false)
+    setIsCancelClick(false)
+    setIsRestoreClick(false)
+    setSelectedReservationId(null)
+    setSelectedCheckboxReservationId([])
+   }
+
+
     return (
         <>
             <div>
@@ -195,25 +205,37 @@ export default function Reservations() {
                     <h1 className="text-2xl font-bold">予約管理</h1>
                     <div>
                         <button
-                            onClick={() => setIsModalOpen(true)}
+                            onClick={() => {
+                                resetAllModes()
+                                setIsModalOpen(true)
+                            }}
                             className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
                         >
                             新規予約
                         </button>
                         <button
-                            onClick={() => setIsEditClick(true)}
+                            onClick={() => {
+                                resetAllModes()
+                                setIsEditClick(true)
+                            }}
                             className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 mr-2"
                         >
                             編集
                         </button>
                         <button
-                            onClick={() => setIsCancelClick(true)}
+                            onClick={() => {
+                                resetAllModes()
+                                setIsCancelClick(true)
+                            }}
                             className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
                         >
                             予約キャンセル
                         </button>
                         <button
-                            onClick={() => setIsRestoreClick(true)}
+                            onClick={() => {
+                                resetAllModes()
+                                setIsRestoreClick(true)
+                            }}
                             className="bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500"
                         >
                             予約復元
@@ -224,7 +246,7 @@ export default function Reservations() {
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                {isEditClick && <th className="px-4 py-3"></th>}
+                                {(isEditClick || isCancelClick || isRestoreClick) && <th className="px-4 py-3"></th>}
                                 <th className="px-4 py-3 text-left">ID</th>
                                 <th className="px-4 py-3 text-left">施設名</th>
                                 <th className="px-4 py-3 text-left">開始日時</th>
@@ -268,7 +290,7 @@ export default function Reservations() {
                                             {/* 予約キャンセルのチェックボックス */}
                                             {(isCancelClick) && (
                                                 <>
-                                                    <td>
+                                                    <td className="px-4 py-3">
                                                         <input
                                                         type="checkbox"
                                                         checked={selectedCheckboxReservationId.includes(reservation.id)}
@@ -292,7 +314,7 @@ export default function Reservations() {
                                             {/* 予約復元のチェックボックス */}
                                             {(isRestoreClick) && (
                                                 <>
-                                                    <td>
+                                                    <td className="px-4 py-3">
                                                         <input
                                                         type="checkbox"
                                                         checked={selectedCheckboxReservationId.includes(reservation.id)}
@@ -315,69 +337,69 @@ export default function Reservations() {
     
                                                     <td className="px-4 py-3">{reservation.id}</td>
                                                     
-                                                    {/* ステータスが'cancelled'以外 かつ ラジオボタンが押されたとき */}
-                                                    {reservation.status !== 'cancelled' &&  selectedReservationId === reservation.id ? (
-                                                        <>
-                                                            <td className="px-4 py-3">
-                                                                <select 
-                                                                value={editFacilityId}
-                                                                onChange={(e) => setEditFacilityId(Number(e.target.value))}
-                                                                >
-                                                                    <option value="">選択してください</option>
-                                                                    {facilities.map((f) => (
-                                                                        <option key={f.id} value={f.id}>
-                                                                            {f.name}
-                                                                        </option>
-                                                                    ))}
-                                                                </select>
-                                                            </td>
-                                                            <td className="px-4 py-3">
-                                                                <input
-                                                                type="datetime-local"
-                                                                value={formatDateTimeLocal(editStartTime)}
-                                                                onChange={(e) => setEditStartTime(e.target.value)}
-                                                                />
-                                                            </td>
-                                                            <td className="px-4 py-3">
-                                                                <input 
-                                                                type="datetime-local"
-                                                                value={formatDateTimeLocal(editEndTime)}
-                                                                onChange={(e) => setEditEndTime(e.target.value)}
-                                                                />
-                                                            </td>
-                                                            <td className="px-4 py-3">
-                                                                <input 
-                                                                type="text"
-                                                                value={getStatusLabel(reservation.status)}
-                                                                readOnly
-                                                                />
-                                                            </td>
-                                                            <td className="px-4 py-3">
-                                                                <input
-                                                                type="number"
-                                                                value={editNumPeople}
-                                                                onChange={(e) => setEditNumPeople(Number(e.target.value))}
-                                                                />
-                                                            </td>
-                                                            <td className="px-4 py-3">
-                                                                <input
-                                                                type="text"
-                                                                value={editPurpose}
-                                                                onChange={(e) => setEditPurpose(e.target.value)}
-                                                                />
-                                                            </td>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            {/* 予約一覧 */}
-                                                            <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
-                                                            <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
-                                                            <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
-                                                            <td className="px-4 py-3">{getStatusLabel(reservation.status)}</td>
-                                                            <td className="px-4 py-3">{reservation.num_people}</td>
-                                                            <td className="px-4 py-3">{reservation.purpose}</td>
-                                                        </>
-                                                    )}
+                                            {/* ステータスが'cancelled'以外 かつ ラジオボタンが押されたとき */}
+                                            {reservation.status !== 'cancelled' &&  selectedReservationId === reservation.id ? (
+                                                <>
+                                                    <td className="px-4 py-3">
+                                                        <select 
+                                                        value={editFacilityId}
+                                                        onChange={(e) => setEditFacilityId(Number(e.target.value))}
+                                                        >
+                                                            <option value="">選択してください</option>
+                                                            {facilities.map((f) => (
+                                                                <option key={f.id} value={f.id}>
+                                                                    {f.name}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        <input
+                                                        type="datetime-local"
+                                                        value={formatDateTimeLocal(editStartTime)}
+                                                        onChange={(e) => setEditStartTime(e.target.value)}
+                                                        />
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        <input 
+                                                        type="datetime-local"
+                                                        value={formatDateTimeLocal(editEndTime)}
+                                                        onChange={(e) => setEditEndTime(e.target.value)}
+                                                        />
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        <input 
+                                                        type="text"
+                                                        value={getStatusLabel(reservation.status)}
+                                                        readOnly
+                                                        />
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        <input
+                                                        type="number"
+                                                        value={editNumPeople}
+                                                        onChange={(e) => setEditNumPeople(Number(e.target.value))}
+                                                        />
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        <input
+                                                        type="text"
+                                                        value={editPurpose}
+                                                        onChange={(e) => setEditPurpose(e.target.value)}
+                                                        />
+                                                    </td>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    {/* 予約一覧 */}
+                                                    <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
+                                                    <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
+                                                    <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
+                                                    <td className="px-4 py-3">{getStatusLabel(reservation.status)}</td>
+                                                    <td className="px-4 py-3">{reservation.num_people}</td>
+                                                    <td className="px-4 py-3">{reservation.purpose}</td>
+                                                </>
+                                            )}
 
                                             
                                     </tr>                                        
@@ -454,13 +476,13 @@ export default function Reservations() {
                                 <div className="mt-4">
                                     <button
                                      onClick={() => setIsModalOpen(false)}
-                                     className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
+                                     className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
                                      >
-                                        キャンセル
+                                        閉じる
                                     </button>
                                     <button
                                      className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-                                     onClick={handleInsertReservations}
+                                     onClick={() => handleInsertReservations()}
                                      >
                                         予約する
                                     </button>
@@ -473,26 +495,17 @@ export default function Reservations() {
                 {/* 予約編集 */}
                 {isEditClick && (
                     <>
-                        <div
-                            className="bg-white rounded shadow p-6"
+                        <div>
+                            <button
+                            onClick={() => resetAllModes()}
+                            className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
                             >
-                                <>
-                                    <div>
-                                        <button
-                                        onClick={() => {
-                                            setIsEditClick(false)
-                                            setSelectedReservationId(null)   
-                                        }}
-                                        className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
-                                        >
-                                            閉じる</button>
-                                        <button
-                                        className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-                                        onClick={handleUpdateReservation}
-                                        >
-                                            更新</button>
-                                    </div>
-                                </>
+                                閉じる</button>
+                            <button
+                            className="bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
+                            onClick={() => handleUpdateReservation()}
+                            >
+                                更新</button>
                         </div>
                     </>
                 )}
@@ -502,19 +515,16 @@ export default function Reservations() {
                     <>
                         <div>
                             <button
-                            className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
-                            onClick={handleCancelReservation}
-                            >
-                                予約をキャンセル
-                            </button>
-                            <button
-                            onClick={() => {
-                                setIsCancelClick(false)
-                                setSelectedCheckboxReservationId([])   
-                            }}
+                            onClick={() => resetAllModes()}
                             className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
                             >
                                 閉じる
+                            </button>
+                            <button
+                            className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500 mr-2"
+                            onClick={() => handleCancelReservation()}
+                            >
+                                予約をキャンセル
                             </button>
                         </div>
                     </>
@@ -525,17 +535,14 @@ export default function Reservations() {
                     <>
                         <div>
                             <button
-                            onClick={() => {
-                                setIsRestoreClick(false)
-                                setSelectedCheckboxReservationId([])   
-                            }}
+                            onClick={() => resetAllModes()}
                             className="bg-gray-300 text-white px-4 py-2 rounded hover:bg-gray-400 mr-2"
                             >
                                 閉じる
                             </button>
                             <button
                             className="bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500 mr-2"
-                            onClick={handleRestoreReservation}
+                            onClick={() => handleRestoreReservation()}
                             >
                                 予約を復元
                             </button>
