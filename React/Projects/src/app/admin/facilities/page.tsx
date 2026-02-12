@@ -123,6 +123,25 @@ export default function Facilities() {
 
     //施設削除（一括）
     const handleDeleteFacilities = async () => {
+        // 削除対象の施設に基づく予約があるかチェック
+        const { data: linkedReservations, error: checkError } = await supabase
+            .from('reservations')
+            .select('id')
+            .in('facility_id', selectedCheckboxFacilityId)
+            .eq('status', 'confirmed')
+            .limit(1)
+
+        if (checkError) {
+            alert('予約の確認に失敗しました')
+            return
+        }
+
+        if (linkedReservations && linkedReservations.length > 0) {
+            alert('確定済みの予約がある施設は削除できません。先に予約をキャンセルしてください。')
+            return
+        }
+
+        //　予約がなければ削除実行
         const { error } = await supabase
             .from('facilities')
             .delete()
