@@ -14,13 +14,13 @@ export default function Facilities() {
     //新規登録
     const [newName, setNewName] = useState('')
     const [newCategoryId, setNewCategoryId] = useState<number | null>(null)
-    const [newMaxCapacity, setNewMaxCapacity] = useState(0)
+    const [newMaxCapacity, setNewMaxCapacity] = useState('')
     const [newIsActive, setNewIsActive] = useState(true)
     //編集
     const [selectedFacilityId, setSelectedFacilityId] = useState<number | null>(null)
     const [editCategoryId, setEditCategoryId] = useState<number | null>(null)
     const [editName, setEditName] = useState('')
-    const [editMaxCapacity, setEditMaxCapacity] = useState(0)
+    const [editMaxCapacity, setEditMaxCapacity] = useState('')
     const [editIsActive, setEditIsActive] = useState(true)
     const [isEditClick, setIsEditClick] = useState(false)   //編集ボタンクリック
     //削除
@@ -46,6 +46,7 @@ export default function Facilities() {
             const { data, error } = await supabase
                 .from('facilities')
                 .select('*')
+                .order('id', { ascending: true })
 
             if (error) {
                 alert('施設一覧の取得に失敗しました')
@@ -84,7 +85,7 @@ export default function Facilities() {
             .insert({
                 name: newName,
                 category_id: newCategoryId,
-                max_capacity: newMaxCapacity,
+                max_capacity: Number(newMaxCapacity),
                 is_active: newIsActive
             })
         if (error) {
@@ -93,7 +94,7 @@ export default function Facilities() {
             setRefreshKey(prev => prev + 1)
             setNewName('')
             setNewCategoryId(null)
-            setNewMaxCapacity(0)
+            setNewMaxCapacity('')
             setNewIsActive(true)
             setIsModalOpen(false)
         }
@@ -108,7 +109,7 @@ export default function Facilities() {
             .update({
                 name: editName,
                 category_id: editCategoryId,
-                max_capacity: editMaxCapacity,
+                max_capacity: Number(editMaxCapacity),
                 is_active: editIsActive
             })
             .eq('id', selectedFacilityId)
@@ -271,7 +272,7 @@ export default function Facilities() {
                                                 <input
                                                     type="number"
                                                     value={editMaxCapacity}
-                                                    onChange={(e) => setEditMaxCapacity(Number(e.target.value))}
+                                                    onChange={(e) => setEditMaxCapacity(e.target.value)}
                                                     className="border rounded px-2 py-1 w-20"
                                                 />
                                             </td>
@@ -344,7 +345,7 @@ export default function Facilities() {
                                         <input
                                             type="number"
                                             value={newMaxCapacity}
-                                            onChange={(e) => setNewMaxCapacity(Number(e.target.value))}
+                                            onChange={(e) => setNewMaxCapacity(e.target.value)}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
