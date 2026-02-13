@@ -252,17 +252,19 @@ export default function Categories() {
                                             カテゴリ名
                                         </label>
                                         <input
+                                            className="border rounded px-2 py-1"
                                             type="text"
                                             value={newName}
                                             onChange={(e) => setNewName(e.target.value)}
-                                            placeholder="カテゴリ名"
+                                            placeholder="会議室"
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <label>
-                                            表示順
+                                            並び順
                                         </label>
                                         <input
+                                            className="border rounded px-2 py-1"
                                             type="number"
                                             value={newSortOrder}
                                             onChange={(e) => setNewSortOrder(Number(e.target.value))}

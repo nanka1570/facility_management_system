@@ -123,7 +123,7 @@ export default function Facilities() {
 
     //施設削除（一括）
     const handleDeleteFacilities = async () => {
-        // 削除対象の施設に基づく予約があるかチェック
+        // 削除対象の施設が予約に使われていないかチェック
         const { data: linkedReservations, error: checkError } = await supabase
             .from('reservations')
             .select('id')
@@ -335,10 +335,11 @@ export default function Facilities() {
                                             施設名
                                         </label>
                                         <input
+                                            className="border rounded px-2 py-1"
                                             type="text"
                                             value={newName}
                                             onChange={(e) => setNewName(e.target.value)}
-                                            placeholder="施設名"
+                                            placeholder="大会議室"
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -346,6 +347,7 @@ export default function Facilities() {
                                             カテゴリ
                                         </label>
                                         <select
+                                            className="border rounded px-2 py-1"
                                             value={newCategoryId ?? ''}
                                             onChange={(e) => setNewCategoryId(Number(e.target.value))}
                                         >
@@ -362,12 +364,14 @@ export default function Facilities() {
                                             最大人数
                                         </label>
                                         <input
+                                            className="border rounded px-2 py-1"
                                             type="number"
                                             value={newMaxCapacity}
                                             onChange={(e) => setNewMaxCapacity(e.target.value)}
+                                            placeholder="30"
                                         />
                                     </div>
-                                    <div className="flex flex-col gap-1">
+                                    <div className="flex items-center gap-2">
                                         <label>
                                             利用可否
                                         </label>

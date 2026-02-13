@@ -15,7 +15,7 @@ export default function Reservations() {
     const [newFacilityId, setNewFacilityId] = useState<number | null>(null)
     const [newStartTime, setNewStartTime] = useState('')
     const [newEndTime, setNewEndTime] = useState('')
-    const [newNumPeople, setNewNumPeople] = useState(1)
+    const [newNumPeople, setNewNumPeople] = useState('')
     const [newPurpose, setNewPurpose] = useState('')
     const [userId, setUserId] = useState('')
     //編集
@@ -25,7 +25,7 @@ export default function Reservations() {
     const [editFacilityId, setEditFacilityId] = useState<number | null>(null)
     const [editStartTime, setEditStartTime] = useState('')
     const [editEndTime, setEditEndTime] = useState('')
-    const [editNumPeople, setEditNumPeople] = useState(1)
+    const [editNumPeople, setEditNumPeople] = useState('')
     const [editPurpose, setEditPurpose] = useState('')
     const [isEditClick, setIsEditClick] = useState(false)   //編集ボタンクリック
     //予約キャンセル
@@ -98,7 +98,7 @@ export default function Reservations() {
                 facility_id: newFacilityId,
                 start_time: newStartTime,
                 end_time: newEndTime,
-                num_people: newNumPeople,
+                num_people: Number(newNumPeople),
                 purpose: newPurpose,
             })
         if (error) {
@@ -108,7 +108,7 @@ export default function Reservations() {
             setNewFacilityId(null)
             setNewStartTime('')
             setNewEndTime('')
-            setNewNumPeople(1)
+            setNewNumPeople('')
             setNewPurpose('')
             setIsModalOpen(false)
         }
@@ -125,7 +125,7 @@ export default function Reservations() {
                 facility_id: editFacilityId,
                 start_time: editStartTime,
                 end_time: editEndTime,
-                num_people: editNumPeople,
+                num_people: Number(editNumPeople),
                 purpose: editPurpose,
             })
             .eq('id', selectedReservation.id)
@@ -356,6 +356,7 @@ export default function Reservations() {
                                             </td>
                                             <td className="px-4 py-3">
                                                 <input
+                                                    className="border rounded px-2 py-1"
                                                     type="datetime-local"
                                                     value={formatDateTimeLocal(editStartTime)}
                                                     onChange={(e) => setEditStartTime(e.target.value)}
@@ -363,6 +364,7 @@ export default function Reservations() {
                                             </td>
                                             <td className="px-4 py-3">
                                                 <input
+                                                    className="border rounded px-2 py-1"
                                                     type="datetime-local"
                                                     value={formatDateTimeLocal(editEndTime)}
                                                     onChange={(e) => setEditEndTime(e.target.value)}
@@ -370,6 +372,7 @@ export default function Reservations() {
                                             </td>
                                             <td className="px-4 py-3">
                                                 <input
+                                                    className="border rounded px-2 py-1"
                                                     type="text"
                                                     value={getStatusLabel(reservation.status)}
                                                     readOnly
@@ -377,13 +380,15 @@ export default function Reservations() {
                                             </td>
                                             <td className="px-4 py-3">
                                                 <input
+                                                    className="border rounded px-2 py-1"
                                                     type="number"
                                                     value={editNumPeople}
-                                                    onChange={(e) => setEditNumPeople(Number(e.target.value))}
+                                                    onChange={(e) => setEditNumPeople(e.target.value)}
                                                 />
                                             </td>
                                             <td className="px-4 py-3">
                                                 <input
+                                                    className="border rounded px-2 py-1"
                                                     type="text"
                                                     value={editPurpose}
                                                     onChange={(e) => setEditPurpose(e.target.value)}
@@ -427,6 +432,7 @@ export default function Reservations() {
                                 <div className="flex flex-col gap-4">
                                     <div className="flex flex-col gap-1">
                                         <select
+                                            className="border rounded px-2 py-1"
                                             value={newFacilityId ?? ''}
                                             onChange={(e) => setNewFacilityId(Number(e.target.value))}
                                         >
@@ -443,6 +449,7 @@ export default function Reservations() {
                                             開始日時
                                         </label>
                                         <input
+                                            className="border rounded px-2 py-1"
                                             type="datetime-local"
                                             value={newStartTime}
                                             onChange={(e) => setNewStartTime(e.target.value)}
@@ -453,6 +460,7 @@ export default function Reservations() {
                                             終了日時
                                         </label>
                                         <input
+                                            className="border rounded px-2 py-1"
                                             type="datetime-local"
                                             value={newEndTime}
                                             onChange={(e) => setNewEndTime(e.target.value)}
@@ -463,9 +471,10 @@ export default function Reservations() {
                                             利用人数
                                         </label>
                                         <input
+                                            className="border rounded px-2 py-1"
                                             type="number"
                                             value={newNumPeople}
-                                            onChange={(e) => setNewNumPeople(Number(e.target.value))}
+                                            onChange={(e) => setNewNumPeople(e.target.value)}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -473,6 +482,7 @@ export default function Reservations() {
                                             利用目的
                                         </label>
                                         <input
+                                            className="border rounded px-2 py-1"
                                             type="text"
                                             value={newPurpose}
                                             onChange={(e) => setNewPurpose(e.target.value)}
