@@ -431,6 +431,9 @@ export default function Reservations() {
                             >
                                 <div className="flex flex-col gap-4">
                                     <div className="flex flex-col gap-1">
+                                        <label>
+                                            施設名
+                                        </label>
                                         <select
                                             className="border rounded px-2 py-1"
                                             value={newFacilityId ?? ''}
@@ -475,6 +478,7 @@ export default function Reservations() {
                                             type="number"
                                             value={newNumPeople}
                                             onChange={(e) => setNewNumPeople(e.target.value)}
+                                            placeholder="例： 30"
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -486,6 +490,7 @@ export default function Reservations() {
                                             type="text"
                                             value={newPurpose}
                                             onChange={(e) => setNewPurpose(e.target.value)}
+                                            placeholder="例： 報告会議"
                                         />
                                     </div>
                                 </div>

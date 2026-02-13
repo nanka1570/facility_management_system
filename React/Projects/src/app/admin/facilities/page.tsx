@@ -339,7 +339,7 @@ export default function Facilities() {
                                             type="text"
                                             value={newName}
                                             onChange={(e) => setNewName(e.target.value)}
-                                            placeholder="例：大会議室"
+                                            placeholder="例： 大会議室"
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
