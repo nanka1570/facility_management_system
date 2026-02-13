@@ -339,7 +339,7 @@ export default function Facilities() {
                                             type="text"
                                             value={newName}
                                             onChange={(e) => setNewName(e.target.value)}
-                                            placeholder="大会議室"
+                                            placeholder="例：大会議室"
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -368,7 +368,7 @@ export default function Facilities() {
                                             type="number"
                                             value={newMaxCapacity}
                                             onChange={(e) => setNewMaxCapacity(e.target.value)}
-                                            placeholder="30"
+                                            placeholder="例： 30"
                                         />
                                     </div>
                                     <div className="flex items-center gap-2">
