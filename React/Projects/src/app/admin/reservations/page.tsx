@@ -99,8 +99,8 @@ export default function Reservations() {
             .insert({
                 user_id: userId,
                 facility_id: newFacilityId,
-                start_time: newStartTime,
-                end_time: newEndTime,
+                start_time: new Date(newStartTime).toISOString(),
+                end_time: new Date(newEndTime).toISOString(),
                 num_people: Number(newNumPeople),
                 purpose: newPurpose,
             })
@@ -126,8 +126,8 @@ export default function Reservations() {
             .from('reservations')
             .update({
                 facility_id: editFacilityId,
-                start_time: editStartTime,
-                end_time: editEndTime,
+                start_time: new Date(editStartTime).toISOString(),
+                end_time: new Date(editEndTime).toISOString(),
                 num_people: Number(editNumPeople),
                 purpose: editPurpose,
             })
