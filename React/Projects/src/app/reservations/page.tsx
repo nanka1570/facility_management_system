@@ -27,16 +27,19 @@ export default function Reservations() {
         const today = new Date()
         return today.toLocaleDateString('sv-SE')
     })
-    // モーダル
+    /* モーダル */
+    // 新規登録モーダル
     const [isModalOpen, setIsModalOpen] = useState(false)
-    // const [modalFacilityId, setModalFacilityId] = useState<number | null>(null)
-    // const [modalTimeSlot, setModalTimeSlot] = useState<number | null>(null)
+    // 詳細モーダル
+    const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
     // 新規登録
     const [newFacilityId, setNewFacilityId] = useState<number | null>(null)
     const [newStartTime, setNewStartTime] = useState('')
     const [newEndTime, setNewEndTime] = useState('')
     const [newNumPeople, setNewNumPeople] = useState('')
     const [newPurpose, setNewPurpose] = useState('')
+    // クリックした予約
+    const [selectedReservation, setSelectedReservation] = useState<any | null>(null)
     //ボタンのスタイル
     const BUTTON_PRIMARY = "bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
     const BUTTON_DANGER = "bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
@@ -81,6 +84,7 @@ export default function Reservations() {
         loadFacilities()
     }, [refreshKey])
 
+    // 新規予約
     const handleInsertReservations = async () => {
         const { data: overlappingReservations, error: checkError } = await supabase
             .from('reservations')
@@ -122,6 +126,62 @@ export default function Reservations() {
             setIsModalOpen(false)
         }
     }
+
+    // 更新処理
+    const handleUpdateReservation = async () => {
+        // nullチェック
+        if (!selectedReservation) return
+
+        const { error } = await supabase
+            .from('reservations')
+            .update({
+                facility_id: selectedReservation.facility_id,
+                start_time: new Date(selectedReservation.start_time).toISOString(),
+                end_time: new Date(selectedReservation.end_time).toISOString(),
+                num_people: Number(newNumPeople),
+                purpose: newPurpose,
+            })
+            .eq('id', selectedReservation.id)
+        if (error) {
+            alert('予約の更新に失敗しました')
+        } else {
+            setRefreshKey(prev => prev + 1)
+            setSelectedReservation(null)
+        }
+    }
+
+    // キャンセル処理
+    const handleCancelReservation = async () => {
+        const { error } = await supabase
+            .from('reservations')
+            .update({
+                status: 'cancelled'
+            })
+            .eq('id', selectedReservation.id)
+        if (error) {
+            alert('予約のキャンセルに失敗しました')
+        } else {
+            setRefreshKey(prev => prev + 1)
+            setSelectedReservation(null)
+            setIsDetailModalOpen(false)
+        }
+    }
+
+    //timeをdatetime-localに変換
+    const formatDateTimeLocal = (time: string) => {
+    const timeLocal = new Date(time)
+    return (
+        timeLocal.getFullYear()
+        + '-' +
+        (timeLocal.getMonth() + 1).toString().padStart(2, '0')
+        + '-' +
+        timeLocal.getDate().toString().padStart(2, '0')
+        + 'T' +
+        timeLocal.getHours().toString().padStart(2, '0')
+        + ':' +
+        timeLocal.getMinutes().toString().padStart(2, '0')
+    )
+}
     
     return (
         <>
@@ -200,6 +260,14 @@ export default function Reservations() {
                                                             setNewStartTime(`${selectedDate}T${String(timeSlot).padStart(2, '0')}:00`)
                                                             setNewEndTime(`${selectedDate}T${String(timeSlot + 1).padStart(2, '0')}:00`)
                                                             setIsModalOpen(true)
+                                                        } else {
+                                                            setSelectedReservation(reservation)
+                                                            setNewFacilityId(reservation.facility_id)
+                                                            setNewStartTime(formatDateTimeLocal(reservation.start_time))
+                                                            setNewEndTime(formatDateTimeLocal(reservation.end_time))
+                                                            setNewNumPeople(String(reservation.num_people))
+                                                            setNewPurpose(reservation.purpose || '')
+                                                            setIsDetailModalOpen(true)
                                                         }
                                                     }}
                                                     >
@@ -293,6 +361,99 @@ export default function Reservations() {
                                     >
                                         予約する
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                    ) : null}
+                    {/* 詳細モーダル */}
+                    {isDetailModalOpen ? (
+                        <div 
+                            className="fixed inset-0 bg-black/50 flex justify-center items-center"
+                            onClick={() => (setIsDetailModalOpen(false))}
+                        >
+                            <div
+                                className="bg-white rounded shadow p-6 w-125"
+                                onClick={(e) => (e.stopPropagation())}
+                            >
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            施設名
+                                        </label>
+                                        <p className="border rounded px-2 py-1 bg-gray-100">
+                                            {facilities.find(f => f.id === newFacilityId)?.name}
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            開始日時
+                                        </label>
+                                        <input
+                                            className="border rounded px-2 py-1 bg-gray-100"
+                                            type="datetime-local"
+                                            value={newStartTime}
+                                            readOnly
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            終了日時
+                                        </label>
+                                        <input
+                                            className="border rounded px-2 py-1"
+                                            type="datetime-local"
+                                            value={newEndTime}
+                                            readOnly
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            利用人数
+                                        </label>
+                                        <input
+                                            className="border rounded px-2 py-1"
+                                            type="number"
+                                            value={newNumPeople}
+                                            onChange={(e) => setNewNumPeople(e.target.value)}
+                                            placeholder="例： 30"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label>
+                                            利用目的
+                                        </label>
+                                        <input
+                                            className="border rounded px-2 py-1"
+                                            type="text"
+                                            value={newPurpose}
+                                            onChange={(e) => setNewPurpose(e.target.value)}
+                                            placeholder="例： 報告会議"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <button
+                                        onClick={() => setIsDetailModalOpen(false)}
+                                        className={`${BUTTON_SECONDARY} mr-2`}
+                                    >
+                                        閉じる
+                                    </button>
+                                    {selectedReservation?.user_id === userId ? (
+                                        <>
+                                            <button
+                                                className={BUTTON_DANGER}
+                                                onClick={() => handleCancelReservation()}
+                                            >
+                                                予約をキャンセルする
+                                            </button>
+                                            <button
+                                                className={BUTTON_PRIMARY}
+                                                onClick={() => handleUpdateReservation()}
+                                            >
+                                                更新する
+                                            </button>
+                                        </>
+                                    ): null}
                                 </div>
                             </div>
                         </div>
