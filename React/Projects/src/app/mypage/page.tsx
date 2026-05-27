@@ -19,6 +19,8 @@ export default function Mypage() {
     const [reservations, setReservations] = useState<any[]>([])
     // 施設一覧
     const [facilities, setFacilities] = useState<any[]>([])
+    // 全件表示かどうか
+    const [displayAll, setDisplayAll] = useState(false)
     //ボタンのスタイル
     const BUTTON_PRIMARY = "bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
     const BUTTON_DANGER = "bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
@@ -141,9 +143,9 @@ export default function Mypage() {
                             予約履歴
                         </h2>
                         <button
-                            
+                            onClick={() => setDisplayAll(!displayAll)}
                         >
-                            すべて表示
+                            {displayAll ? '直近5件のみ表示' : 'すべて表示'}
                         </button>
                     </div>
                     <div className="bg-white rounded shadow overflow-hidden">
@@ -157,7 +159,9 @@ export default function Mypage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {reservations
+                                {(displayAll ? 
+                                reservations : 
+                                reservations.slice(0,5))
                                     .map((reservation) => (
                                         <tr
                                             key={reservation.id}
@@ -173,14 +177,15 @@ export default function Mypage() {
                                                 {facilities.find(f => f.id === reservation.facility_id)?.name}
                                             </td>
                                             <td
-                                             className={`px-4 py-3
-                                             ${reservation.status === 'completed' ? 'text-green-600 font-semibold' :
+                                                className={`px-4 py-3
+                                                ${reservation.status === 'completed' ? 'text-green-600 font-semibold' :
                                                 reservation.status === 'cancelled' ? 'text-red-400' : ''}`}
                                             >
                                                 {getStatusLabel(reservation.status)}
                                             </td>
                                         </tr>
-                                    ))}
+                                    ))
+                                }
                             </tbody>
                         </table>
                     </div>
