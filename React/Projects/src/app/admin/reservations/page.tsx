@@ -290,7 +290,7 @@ export default function Reservations() {
                  />
 
                 {/* テーブル */}
-                <div className="bg-white rounded shadow overflow-hidden">
+                <div className="bg-white rounded shadow overflow-x-auto">
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
