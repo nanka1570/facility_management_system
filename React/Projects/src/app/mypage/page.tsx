@@ -21,6 +21,10 @@ export default function Mypage() {
     const [facilities, setFacilities] = useState<any[]>([])
     // 全件表示かどうか
     const [displayAll, setDisplayAll] = useState(false)
+    // 編集モーダル開閉
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    // 編集
+    const [updateDisplayName, setUpdateDisplayName] = useState('')
     //ボタンのスタイル
     const BUTTON_PRIMARY = "bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
     const BUTTON_DANGER = "bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
@@ -74,6 +78,19 @@ export default function Mypage() {
         loadFacilities()
     }, [refreshKey])
 
+    // 編集
+    const handleUpdateProfile = async () => {
+        const { error } = await supabase
+            .from('profiles')
+            .update({ display_name: updateDisplayName })
+            .eq('id', userId)
+        if (error) {
+            alert('プロフィールの更新に失敗しました')
+        } else {
+            setRefreshKey(prev => prev + 1)
+            setIsModalOpen(false)
+        }
+    }
 
     //日時をフォーマットする関数
     const formatDateTime = (dateString: string) => {
@@ -115,6 +132,10 @@ export default function Mypage() {
                         </h2>
                         <button
                             className={`${BUTTON_PRIMARY} mr-2`}
+                            onClick={() => {
+                                setIsModalOpen(true)
+                                setUpdateDisplayName(profile?.display_name || '')
+                            }}
                         >
                             編集
                         </button>
@@ -190,6 +211,54 @@ export default function Mypage() {
                         </table>
                     </div>
                 </div>
+                {/* 編集モーダル */}
+                {isModalOpen ? (
+                    <>
+                        <div
+                            className="fixed inset-0 bg-black/50 flex justify-center items-center"
+                            onClick={() => (setIsModalOpen(false))}
+                        >
+                            <div
+                                className="bg-white rounded shadow p-6 w-125"
+                                onClick={(e) => (e.stopPropagation())}
+                            >
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-col gap-1">
+                                        <label>表示名: </label>
+                                        <input
+                                            type="text"
+                                            className="border rounded px-2 py-1"
+                                            value={updateDisplayName}
+                                            onChange={(e) => setUpdateDisplayName(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <p className="text-gray-500">メール</p>
+                                        <p className="text-gray-500 border rounded px-2 py-1 bg-gray-100">{profile?.email}</p>
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <p className="text-gray-500">権限</p>
+                                        <p className="text-gray-500 border rounded px-2 py-1 bg-gray-100">{profile?.role}</p>
+                                    </div>
+                                    <div className="mt-4">
+                                        <button
+                                            onClick={() => setIsModalOpen(false)}
+                                            className={`${BUTTON_SECONDARY} mr-2`}
+                                        >
+                                            閉じる
+                                        </button>
+                                        <button
+                                            className={BUTTON_PRIMARY}
+                                            onClick={() => handleUpdateProfile()}
+                                        >
+                                            更新する
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </>    
+                ): null}
             </main>
         </>
     )
