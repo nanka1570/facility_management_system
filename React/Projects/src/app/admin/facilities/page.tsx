@@ -4,6 +4,8 @@ import Header from "@/components/Header"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+// ボタンのスタイル
+import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants"
 
 export default function Facilities() {
     const router = useRouter()
@@ -29,12 +31,6 @@ export default function Facilities() {
     const [selectedCheckboxFacilityId, setSelectedCheckboxFacilityId] = useState<number[]>([])
     // フィルター
     const [filterCategoryId, setFilterCategoryId] = useState<number | null>(null)
-    
-    //ボタンのスタイル
-    const BUTTON_PRIMARY = "bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-    const BUTTON_DANGER = "bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
-    const BUTTON_SECONDARY = "bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
-    const BUTTON_SUCCESS = "bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500"
 
     useEffect(() => {
         //ログインチェック
