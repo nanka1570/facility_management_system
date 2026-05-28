@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
 import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants"
+// timeをdatetime-localに変換する関数
+import { formatDateTimeLocal } from "@/lib/utils"
 
 export default function Reservations() {
 
@@ -183,22 +185,6 @@ export default function Reservations() {
             setIsDetailModalOpen(false)
         }
     }
-
-    //timeをdatetime-localに変換
-    const formatDateTimeLocal = (time: string) => {
-    const timeLocal = new Date(time)
-    return (
-        timeLocal.getFullYear()
-        + '-' +
-        (timeLocal.getMonth() + 1).toString().padStart(2, '0')
-        + '-' +
-        timeLocal.getDate().toString().padStart(2, '0')
-        + 'T' +
-        timeLocal.getHours().toString().padStart(2, '0')
-        + ':' +
-        timeLocal.getMinutes().toString().padStart(2, '0')
-    )
-}
     
     return (
         <>

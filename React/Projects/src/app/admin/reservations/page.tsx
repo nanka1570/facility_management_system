@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
 import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, BUTTON_SUCCESS } from "@/lib/constants"
+// 日時をフォーマットする関数, timeをdatetime-localに変換する関数, ステータスを日本語に直す関数
+import { formatDateTime, formatDateTimeLocal, getStatusLabel } from "@/lib/utils"
 
 export default function Reservations() {
     const router = useRouter()
@@ -167,44 +169,6 @@ export default function Reservations() {
             setRefreshKey(prev => prev + 1)
             setSelectedCheckboxReservationId([])
         }
-    }
-
-    //日時をフォーマットする関数
-    const formatDateTime = (dateString: string) => {
-        const date = new Date(dateString)
-        return date.toLocaleString('ja-JP', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        })
-    }
-
-    //timeをdatetime-localに変換
-    const formatDateTimeLocal = (time: string) => {
-        const timeLocal = new Date(time)
-        return (
-            (timeLocal.getFullYear())
-            + '-' +
-            ((timeLocal.getMonth() + 1).toString().padStart(2, '0'))
-            + '-' +
-            (timeLocal.getDate().toString().padStart(2, '0'))
-            + 'T' +
-            (timeLocal.getHours().toString().padStart(2, '0'))
-            + ':' +
-            (timeLocal.getMinutes().toString().padStart(2, '0'))
-        )
-    }
-
-    //ステータスを日本語に直す関数
-    const getStatusLabel = (status: string) => {
-        const statusMap: { [key: string]: string } = {
-            'confirmed': '確定',
-            'cancelled': 'キャンセル',
-            'completed': '完了'
-        }
-        return statusMap[status] || status
     }
 
     //ボタンのONをすべてリセットする関数

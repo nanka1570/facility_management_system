@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
 import { BUTTON_PRIMARY, BUTTON_SECONDARY } from "@/lib/constants"
-
+// 日時をフォーマットする関数, ステータスを日本語に直す関数
+import { formatDateTime, getStatusLabel } from "@/lib/utils"
 
 export default function Mypage() {
     
@@ -88,29 +89,6 @@ export default function Mypage() {
             setIsModalOpen(false)
         }
     }
-
-    //日時をフォーマットする関数
-    const formatDateTime = (dateString: string) => {
-        const date = new Date(dateString)
-        return date.toLocaleString('ja-JP', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-        })
-    }
-
-    //ステータスを日本語に直す関数
-    const getStatusLabel = (status: string) => {
-        const statusMap: { [key: string]: string } = {
-            'confirmed': '確定',
-            'cancelled': 'キャンセル',
-            'completed': '完了'
-        }
-        return statusMap[status] || status
-    }
-
 
     return (
         <>
