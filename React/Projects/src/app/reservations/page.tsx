@@ -172,6 +172,7 @@ export default function Reservations() {
 
     // キャンセル処理
     const handleCancelReservation = async () => {
+        if (!selectedReservation) return
         const { error } = await supabase
             .from('reservations')
             .update({

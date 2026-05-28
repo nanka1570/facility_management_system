@@ -298,7 +298,7 @@ export default function Reservations() {
                                                             setEditFacilityId(reservation.facility_id)
                                                             setEditStartTime(reservation.start_time)
                                                             setEditEndTime(reservation.end_time)
-                                                            setEditNumPeople(reservation.num_people)
+                                                            setEditNumPeople(String(reservation.num_people))
                                                             setEditPurpose(reservation.purpose || '')
                                                         }}
                                                         disabled={reservation.status !== 'confirmed'}

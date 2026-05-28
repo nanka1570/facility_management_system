@@ -253,7 +253,7 @@ export default function Facilities() {
                                                             setSelectedFacilityId(facility.id)
                                                             setEditName(facility.name)
                                                             setEditCategoryId(facility.category_id)
-                                                            setEditMaxCapacity(facility.max_capacity)
+                                                            setEditMaxCapacity(String(facility.max_capacity))
                                                             setEditIsActive(facility.is_active)
                                                         }}
                                                     />
