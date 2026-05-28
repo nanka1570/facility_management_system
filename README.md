@@ -1,269 +1,162 @@
-# 🏢 汎用施設管理システム（React版）
+# M-FACILITY（汎用施設管理システム）
 
-専門学校卒業制作で作成したPHP版「汎用的施設管理システム」を、モダンな技術スタックでフルリライトするプロジェクトです。
+専門学校卒業制作で作成したPHP版施設管理システムを、モダンな技術スタックでフルリライトしたWebアプリケーションです。
 
-> **📢 前提知識の学習記録**  
-> このプロジェクトの前提となるJavaScript・React基礎の学習記録は  
-> **[Claude_learning_js](https://github.com/nanka1570/Claude_learning_js)** にあります。
+## 概要
 
----
+企業の会議室、レンタルスペース、カラオケ店の部屋など、さまざまな「施設」の予約を管理するシステムです。モジュール設計により、顧客ごとに必要な機能のみをON/OFFして提供できます。
 
-## 🎯 プロジェクトの目的
+## 技術スタック
 
-### システム開発の目的
-- ユーザビリティの改善（予約フロー6ステップ→3ステップ）
-- モジュール設計の改善（機能のON/OFF切り替え可能）
-- 実務レベルのポートフォリオ作成
+| 層 | 技術 |
+|----|------|
+| フレームワーク | Next.js（App Router） |
+| 言語 | TypeScript |
+| スタイリング | Tailwind CSS |
+| バックエンド / DB | Supabase（PostgreSQL） |
+| 認証 | Supabase Auth |
 
-### 技術学習の目的
-このプロジェクトを通じて以下の技術を習得します：
-- **Next.js**（App Router）- ファイルベースルーティング、Server/Client Components
-- **TypeScript** - 型定義、Props型付け、ジェネリクス
-- **Tailwind CSS** - ユーティリティクラス、レスポンシブデザイン
-- **Supabase** - 認証、データベース、RLS
+## 実装済み機能（Phase 1）
 
----
+### 一般ユーザー向け
 
-## 📊 プロジェクト進捗
+- **予約カレンダー（U-02）** — 時間×施設のグリッド表示、日付ナビゲーション、空きセルクリックで予約作成
+- **予約詳細モーダル（U-03）** — 予約の閲覧・編集・キャンセル、開始/終了日時の変更、重複チェック
+- **マイページ（U-04）** — プロフィール表示・編集、予約履歴（直近5件/全件切替）
 
-```
-■■■■■■■□□□ 70% - Phase 1 進行中（M-RESERVE実装中）
-```
+### 管理者向け
 
-| フェーズ | 内容 | 時間 | 進捗 |
-|---------|------|------|------|
-| Phase 1 | コア機能 | 50h | 🔄 70% |
-| Phase 2 | 拡張機能 | 40h | ⏳ 予定 |
-| Phase 3 | 高度な機能 | 30h | ⏳ 予定 |
+- **施設管理（A-02）** — 施設のCRUD、インライン編集、カテゴリフィルター
+- **カテゴリ管理（A-03）** — カテゴリのCRUD、インライン編集
+- **予約管理（A-04）** — 予約の一覧・編集・キャンセル・復元、施設/日付フィルター
+- **システム設定（A-08）** — モジュールのON/OFFトグル（developer権限のみ）
 
-**総開発時間: 120時間**
+### 認証
 
----
+- **ログイン / 新規登録（C-01）** — メール・パスワード認証
+- **パスワードリセット（C-03）**
 
-## 🛠️ 技術スタック
+### データ整合性
 
-[![Next.js](https://img.shields.io/badge/Next.js-14+-black?logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.0+-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase)](https://supabase.com/)
+- 施設削除時の予約存在チェック（DB側RESTRICT + アプリ側チェックの二重防御）
+- 予約作成・更新時の重複チェック（同一施設・同一時間帯の二重予約防止）
+- 予約更新時の自己除外（`.neq('id', ...)` で自分の予約と重複判定しない）
 
-| 層 | 技術 | 選定理由 |
-|----|------|---------|
-| フレームワーク | **Next.js 14+** (App Router) | SSR対応、Vercelとの相性◎ |
-| 言語 | **TypeScript** | 型安全、保守性向上 |
-| スタイリング | **Tailwind CSS** | 高速開発、レスポンシブ対応 |
-| バックエンド | **Supabase** | BaaSで開発効率化 |
-| データベース | **PostgreSQL** | Supabase標準 |
-| 認証 | **Supabase Auth** | メール認証 |
-| ホスティング | **Vercel** | Next.jsと相性◎ |
-| カレンダーUI | **react-big-calendar** | 予約表示（予定） |
+## モジュール構成
 
----
+機能をモジュール単位でON/OFFし、顧客ごとに必要な機能だけを提供できます。
 
-## 🎯 システムコンセプト
+| モジュール | 説明 | Phase 1 |
+|-----------|------|---------|
+| M-CORE | コアシステム（認証・基本設定） | ✅ ON固定 |
+| M-USER | ユーザー管理 | ✅ ON固定 |
+| M-FACILITY | 施設管理 | ✅ ON固定 |
+| M-RESERVE | 予約機能 | ✅ |
+| M-EXTEND | 時間延長 | Phase 2 |
+| M-DISPLAY | デジタルサイネージ | Phase 2 |
+| M-PRICE | 料金計算 | Phase 2 |
+| M-ITEM | 備品管理 | Phase 2 |
+| M-INQUIRY | 問い合わせ | Phase 2 |
+| M-NOTIFY | メール通知 | Phase 2 |
+| M-THEME | テーマカスタマイズ | Phase 2 |
+| M-TENANT | マルチテナント | Phase 3 |
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│            汎用施設管理システム（コア）                      │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐          │
-│  │ユーザー │ │ 施設   │ │ 予約   │ │ 表示   │          │
-│  │ 管理   │ │ 管理   │ │ 機能   │ │ 機能   │  ...     │
-│  │モジュール│ │モジュール│ │モジュール│ │モジュール│          │
-│  └─────────┘ └─────────┘ └─────────┘ └─────────┘          │
-│       ON        ON        ON/OFF      ON/OFF              │
-└─────────────────────────────────────────────────────────────┘
-        ↓
-    顧客Aには予約+表示を提供
-    顧客Bには予約+料金+備品を提供
-    顧客Cにはフル機能を提供
-```
-
-### 特徴
-
-- 🧩 **モジュール型設計** - 機能のON/OFF切り替えが可能
-- 📱 **レスポンシブ対応** - PC・タブレット・スマートフォン対応
-- 🎨 **モダンUI/UX** - 直感的な予約フロー（6ステップ→3ステップに簡略化）
-- 🏢 **マルチテナント対応** - 複数組織での利用が可能（Phase 3）
-
-### 想定利用シーン
-
-- 企業の会議室予約
-- カラオケ店の部屋管理
-- レンタルスペースの予約
-- 学校の教室・設備予約
-- 公共施設の予約管理
-
----
-
-## 📦 モジュール構成
-
-| モジュール | 説明 | デフォルト | フェーズ | 進捗 |
-|-----------|------|-----------|---------|------|
-| **M-CORE** | コアシステム（認証・基本設定） | ON（固定） | Phase 1 | ⏳ |
-| **M-USER** | ユーザー管理 | ON（固定） | Phase 1 | ✅ |
-| **M-FACILITY** | 施設管理 | ON（固定） | Phase 1 | ✅ |
-| M-RESERVE | 予約機能 | ON/OFF | Phase 1 | 🔄 |
-| M-EXTEND | 時間延長 | ON/OFF | Phase 2 | ⏳ |
-| M-DISPLAY | デジタルサイネージ | ON/OFF | Phase 2 | ⏳ |
-| M-PRICE | 料金計算 | ON/OFF | Phase 2 | ⏳ |
-| M-ITEM | 備品管理 | ON/OFF | Phase 2 | ⏳ |
-| M-INQUIRY | 問い合わせ | ON/OFF | Phase 2 | ⏳ |
-| M-NOTIFY | 通知機能 | ON/OFF | Phase 3 | ⏳ |
-| M-THEME | テーマカスタマイズ | ON/OFF | Phase 2 | ⏳ |
-| M-TENANT | マルチテナント | ON/OFF | Phase 3 | ⏳ |
-
-### モジュール依存関係
+## ディレクトリ構成
 
 ```
-M-CORE（必須）
-  └── M-USER（必須）
-        └── M-FACILITY（必須）
-              ├── M-RESERVE（任意）
-              │     ├── M-EXTEND（任意）
-              │     ├── M-PRICE（任意）
-              │     └── M-ITEM（任意）
-              ├── M-DISPLAY（任意）
-              └── M-INQUIRY（任意）
-  └── M-NOTIFY（任意）
-  └── M-THEME（任意）
-  └── M-TENANT（任意）
+src/
+├── app/
+│   ├── page.tsx                    # ログイン / 新規登録（C-01）
+│   ├── reservations/
+│   │   └── page.tsx                # 予約カレンダー（U-02）
+│   ├── mypage/
+│   │   └── page.tsx                # マイページ（U-04）
+│   └── admin/
+│       ├── categories/
+│       │   └── page.tsx            # カテゴリ管理（A-03）
+│       ├── facilities/
+│       │   └── page.tsx            # 施設管理（A-02）
+│       ├── reservations/
+│       │   └── page.tsx            # 予約管理（A-04）
+│       └── settings/
+│           └── page.tsx            # システム設定（A-08）
+├── components/
+│   └── Header.tsx                  # 共通ヘッダー
+└── lib/
+    └── supabase.ts                 # Supabaseクライアント
 ```
 
----
+## データベース
 
-## 📅 開発スケジュール
+| テーブル | 説明 |
+|---------|------|
+| profiles | ユーザー情報（auth.usersと1:1） |
+| categories | 施設カテゴリ |
+| facilities | 施設 |
+| reservations | 予約 |
+| module_settings | モジュールON/OFF設定 |
 
-### Phase 1: コア機能（50時間）
+詳細は `documents/02_DB設計書_v1.0.md` を参照。
 
-| 項目 | 時間 | 内容 | 進捗 |
-|------|------|------|------|
-| 環境構築・DB設計 | 10h | Supabase設定、テーブル作成、RLS設定 | ✅ |
-| M-USER | 10h | ログイン/ログアウト、ユーザー登録 | ✅ |
-| M-FACILITY | 10h | 施設CRUD、カテゴリCRUD | ✅ |
-| M-RESERVE | 15h | 予約カレンダー、予約CRUD、重複チェック | 🔄 |
-| M-CORE | 5h | モジュール設定画面、基本設定 | ⏳ |
+## セットアップ
 
-### Phase 2: 拡張機能（40時間）
+### 前提条件
 
-| 項目 | 時間 | 内容 |
-|------|------|------|
-| M-EXTEND | 5h | 時間延長機能 |
-| M-DISPLAY | 10h | サイネージ画面、自動更新 |
-| M-PRICE | 8h | 料金設定、予約時料金表示 |
-| M-ITEM | 10h | 備品CRUD、予約時の備品選択 |
-| M-INQUIRY | 12h | 問い合わせ投稿、チャット形式表示 |
+- Node.js 18以上
+- Supabaseアカウント
 
-### Phase 3: 高度な機能（30時間）
+### 手順
 
-| 項目 | 時間 | 内容 |
-|------|------|------|
-| M-NOTIFY | 15h | メール送信設定、各種通知 |
-| M-TENANT | 10h | テナント管理、データ分離 |
-| 仕上げ | 5h | UI/UXブラッシュアップ、テスト |
-
----
-
-## 📊 PHP版からの改善点
-
-| 項目 | PHP版 | React版 |
-|------|-------|---------|
-| 予約フロー | 6ステップ | **3ステップ** |
-| モバイル対応 | なし | **レスポンシブ対応** |
-| 空き状況確認 | ページ遷移が必要 | **リアルタイム表示** |
-| モジュール管理 | 拡張機能テーブル | **設定画面でON/OFF** |
-| 認証方式 | 秘密の質問 | **メール認証** |
-| ユーザーID | varchar(30) | **UUID** |
-
----
-
-## 🚀 セットアップ
-
+1. リポジトリをクローン
 ```bash
-# リポジトリをクローン
-git clone https://github.com/nanka1570/facility_reservation_system.git
+git clone https://github.com/your-username/facility_reservation_system.git
+cd facility_reservation_system
+```
 
-# ディレクトリに移動
-cd facility_reservation_system/React/Projects
-
-# 依存関係をインストール
+2. 依存パッケージをインストール
+```bash
 npm install
+```
 
-# 環境変数を設定（.env.local を作成）
+3. 環境変数を設定（`.env.local`を作成）
+```
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
 
-# 開発サーバーを起動
+4. Supabaseでテーブルを作成（`documents/02_DB設計書_v1.0.md` のSQL参照）
+
+5. 開発サーバーを起動
+```bash
 npm run dev
 ```
 
-### 環境変数
+6. ブラウザで `http://localhost:3000` にアクセス
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
+## ドキュメント
 
----
+| ドキュメント | 内容 |
+|------------|------|
+| `documents/01_要件定義書_v2.3.md` | 要件定義、モジュール構成、技術スタック |
+| `documents/02_DB設計書_v1.0.md` | テーブル定義、ER図、RLS設定 |
+| `documents/03_画面設計書_v1.5.md` | 画面一覧、ワイヤーフレーム、仕様 |
 
-## 📄 ドキュメント
+## 開発期間
 
-| ドキュメント | バージョン | 状態 |
-|-------------|-----------|------|
-| [要件定義書](./docs/01_要件定義書_v2_3.md) | v2.3 | ✅ 完成 |
-| [DB設計書](./docs/02_DB設計書_v1_0.md) | v1.0 | ✅ 完成 |
-| [画面設計書](./docs/03_画面設計書_v1_2.md) | v1.2 | ✅ 完成 |
-| API設計書 | - | ⏳ 作成予定 |
+| 期間 | 作業内容 |
+|------|---------|
+| 2026/01 | 環境構築、DB設計、M-USER（認証） |
+| 2026/02 | M-FACILITY（施設・カテゴリ管理）、M-RESERVE（管理者用予約管理） |
+| 2026/05 | 管理画面フィルター、M-RESERVE（ユーザー向けカレンダー・マイページ）、M-CORE（システム設定） |
 
----
+## ユーザー種別
 
-## 🔧 習得した技術パターン
+| 種別 | 説明 | 権限 |
+|------|------|------|
+| user | 一般ユーザー | 予約の作成・変更・キャンセル |
+| admin | 管理者 | 施設・予約・ユーザーの管理 |
+| developer | 開発者 | モジュールのON/OFF設定 |
 
-### React / Next.js
-- `useState`, `useEffect`, `useRouter`
-- App Router でのルーティング
-- Client Components (`'use client'`)
+## ライセンス
 
-### Supabase
-- 認証（signUp, signIn, signOut, getSession）
-- CRUD操作（select, insert, update, delete）
-- RLS（Row Level Security）
-
-### UIパターン
-- インライン編集
-- モーダル（外側クリックで閉じる、`stopPropagation`）
-- refreshKeyによる再取得
-- `find()`でID→名前変換
-
-### Tailwind CSS
-- Flexbox（`flex`, `flex-col`, `gap`, `justify-between`）
-- レスポンシブ対応
-- hover, rounded, shadow
-
----
-
-## 🔗 関連リポジトリ
-
-| リポジトリ | 内容 |
-|-----------|------|
-| **[Claude_learning_js](https://github.com/nanka1570/Claude_learning_js)** | JavaScript・React基礎学習 |
-| **このリポジトリ** | 施設予約システム（ポートフォリオ） |
-
----
-
-## 📝 開発記録
-
-| 日付 | 内容 |
-|------|------|
-| 2026/2/5 | M-RESERVE: 新規予約モーダル完成、詳細モーダル実装中 |
-| 2026/2/4 | 画面設計書v1.2作成、モーダル外クリックで閉じる機能実装 |
-| 2026/2/3 | M-RESERVE: 予約一覧表示、新規予約INSERT機能 |
-| 2026/2/2 | M-RESERVE: 予約管理画面の基本実装開始 |
-| 2026/1/26 | M-FACILITY: 施設管理CRUD完成 |
-| 2026/1/19 | M-FACILITY: カテゴリ管理CRUD完成 |
-| 2026/1/12 | M-USER: 認証機能完成、ダッシュボード実装 |
-| 2026/1/9 | DB設計書v1.0、画面設計書v1.0作成 |
-| 2026/1/7 | 要件定義書v2完成（モジュール構成、技術学習目標追加） |
-| 2026/1/6 | 要件定義完了、README作成、環境構築準備 |
-| 2026/1/4 | PHP版コードをGitHubにアップロード |
-
----
-
-*Last Updated: 2026/2/5*
+MIT
