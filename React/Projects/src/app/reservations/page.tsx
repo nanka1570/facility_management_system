@@ -86,6 +86,7 @@ export default function Reservations() {
 
     // 新規予約
     const handleInsertReservations = async () => {
+        // 予約重複
         const { data: overlappingReservations, error: checkError } = await supabase
             .from('reservations')
             .select('id')
@@ -99,7 +100,7 @@ export default function Reservations() {
             alert('予約の確認に失敗しました')
             return
         }
-
+        // 予約重複チェック
         if (overlappingReservations && overlappingReservations.length > 0) {
             alert('この時間帯はすでに予約が入っています。')
             return
@@ -131,13 +132,32 @@ export default function Reservations() {
     const handleUpdateReservation = async () => {
         // nullチェック
         if (!selectedReservation) return
+        // 予約重複
+        const { data: overlappingReservations, error: checkError } = await supabase
+            .from('reservations')
+            .select('id')
+            .eq('facility_id', newFacilityId)
+            .eq('status', 'confirmed')
+            .neq('id', selectedReservation.id)
+            .lt('start_time', new Date(newEndTime).toISOString())
+            .gt('end_time', new Date(newStartTime).toISOString())
+            .limit(1)
 
+        if (checkError) {
+            alert('予約の確認に失敗しました')
+            return
+        }
+        // 予約重複チェック
+        if (overlappingReservations && overlappingReservations.length > 0) {
+            alert('この時間帯はすでに予約が入っています。')
+            return
+        }
         const { error } = await supabase
             .from('reservations')
             .update({
                 facility_id: selectedReservation.facility_id,
-                start_time: new Date(selectedReservation.start_time).toISOString(),
-                end_time: new Date(selectedReservation.end_time).toISOString(),
+                start_time: new Date(newStartTime).toISOString(),
+                end_time: new Date(newEndTime).toISOString(),
                 num_people: Number(newNumPeople),
                 purpose: newPurpose,
             })
@@ -243,7 +263,9 @@ export default function Reservations() {
                                                     // 時間と施設が一致する予約を探す
                                                     const reservation = reservations.find((r) =>
                                                         r.facility_id === facility.id &&
-                                                        new Date(r.start_time).getHours() === timeSlot &&
+                                                        r.status === 'confirmed' &&
+                                                        new Date(r.start_time).getHours() <= timeSlot &&
+                                                        new Date(r.end_time).getHours() > timeSlot &&
                                                         new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
                                                 )
                                                 return (
@@ -392,7 +414,7 @@ export default function Reservations() {
                                             className="border rounded px-2 py-1 bg-gray-100"
                                             type="datetime-local"
                                             value={newStartTime}
-                                            readOnly
+                                            onChange={(e) => setNewStartTime(e.target.value)}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -403,7 +425,7 @@ export default function Reservations() {
                                             className="border rounded px-2 py-1"
                                             type="datetime-local"
                                             value={newEndTime}
-                                            readOnly
+                                            onChange={(e) => setNewEndTime(e.target.value)}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
