@@ -8,6 +8,7 @@ import { useEffect, useState } from "react"
 import { BUTTON_PRIMARY, BUTTON_SECONDARY } from "@/lib/constants"
 // 日時をフォーマットする関数, ステータスを日本語に直す関数
 import { formatDateTime, getStatusLabel } from "@/lib/utils"
+import { Facility, Profile, Reservation } from "@/lib/types"
 
 export default function Mypage() {
     
@@ -17,11 +18,11 @@ export default function Mypage() {
     // 画面更新
     const [refreshKey, setRefreshKey] = useState(0)
     // プロフィール
-    const [profile, setProfile] = useState<any | null>(null)
+    const [profile, setProfile] = useState<Profile | null>(null)
     // 予約一覧
-    const [reservations, setReservations] = useState<any[]>([])
+    const [reservations, setReservations] = useState<Reservation[]>([])
     // 施設一覧
-    const [facilities, setFacilities] = useState<any[]>([])
+    const [facilities, setFacilities] = useState<Facility[]>([])
     // 全件表示かどうか
     const [displayAll, setDisplayAll] = useState(false)
     // 編集モーダル開閉

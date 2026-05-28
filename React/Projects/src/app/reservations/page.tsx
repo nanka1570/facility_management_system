@@ -8,6 +8,7 @@ import { useEffect, useState } from "react"
 import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants"
 // timeをdatetime-localに変換する関数
 import { formatDateTimeLocal } from "@/lib/utils"
+import { Facility, Reservation } from "@/lib/types"
 
 export default function Reservations() {
 
@@ -18,9 +19,9 @@ export default function Reservations() {
     // 更新
     const [refreshKey, setRefreshKey] = useState(0)
     /* 予約 */
-    const [reservations, setReservations] = useState<any[]>([])
+    const [reservations, setReservations] = useState<Reservation[]>([])
     /* 施設 */
-    const [facilities, setFacilities] = useState<any[]>([])
+    const [facilities, setFacilities] = useState<Facility[]>([])
     /* 予約カレンダー */
     // 営業時間
     const BUSINESS_HOUR_START = 9

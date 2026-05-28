@@ -6,10 +6,11 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
 import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants"
+import { category } from "@/lib/types"
 
 export default function Categories() {
     const router = useRouter()
-    const [categories, setCategories] = useState<any[]>([])
+    const [categories, setCategories] = useState<category[]>([])
     const [refreshKey, setRefreshKey] = useState(0)
     const [isModalOpen, setIsModalOpen] = useState(false)
     //新規登録

@@ -8,11 +8,12 @@ import { useEffect, useState } from "react"
 import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, BUTTON_SUCCESS } from "@/lib/constants"
 // 日時をフォーマットする関数, timeをdatetime-localに変換する関数, ステータスを日本語に直す関数
 import { formatDateTime, formatDateTimeLocal, getStatusLabel } from "@/lib/utils"
+import { Facility, Reservation } from "@/lib/types"
 
 export default function Reservations() {
     const router = useRouter()
-    const [reservations, setReservations] = useState<any[]>([])
-    const [facilities, setFacilities] = useState<any[]>([])
+    const [reservations, setReservations] = useState<Reservation[]>([])
+    const [facilities, setFacilities] = useState<Facility[]>([])
     const [refreshKey, setRefreshKey] = useState(0)
     const [isModalOpen, setIsModalOpen] = useState(false)
     //新規予約

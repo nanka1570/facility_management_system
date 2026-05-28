@@ -2,6 +2,7 @@
 
 import Header from "@/components/Header"
 import { supabase } from "@/lib/supabase"
+import { ModuleSetting } from "@/lib/types"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -12,7 +13,7 @@ export default function Settings() {
     // 画面更新
     const [refreshKey, setRefreshKey] = useState(0)
     // モジュール設定一覧
-    const [moduleSettings, setModuleSettings] = useState<any[]>([])
+    const [moduleSettings, setModuleSettings] = useState<ModuleSetting[]>([])
     // 固定モジュール
     const FIXED_MODULE_IDS = ['M-CORE', 'M-USER', 'M-FACILITY']
 

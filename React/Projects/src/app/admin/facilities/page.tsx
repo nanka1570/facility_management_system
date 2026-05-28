@@ -6,11 +6,12 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
 import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants"
+import { category, Facility } from "@/lib/types"
 
 export default function Facilities() {
     const router = useRouter()
-    const [facilities, setFacilities] = useState<any[]>([])
-    const [categories, setCategories] = useState<any[]>([])
+    const [facilities, setFacilities] = useState<Facility[]>([])
+    const [categories, setCategories] = useState<category[]>([])
     const [refreshKey, setRefreshKey] = useState(0)
     const [isModalOpen, setIsModalOpen] = useState(false)
     /*施設*/

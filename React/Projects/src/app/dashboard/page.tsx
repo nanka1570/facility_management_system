@@ -4,15 +4,16 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation" //next.jsの画面遷移
 import { useEffect, useState } from "react"
 import Header from "@/components/Header"
+import { Facility, Reservation } from "@/lib/types"
 
 export default function Dashboard() {
     const [ displayName, setDisplayName ] = useState('')
     const router = useRouter();
 
     // 予約一覧
-    const [reservations, setReservations] = useState<any[]>([])
+    const [reservations, setReservations] = useState<Reservation[]>([])
     // 施設一覧
-    const [facilities, setFacilities] = useState<any[]>([])
+    const [facilities, setFacilities] = useState<Facility[]>([])
     // 今日の日付
     const [selectedDate, setSelectedDate] = useState(() => {
         const today = new Date()
