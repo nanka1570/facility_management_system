@@ -7,7 +7,7 @@ export type Profile = {
     updated_at: string
 }
 
-export type category = {
+export type Category = {
     id: number
     name: string
     sort_order: number

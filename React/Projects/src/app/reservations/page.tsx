@@ -44,7 +44,7 @@ export default function Reservations() {
     const [newNumPeople, setNewNumPeople] = useState('')
     const [newPurpose, setNewPurpose] = useState('')
     // クリックした予約
-    const [selectedReservation, setSelectedReservation] = useState<any | null>(null)
+    const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
 
     useEffect(() => {
         // ログインチェック
