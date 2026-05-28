@@ -15,22 +15,27 @@ export default function Header() {
 
     return(
         <header className="bg-white p-4 shadow flex justify-between">
-            <h1>
+            <h1
+                onClick={() => router.push('/dashboard')}
+                className="cursor-pointer"
+            >
                 施設管理システム
             </h1>
             <div className="flex gap-4">
                 <button
-                    className="text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
+                    className="cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
+                    onClick={() => router.push('/reservations')}
                     >
                     予約
                     </button>
                 <button
-                    className="text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
+                    className="cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
+                    onClick={() => router.push('/mypage')}
                     >
                     マイページ
                     </button>
                 <button 
-                    className="text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
+                    className="cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
                     onClick={handleLogout}
                     >
                     ログアウト</button>

@@ -9,6 +9,15 @@ export default function Dashboard() {
     const [ displayName, setDisplayName ] = useState('')
     const router = useRouter();
 
+    // 予約一覧
+    const [reservations, setReservations] = useState<any[]>([])
+    // 施設一覧
+    const [facilities, setFacilities] = useState<any[]>([])
+    // 今日の日付
+    const [selectedDate, setSelectedDate] = useState(() => {
+        const today = new Date()
+        return today.toLocaleDateString('sv-SE')
+    })
     useEffect(() => {
         const checkSession = async () => {
             const { data: { session } } = await supabase.auth.getSession()
@@ -24,7 +33,27 @@ export default function Dashboard() {
                     .single()
                 setDisplayName(data.display_name)
             }
-            
+
+            // 予約一覧をロード
+            const { data: reservationData, error: reservationError } = await supabase
+                .from('reservations')
+                .select('*')
+                .eq('status', 'confirmed')
+            if (reservationError) {
+                alert('予約一覧の取得に失敗しました')
+            } else {
+                setReservations(reservationData)
+            }
+
+            // 施設一覧をロード
+            const { data: facilityData, error: facilityError } = await supabase
+                .from('facilities')
+                .select('*')
+            if (facilityError) {
+                alert('施設一覧の取得に失敗しました')
+            } else {
+                setFacilities(facilityData)
+            }
         }
         checkSession()
     }, [])
@@ -46,13 +75,29 @@ export default function Dashboard() {
                             >
                                 今日の予約
                             </h2>
-                            <p 
-                            className="text-gray-500"
-                            >
-                                (予約なし)
-                            </p>
+                            {reservations ? (
+                                <>
+                                    {reservations
+                                        .filter((r) => 
+                                            new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate)
+                                        .map((r) => (
+                                            <p key={r.id} className="text-gray-600 py-1">
+                                                {facilities.find(f => f.id === r.facility_id)?.name}
+                                                {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
+                                            </p>
+                                        ))
+                                    }
+                                </>
+                            ) : (
+                                <p 
+                                className="text-gray-500"
+                                >
+                                    (予約なし)
+                                </p>
+                            )}
                             <button
-                            className="text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
+                                className="text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
+                                onClick={() => router.push('/reservations')}
                             >
                                 予約カレンダーへ
                             </button>
@@ -62,7 +107,13 @@ export default function Dashboard() {
                             >
                                 今月の予約数
                             </h2>
-                            <p>0件</p>
+                            <p>
+                                {reservations
+                                    .filter((r) => 
+                                        new Date(r.start_time).toLocaleDateString('sv-SE').slice(0, 7) === selectedDate.slice(0, 7))
+                                    .length
+                                }
+                            </p>
                         </div>
                     </div>
                 </main>
