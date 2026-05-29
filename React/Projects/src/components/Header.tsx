@@ -36,7 +36,7 @@ export default function Header() {
                     </button>
                 <button 
                     className="cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
-                    onClick={() => handleLogout}
+                    onClick={() => handleLogout()}
                     >
                     ログアウト</button>
             </div>
