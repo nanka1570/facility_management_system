@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation" //next.jsの画面遷移
 import { useEffect, useState } from "react"
 import Header from "@/components/Header"
 import { Facility, Reservation } from "@/lib/types"
+import { BUTTON_SECONDARY } from "@/lib/constants"
 
 export default function Dashboard() {
     const [ displayName, setDisplayName ] = useState('')
@@ -25,6 +26,7 @@ export default function Dashboard() {
             
             if (!session) {
                 router.push('/')
+                return
             } else {
                 const userId = session.user.id
                 const { data, error } = await supabase
@@ -32,7 +34,11 @@ export default function Dashboard() {
                     .select('*')
                     .eq('id', userId)
                     .single()
-                setDisplayName(data.display_name)
+                if (error) {
+                    alert('プロフィールの取得に失敗しました')
+                } else {
+                    setDisplayName(data.display_name)
+                }
             }
 
             // 予約一覧をロード
@@ -76,28 +82,26 @@ export default function Dashboard() {
                             >
                                 今日の予約
                             </h2>
-                            {reservations ? (
-                                <>
-                                    {reservations
-                                        .filter((r) => 
-                                            new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate)
-                                        .map((r) => (
+                            {( () => {
+                                const todayReservations = reservations.filter(
+                                    (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
+                                )
+                                return todayReservations.length > 0 ? (
+                                    todayReservations.map(
+                                        (r) => (
                                             <p key={r.id} className="text-gray-600 py-1">
                                                 {facilities.find(f => f.id === r.facility_id)?.name}
                                                 {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
                                             </p>
-                                        ))
-                                    }
-                                </>
-                            ) : (
-                                <p 
-                                className="text-gray-500"
-                                >
-                                    (予約なし)
-                                </p>
-                            )}
+                                        )
+                                    )
+                                ) : (
+                                        <p className="text-gray-500">(予約なし)</p>
+                                    )
+                                }
+                            )()}
                             <button
-                                className="text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
+                                className={BUTTON_SECONDARY}
                                 onClick={() => router.push('/reservations')}
                             >
                                 予約カレンダーへ
