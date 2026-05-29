@@ -140,6 +140,7 @@ export default function Mypage() {
                             予約履歴
                         </h2>
                         <button
+                            className={BUTTON_SECONDARY}
                             onClick={() => setDisplayAll(!displayAll)}
                         >
                             {displayAll ? '直近5件のみ表示' : 'すべて表示'}
