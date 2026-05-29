@@ -94,6 +94,19 @@ export default function Reservations() {
 
     //新規予約
     const handleInsertReservations = async () => {
+        const { data: overlapping, error: checkError } = await supabase
+            .from('reservations')
+            .select('id')
+            .eq('facility_id', newFacilityId)
+            .eq('status', 'confirmed')
+            .lt('start_time', new Date(newEndTime).toISOString())
+            .gt('end_time', new Date(newStartTime).toISOString())
+            .limit(1)
+        if (checkError) { alert('予約の確認に失敗しました'); return }
+        if (overlapping && overlapping.length > 0) {
+            alert('この時間帯はすでに予約が入っています')
+            return
+        }
         const { error } = await supabase
             .from('reservations')
             .insert({
