@@ -83,6 +83,7 @@ export default function Categories() {
 
     //カテゴリ削除（一括）
     const handleDeleteCategories = async () => {
+        if (!window.confirm('選択したかてごりを削除しますか？')) return
         const { error } = await supabase
             .from('categories')
             .delete()
