@@ -123,6 +123,7 @@ export default function Facilities() {
 
     //施設削除（一括）
     const handleDeleteFacilities = async () => {
+        if (!window.confirm('選択した施設を削除しますか？')) return
         // 削除対象の施設が予約に使われていないかチェック
         const { data: linkedReservations, error: checkError } = await supabase
             .from('reservations')
