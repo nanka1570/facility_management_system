@@ -9,12 +9,18 @@ import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants
 import { Category, Facility } from "@/lib/types"
 
 export default function Facilities() {
+
+    // 画面遷移
     const router = useRouter()
-    const [facilities, setFacilities] = useState<Facility[]>([])
-    const [categories, setCategories] = useState<Category[]>([])
+    // 画面更新
     const [refreshKey, setRefreshKey] = useState(0)
+    // 施設一覧
+    const [facilities, setFacilities] = useState<Facility[]>([])
+    // カテゴリ一覧
+    const [categories, setCategories] = useState<Category[]>([])
+    /* 施設 */
+    // 新規登録モーダル
     const [isModalOpen, setIsModalOpen] = useState(false)
-    /*施設*/
     // 新規登録
     const [newName, setNewName] = useState('')
     const [newCategoryId, setNewCategoryId] = useState<number | null>(null)
@@ -34,41 +40,39 @@ export default function Facilities() {
     const [filterCategoryId, setFilterCategoryId] = useState<number | null>(null)
 
     useEffect(() => {
-        //ログインチェック
-        const checkSession = async () => {
+        // 初期処理
+        const init = async () => {
+            //ログインチェック
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
                 router.push('/')
+                return
             }
-        }
-        //施設一覧をロード
-        const loadFacilities = async () => {
-            const { data, error } = await supabase
+
+            //施設一覧をロード
+            const { data: facilityData, error: facilityError } = await supabase
                 .from('facilities')
                 .select('*')
                 .order('id', { ascending: true })
 
-            if (error) {
+            if (facilityError) {
                 alert('施設一覧の取得に失敗しました')
             } else {
-                setFacilities(data)
+                setFacilities(facilityData)
             }
-        }
-        //カテゴリ一覧をロード
-        const loadCategories = async () => {
-            const { data, error } = await supabase
+
+            //カテゴリ一覧をロード
+            const { data: categoryData, error: categoryError } = await supabase
                 .from('categories')
                 .select('*')
 
-            if (error) {
+            if (categoryError) {
                 alert('カテゴリ一覧の取得に失敗しました')
             } else {
-                setCategories(data)
+                setCategories(categoryData)
             }
         }
-        checkSession()
-        loadFacilities()
-        loadCategories()
+        init()
     }, [refreshKey])
 
     //カテゴリ名を取得

@@ -11,32 +11,39 @@ import { formatDateTime, formatDateTimeLocal, getStatusLabel } from "@/lib/utils
 import { Facility, Reservation } from "@/lib/types"
 
 export default function Reservations() {
+
+    // 画面遷移
     const router = useRouter()
-    const [reservations, setReservations] = useState<Reservation[]>([])
-    const [facilities, setFacilities] = useState<Facility[]>([])
+    // 画面更新
     const [refreshKey, setRefreshKey] = useState(0)
+    // ユーザーID
+    const [userId, setUserId] = useState('')
+    // 予約一覧
+    const [reservations, setReservations] = useState<Reservation[]>([])
+    // 施設一覧
+    const [facilities, setFacilities] = useState<Facility[]>([])
+    /* 予約 */
+    // 新規登録モーダル 
     const [isModalOpen, setIsModalOpen] = useState(false)
-    //新規予約
+    // 新規予約
     const [newFacilityId, setNewFacilityId] = useState<number | null>(null)
     const [newStartTime, setNewStartTime] = useState('')
     const [newEndTime, setNewEndTime] = useState('')
     const [newNumPeople, setNewNumPeople] = useState('')
     const [newPurpose, setNewPurpose] = useState('')
-    const [userId, setUserId] = useState('')
-    //編集
+    // 編集
     const [selectedReservationId, setSelectedReservationId] = useState<number | null>(null)
     const selectedReservation = reservations.find(r => r.id === selectedReservationId)
-
     const [editFacilityId, setEditFacilityId] = useState<number | null>(null)
     const [editStartTime, setEditStartTime] = useState('')
     const [editEndTime, setEditEndTime] = useState('')
     const [editNumPeople, setEditNumPeople] = useState('')
     const [editPurpose, setEditPurpose] = useState('')
     const [isEditClick, setIsEditClick] = useState(false)   //編集ボタンクリック
-    //予約キャンセル
+    // 予約キャンセル
     const [isCancelClick, setIsCancelClick] = useState(false)   //予約キャンセルボタンクリック
     const [selectedCheckboxReservationId, setSelectedCheckboxReservationId] = useState<number[]>([])
-    //予約復元
+    // 予約復元
     const [isRestoreClick, setIsRestoreClick] = useState(false) //予約復元ボタンクリック
 
     // フィルター
@@ -44,43 +51,42 @@ export default function Reservations() {
     const [filterDate, setFilterDate] = useState('')
 
     useEffect(() => {
-        //ログインチェック
-        const checkSession = async () => {
+        // 初期処理
+        const init = async () => {
+            // ログインチェック
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
                 router.push('/')
-            } else {
-                //sessionからUUIDを取り出す
-                setUserId(session.user.id)
+                return
             }
-        }
-        //予約一覧をロード
-        const loadReservations = async () => {
-            const { data, error } = await supabase
+
+            // UUIDをユーザーIDとしてセット
+            setUserId(session.user.id)
+
+            // 予約一覧をロード
+            const { data: reservationData, error: reservationError } = await supabase
                 .from('reservations')
                 .select('*')
                 .order('id', { ascending: true })
-
-            if (error) {
+    
+            if (reservationError) {
                 alert('予約一覧の取得に失敗しました')
             } else {
-                setReservations(data)
+                setReservations(reservationData)
             }
-        }
-        //施設一覧をロード
-        const loadFacilities = async () => {
-            const { data, error } = await supabase
+
+            // 施設一覧をロード
+            const { data: facilityData, error: facilityError } = await supabase
                 .from('facilities')
                 .select('*')
-            if (error) {
+            if (facilityError) {
                 alert('施設一覧の取得に失敗しました')
             } else {
-                setFacilities(data)
+                setFacilities(facilityData)
             }
+
         }
-        checkSession()
-        loadReservations()
-        loadFacilities()
+        init()
     }, [refreshKey])
 
 
@@ -94,6 +100,7 @@ export default function Reservations() {
 
     //新規予約
     const handleInsertReservations = async () => {
+        // 予約重複チェック
         const { data: overlapping, error: checkError } = await supabase
             .from('reservations')
             .select('id')
@@ -107,6 +114,8 @@ export default function Reservations() {
             alert('この時間帯はすでに予約が入っています')
             return
         }
+
+        // 予約登録
         const { error } = await supabase
             .from('reservations')
             .insert({
@@ -135,6 +144,22 @@ export default function Reservations() {
         // nullチェック
         if (!selectedReservation) return
 
+        // 予約重複チェック
+        const { data: overlapping, error: checkError } = await supabase
+            .from('reservations')
+            .select('id')
+            .eq('facility_id', editFacilityId)
+            .eq('status', 'confirmed')
+            .lt('start_time', new Date(newEndTime).toISOString())
+            .gt('end_time', new Date(newStartTime).toISOString())
+            .limit(1)
+        if (checkError) { alert('予約の確認に失敗しました'); return }
+        if (overlapping && overlapping.length > 0) {
+            alert('この時間帯はすでに予約が入っています')
+            return
+        }
+
+        // 予約更新
         const { error } = await supabase
             .from('reservations')
             .update({

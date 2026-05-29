@@ -12,27 +12,26 @@ import { Facility, Reservation } from "@/lib/types"
 
 export default function Reservations() {
 
-    /* ログイン */
-    // ルーター
+    // 画面遷移
     const router = useRouter()
-    const [userId, setUserId] = useState('')
-    // 更新
+    // 画面更新
     const [refreshKey, setRefreshKey] = useState(0)
-    /* 予約 */
+    // ユーザーID
+    const [userId, setUserId] = useState('')
+    // 予約一覧
     const [reservations, setReservations] = useState<Reservation[]>([])
-    /* 施設 */
+    // 施設一覧
     const [facilities, setFacilities] = useState<Facility[]>([])
-    /* 予約カレンダー */
-    // 営業時間
-    const BUSINESS_HOUR_START = 9
-    const BUSINESS_HOUR_END = 17
+    // 予約カレンダー
+    const BUSINESS_HOUR_START = 9   // 営業開始時間
+    const BUSINESS_HOUR_END = 17    // 営業終了時間
     const timeSlots = Array.from({ length: BUSINESS_HOUR_END - BUSINESS_HOUR_START + 1 }, (_, i) => i + BUSINESS_HOUR_START)
     // 今日の日付
     const [selectedDate, setSelectedDate] = useState(() => {
         const today = new Date()
         return today.toLocaleDateString('sv-SE')
     })
-    /* モーダル */
+    /* 予約 */
     // 新規登録モーダル
     const [isModalOpen, setIsModalOpen] = useState(false)
     // 詳細モーダル
@@ -47,41 +46,40 @@ export default function Reservations() {
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
 
     useEffect(() => {
-        // ログインチェック
-        const checkSession = async () => {
+        // 初期処理
+        const init = async () => {
+            // ログインチェック
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
                 router.push('/')
-            }else {
-                setUserId(session.user.id)
+                return
             }
-        }
-        // 予約一覧をロード
-        const loadReservations = async () => {
-            const { data, error } = await supabase
+
+            // UUIDをユーザーIDとしてセット
+            setUserId(session.user.id)
+            
+            // 予約一覧をロード
+            const { data: reservationData, error: reservationError } = await supabase
                 .from('reservations')
                 .select('*')
                 .order('id', { ascending: true })
-            if (error) {
+            if (reservationError) {
                 alert('予約一覧の取得に失敗しました')
             } else {
-                setReservations(data)
+                setReservations(reservationData)
             }
-        }
-        // 施設一覧をロード
-        const loadFacilities = async () => {
-            const { data, error } = await supabase
+
+            // 施設一覧をロード
+            const { data: facilityData, error: facilityError } = await supabase
                 .from('facilities')
                 .select('*')
-            if (error) {
+            if (facilityError) {
                 alert('施設一覧の取得に失敗しました')
             } else {
-                setFacilities(data)
+                setFacilities(facilityData)
             }
         }
-        checkSession()
-        loadReservations()
-        loadFacilities()
+        init()
     }, [refreshKey])
 
     // 新規予約

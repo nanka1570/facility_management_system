@@ -12,11 +12,12 @@ import { Facility, Profile, Reservation } from "@/lib/types"
 
 export default function Mypage() {
     
-    // ログイン
+    // 画面遷移
     const router = useRouter()
-    const [userId, setUserId] = useState('')
     // 画面更新
     const [refreshKey, setRefreshKey] = useState(0)
+    // ユーザーID
+    const [userId, setUserId] = useState('')
     // プロフィール
     const [profile, setProfile] = useState<Profile | null>(null)
     // 予約一覧
@@ -31,39 +32,43 @@ export default function Mypage() {
     const [updateDisplayName, setUpdateDisplayName] = useState('')
 
     useEffect(() => {
-        // ログインチェック
-        const checkSession = async () => {
+        // 初期処理
+        const init = async () => {
+            // ログインチェック
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
                 router.push('/')
-            } else {
-                setUserId(session.user.id)
-                // プロフィールをロード
-                const { data: profileData, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', session.user.id)
-                    .single()
-                if (profileError) {
-                    alert('プロフィールの取得に失敗しました')
-                } else {
-                    setProfile(profileData)
-                }
-                // 予約一覧をロード
-                const { data: reservationData, error: reservationError } = await supabase
-                    .from('reservations')
-                    .select('*')
-                    .eq('user_id', session.user.id)
-                    .order('start_time', { ascending: false })
-                if (reservationError) {
-                    alert('予約一覧の取得に失敗しました')
-                } else {
-                    setReservations(reservationData)
-                }
+                return
             }
-        }
-        // 施設一覧をロード
-        const loadFacilities = async () => {
+
+            // UUIDをユーザーIDとしてセット
+            setUserId(session.user.id)
+
+            // プロフィールをロード
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single()
+            if (profileError) {
+                alert('プロフィールの取得に失敗しました')
+            } else {
+                setProfile(profileData)
+            }
+
+            // 予約一覧をロード
+            const { data: reservationData, error: reservationError } = await supabase
+                .from('reservations')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .order('start_time', { ascending: false })
+            if (reservationError) {
+                alert('予約一覧の取得に失敗しました')
+            } else {
+                setReservations(reservationData)
+            }
+
+            // 施設一覧をロード
             const { data, error } = await supabase
                 .from('facilities')
                 .select('*')
@@ -73,8 +78,7 @@ export default function Mypage() {
                 setFacilities(data)
             }
         }
-        checkSession()
-        loadFacilities()
+        init()
     }, [refreshKey])
 
     // 編集

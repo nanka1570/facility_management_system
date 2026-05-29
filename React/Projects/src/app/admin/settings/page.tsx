@@ -8,7 +8,7 @@ import { useEffect, useState } from "react"
 
 export default function Settings() {
     
-    // ログイン
+    // 画面遷移
     const router = useRouter()
     // 画面更新
     const [refreshKey, setRefreshKey] = useState(0)
@@ -18,37 +18,39 @@ export default function Settings() {
     const FIXED_MODULE_IDS = ['M-CORE', 'M-USER', 'M-FACILITY']
 
     useEffect(() => {
-        const checkSession = async () => {
+        // 初期処理
+        const init = async () => {
+            // ログインチェック
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
                 router.push('/')
-            } else {
-                // developer権限チェック
-                const { data: profileData } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', session.user.id)
-                    .single()
+                return
+            }
 
-                if (profileData?.role !== 'developer') {
-                    alert('開発者のみアクセスできます')
-                    router.push('/dashboard')
-                    return
+            // developer権限チェック
+            const { data: profileData } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single()
+            if (profileData?.role !== 'developer') {
+                alert('開発者のみアクセスできます')
+                router.push('/dashboard')
+                return
+            } else {
+                // モジュール設定一覧をロード
+                const { data: moduleData, error: moduleError } = await supabase
+                    .from('module_settings')
+                    .select('*')
+                    .order('id', { ascending: true })
+                if (moduleError) {
+                    alert('モジュール設定値欄の取得に失敗しました')
                 } else {
-                    // モジュール設定一覧をロード
-                    const { data: moduleData, error: moduleError } = await supabase
-                        .from('module_settings')
-                        .select('*')
-                        .order('id', { ascending: true })
-                    if (moduleError) {
-                        alert('モジュール設定値欄の取得に失敗しました')
-                    } else {
-                        setModuleSettings(moduleData)
-                    }
+                    setModuleSettings(moduleData)
                 }
             }
         }
-        checkSession()
+        init()
     }, [refreshKey])
 
     const handleUpdateToggle = async (id: number, currentValue: boolean) => {

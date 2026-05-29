@@ -8,37 +8,46 @@ import { Facility, Reservation } from "@/lib/types"
 import { BUTTON_SECONDARY } from "@/lib/constants"
 
 export default function Dashboard() {
-    const [ displayName, setDisplayName ] = useState('')
-    const router = useRouter();
 
+    // 画面遷移
+    const router = useRouter();
+    // ユーザーID
+    const [userId, setUserId] = useState('')
     // 予約一覧
     const [reservations, setReservations] = useState<Reservation[]>([])
     // 施設一覧
     const [facilities, setFacilities] = useState<Facility[]>([])
+    // 表示名
+    const [ displayName, setDisplayName ] = useState('')
     // 今日の日付
     const [selectedDate, setSelectedDate] = useState(() => {
         const today = new Date()
         return today.toLocaleDateString('sv-SE')
     })
+
     useEffect(() => {
-        const checkSession = async () => {
+        // 初期処理
+        const init = async () => {
+            // ログインチェック
             const { data: { session } } = await supabase.auth.getSession()
-            
             if (!session) {
                 router.push('/')
                 return
+            }
+
+            // UUIDをユーザーIDとしてセット
+            setUserId(session.user.id)
+            
+            // プロフィールをロード
+            const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single()
+            if (profileError) {
+                alert('プロフィールの取得に失敗しました')
             } else {
-                const userId = session.user.id
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', userId)
-                    .single()
-                if (error) {
-                    alert('プロフィールの取得に失敗しました')
-                } else {
-                    setDisplayName(data.display_name)
-                }
+                setDisplayName(profileData.display_name)
             }
 
             // 予約一覧をロード
@@ -62,7 +71,7 @@ export default function Dashboard() {
                 setFacilities(facilityData)
             }
         }
-        checkSession()
+        init()
     }, [])
 
     return (

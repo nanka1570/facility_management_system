@@ -9,9 +9,15 @@ import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants
 import { Category } from "@/lib/types"
 
 export default function Categories() {
+    
+    // 画面遷移
     const router = useRouter()
-    const [categories, setCategories] = useState<Category[]>([])
+    // 画面更新
     const [refreshKey, setRefreshKey] = useState(0)
+    // カテゴリ一覧
+    const [categories, setCategories] = useState<Category[]>([])
+    /* カテゴリ */
+    // 新規登録モーダル
     const [isModalOpen, setIsModalOpen] = useState(false)
     //新規登録
     const [newName, setNewName] = useState('')
@@ -22,32 +28,32 @@ export default function Categories() {
     const [editSortOrder, setEditSortOrder] = useState(0)
     const [isEditClick, setIsEditClick] = useState(false)   //編集ボタンクリック
     //削除
-    const [isDeleteClick, setIsDeleteClick] = useState(false)   //削除ボタンクリック
     const [selectedCheckboxCategoryId, setSelectedCheckboxCategoryId] = useState<number[]>([])
+    const [isDeleteClick, setIsDeleteClick] = useState(false)   //削除ボタンクリック
 
     useEffect(() => {
-        //ログインチェック
-        const checkSession = async () => {
+        // 初期処理
+        const init = async () => {
+            //ログインチェック
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
                 router.push('/')
+                return
             }
-        }
-        //カテゴリ一覧を表示
-        const loadCategories = async () => {
-            const { data, error } = await supabase
+
+            //カテゴリ一覧を表示
+            const { data: categoryData, error: categoryError } = await supabase
                 .from('categories')
                 .select('*')
                 .order('sort_order', { ascending: true })
 
-            if (error) {
+            if (categoryError) {
                 alert('カテゴリ一覧の取得に失敗しました')
             } else {
-                setCategories(data)
+                setCategories(categoryData)
             }
         }
-        checkSession()
-        loadCategories()
+        init()
     }, [refreshKey])
 
     //カテゴリ追加
