@@ -42,7 +42,7 @@ export default function Reservations() {
     const [newEndTime, setNewEndTime] = useState('')
     const [newNumPeople, setNewNumPeople] = useState('')
     const [newPurpose, setNewPurpose] = useState('')
-    // クリックした予約
+    // 更新
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
 
     useEffect(() => {
@@ -88,7 +88,7 @@ export default function Reservations() {
         const { data: overlappingReservations, error: checkError } = await supabase
             .from('reservations')
             .select('id')
-            .eq('facility_id', newFacilityId)
+            .eq('facility_id', selectedReservation?.facility_id)
             .eq('status', 'confirmed')
             .lt('start_time', new Date(newEndTime).toISOString())
             .gt('end_time', new Date(newStartTime).toISOString())
