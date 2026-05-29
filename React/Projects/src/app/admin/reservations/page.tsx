@@ -150,8 +150,9 @@ export default function Reservations() {
             .select('id')
             .eq('facility_id', editFacilityId)
             .eq('status', 'confirmed')
-            .lt('start_time', new Date(newEndTime).toISOString())
-            .gt('end_time', new Date(newStartTime).toISOString())
+            .neq('id', selectedReservation.id)   // 自分自身を除外
+            .lt('start_time', new Date(editEndTime).toISOString())
+            .gt('end_time', new Date(editStartTime).toISOString())
             .limit(1)
         if (checkError) { alert('予約の確認に失敗しました'); return }
         if (overlapping && overlapping.length > 0) {
