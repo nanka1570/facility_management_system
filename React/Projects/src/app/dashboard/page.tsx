@@ -11,8 +11,6 @@ export default function Dashboard() {
 
     // 画面遷移
     const router = useRouter();
-    // ユーザーID
-    const [userId, setUserId] = useState('')
     // 予約一覧
     const [reservations, setReservations] = useState<Reservation[]>([])
     // 施設一覧
@@ -34,15 +32,12 @@ export default function Dashboard() {
                 router.push('/')
                 return
             }
-
-            // UUIDをユーザーIDとしてセット
-            setUserId(session.user.id)
             
             // プロフィールをロード
             const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', userId)
+                .eq('id', session.user.id)
                 .single()
             if (profileError) {
                 alert('プロフィールの取得に失敗しました')
