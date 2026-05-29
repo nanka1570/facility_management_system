@@ -46,14 +46,66 @@ onClick={handleXxx}          // ❌
 
 ### ■ B. 命名・意図の明示
 
+> 原則: **「間違ったコードは間違って見える」（Joel Spolsky / Application Hungarian）**
+> 変数名に「データの種類・状態・出所」を含めることで、**コードを1行見ただけで誤用が視覚的に分かる**ようにする。
+> 型（TypeScript）が同じでも「意味」が違えば名前で区別する。
+
 **B-1 ★★★ 名前だけで型・用途・出所が読み取れるか**
-- 安全なデータと未検証のデータを名前で区別しているか
-- 出所が名前から分かるか（例: `userIdFromAuth` vs `userIdFromDB`）
-- 1行見ただけで間違いが分かる命名か（代入の両辺で意味が一致しているか）
+
+以下の3観点で、**1行見ただけで誤りに気づける命名**になっているかをチェックする。
+
+**(1) 安全/未検証の区別** — `raw` / `sanitized` / `validated` などで状態を表しているか
+```ts
+// ❌ 検証前後が名前で区別できない。未検証のまま使っても気づけない
+const input = e.target.value
+await supabase.from('facilities').insert({ name: input })
+
+// ✅ 状態が名前に出る。未検証データの混入が「見て」分かる
+const rawName = e.target.value
+const validatedName = rawName.trim()
+if (!validatedName) return
+await supabase.from('facilities').insert({ name: validatedName })
+```
+
+**(2) データの出所の区別** — どこから来たIDか名前で分かるか
+```ts
+// ❌ どちらも userId。出所が違うのに同じ名前 → 取り違えに気づけない
+const userId = session.user.id
+const userId2 = formValues.userId
+
+// ✅ 出所が名前に出る。認証由来とフォーム由来の混在が「見て」分かる
+const userIdFromAuth = session.user.id   // セッション（信頼できる）
+const userIdFromForm = formValues.userId // フォーム入力（未検証）
+// 保存する user_id に userIdFromForm を使っていたら一目で危険と分かる
+```
+> 出所が違うIDを混在させると、なりすまし等のセキュリティバグや論理バグになる。
+> 特に Supabase の `user_id` には「セッション由来の値」を使う（フォーム/URL由来を使わない）。
+
+**(3) 代入の両辺で意味が一致しているか** — 型が同じでも「種類」が一致しているか
+```ts
+// ❌ 型はどちらも number だが、意味が違う（施設ID ← 予約ID）
+const facilityId = reservation.id        // 予約のIDを施設IDに入れている！
+// → Application Hungarian なら名前から「facility ← reservation」のズレが見える
+
+// ✅ 左辺と右辺の「種類」が一致している
+const facilityId = reservation.facility_id
+```
 
 **B-2 ★★★ マジックナンバー・マジックストリングが定数化されているか**
 
+`status` の文字列リテラル（`'confirmed'` / `'cancelled'` / `'completed'`）を直接比較していないか。
+```ts
+// ❌ タイポしてもエラーにならず、常に false になるだけ → 気づけない
+if (reservation.status === 'confiremd') { ... }
+
+// ✅ 定数（または型）経由で比較し、タイポをコンパイル時に弾く
+if (reservation.status === RESERVATION_STATUS.CONFIRMED) { ... }
+```
+- 営業時間や上限などの数値も `BUSINESS_HOUR_START` のように定数化されているか
+- Supabase から取得した**生データ**と、`formatDateTime()` 等で**加工済みのデータ**を同じ名前で扱っていないか
+
 **B-3 ★★☆ プロジェクトの命名規則と一致しているか**（CLAUDE.md参照）
+- 型 PascalCase / DBカラム snake_case / state camelCase / 定数 UPPER_SNAKE_CASE
 
 ---
 
