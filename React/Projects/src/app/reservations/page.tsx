@@ -47,6 +47,8 @@ export default function Reservations() {
     const [newPurpose, setNewPurpose] = useState('')
     // 更新
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
+    // 多重送信防止
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
         // 初期処理
@@ -106,26 +108,32 @@ export default function Reservations() {
             alert('この時間帯はすでに予約が入っています。')
             return
         }
-        const { error } = await supabase
-            .from('reservations')
-            .insert({
-                user_id: userId,
-                facility_id: newFacilityId,
-                start_time: new Date(newStartTime).toISOString(),
-                end_time: new Date(newEndTime).toISOString(),
-                num_people: Number(newNumPeople),
-                purpose: newPurpose,
-            })
-        if (error) {
-            alert('新規予約に失敗しました')
-        } else {
-            setRefreshKey(prev => prev + 1)
-            setNewFacilityId(null)
-            setNewStartTime('')
-            setNewEndTime('')
-            setNewNumPeople('')
-            setNewPurpose('')
-            setIsModalOpen(false)
+        
+        setIsSubmitting(true)
+        try {
+            const { error } = await supabase
+                .from('reservations')
+                .insert({
+                    user_id: userId,
+                    facility_id: newFacilityId,
+                    start_time: new Date(newStartTime).toISOString(),
+                    end_time: new Date(newEndTime).toISOString(),
+                    num_people: Number(newNumPeople),
+                    purpose: newPurpose,
+                })
+            if (error) {
+                alert('新規予約に失敗しました')
+            } else {
+                setRefreshKey(prev => prev + 1)
+                setNewFacilityId(null)
+                setNewStartTime('')
+                setNewEndTime('')
+                setNewNumPeople('')
+                setNewPurpose('')
+                setIsModalOpen(false)
+            }
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -153,39 +161,51 @@ export default function Reservations() {
             alert('この時間帯はすでに予約が入っています。')
             return
         }
-        const { error } = await supabase
-            .from('reservations')
-            .update({
-                facility_id: selectedReservation.facility_id,
-                start_time: new Date(newStartTime).toISOString(),
-                end_time: new Date(newEndTime).toISOString(),
-                num_people: Number(newNumPeople),
-                purpose: newPurpose,
-            })
-            .eq('id', selectedReservation.id)
-        if (error) {
-            alert('予約の更新に失敗しました')
-        } else {
-            setRefreshKey(prev => prev + 1)
-            setSelectedReservation(null)
+
+        setIsSubmitting(true)
+        try {
+            const { error } = await supabase
+                .from('reservations')
+                .update({
+                    facility_id: selectedReservation.facility_id,
+                    start_time: new Date(newStartTime).toISOString(),
+                    end_time: new Date(newEndTime).toISOString(),
+                    num_people: Number(newNumPeople),
+                    purpose: newPurpose,
+                })
+                .eq('id', selectedReservation.id)
+            if (error) {
+                alert('予約の更新に失敗しました')
+            } else {
+                setRefreshKey(prev => prev + 1)
+                setSelectedReservation(null)
+            }
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
     // キャンセル処理
     const handleCancelReservation = async () => {
         if (!selectedReservation) return
-        const { error } = await supabase
-            .from('reservations')
-            .update({
-                status: RESERVATION_STATUS.CANCELLED
-            })
-            .eq('id', selectedReservation.id)
-        if (error) {
-            alert('予約のキャンセルに失敗しました')
-        } else {
-            setRefreshKey(prev => prev + 1)
-            setSelectedReservation(null)
-            setIsDetailModalOpen(false)
+
+        setIsSubmitting(true)
+        try {
+            const { error } = await supabase
+                .from('reservations')
+                .update({
+                    status: RESERVATION_STATUS.CANCELLED
+                })
+                .eq('id', selectedReservation.id)
+            if (error) {
+                alert('予約のキャンセルに失敗しました')
+            } else {
+                setRefreshKey(prev => prev + 1)
+                setSelectedReservation(null)
+                setIsDetailModalOpen(false)
+            }
+        } finally {
+            setIsSubmitting(false)
         }
     }
     
@@ -365,6 +385,7 @@ export default function Reservations() {
                                     </button>
                                     <button
                                         className={BUTTON_PRIMARY}
+                                        disabled={isSubmitting}
                                         onClick={() => handleInsertReservations()}
                                     >
                                         予約する
@@ -450,12 +471,14 @@ export default function Reservations() {
                                         <>
                                             <button
                                                 className={BUTTON_DANGER}
+                                                disabled={isSubmitting}
                                                 onClick={() => handleCancelReservation()}
                                             >
                                                 予約をキャンセルする
                                             </button>
                                             <button
                                                 className={BUTTON_PRIMARY}
+                                                disabled={isSubmitting}
                                                 onClick={() => handleUpdateReservation()}
                                             >
                                                 更新する

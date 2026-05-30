@@ -30,6 +30,8 @@ export default function Categories() {
     //削除
     const [selectedCheckboxCategoryId, setSelectedCheckboxCategoryId] = useState<number[]>([])
     const [isDeleteClick, setIsDeleteClick] = useState(false)   //削除ボタンクリック
+    // 多重送信防止
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
         // 初期処理
@@ -58,47 +60,61 @@ export default function Categories() {
 
     //カテゴリ追加
     const handleInsertCategories = async () => {
-        const { error } = await supabase
-            .from('categories')
-            .insert({ name: newName, sort_order: newSortOrder })
-        if (error) {
-            alert('カテゴリの追加に失敗しました')
-        } else {
-            setRefreshKey(prev => prev + 1)
-            setNewName('')
-            setNewSortOrder(0)
-            setIsModalOpen(false)
+        setIsSubmitting(true)
+        try {
+            const { error } = await supabase
+                .from('categories')
+                .insert({ name: newName, sort_order: newSortOrder })
+            if (error) {
+                alert('カテゴリの追加に失敗しました')
+            } else {
+                setRefreshKey(prev => prev + 1)
+                setNewName('')
+                setNewSortOrder(0)
+                setIsModalOpen(false)
+            }
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
     //カテゴリ更新
     const handleUpdateCategories = async () => {
         if (!selectedCategoryId) return
-
-        const { error } = await supabase
-            .from('categories')
-            .update({ name: editName, sort_order: editSortOrder })
-            .eq('id', selectedCategoryId)
-        if (error) {
-            alert('カテゴリの更新に失敗しました')
-        } else {
-            setRefreshKey(prev => prev + 1)
-            setSelectedCategoryId(null)
+        setIsSubmitting(true)
+        try {
+            const { error } = await supabase
+                .from('categories')
+                .update({ name: editName, sort_order: editSortOrder })
+                .eq('id', selectedCategoryId)
+            if (error) {
+                alert('カテゴリの更新に失敗しました')
+            } else {
+                setRefreshKey(prev => prev + 1)
+                setSelectedCategoryId(null)
+            }
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
     //カテゴリ削除（一括）
     const handleDeleteCategories = async () => {
         if (!window.confirm('選択したカテゴリを削除しますか？')) return
-        const { error } = await supabase
-            .from('categories')
-            .delete()
-            .in('id', selectedCheckboxCategoryId)
-        if (error) {
-            alert('カテゴリの削除に失敗しました')
-        } else {
-            setRefreshKey(prev => prev + 1)
-            setSelectedCheckboxCategoryId([])
+        setIsSubmitting(true)
+        try {
+            const { error } = await supabase
+                .from('categories')
+                .delete()
+                .in('id', selectedCheckboxCategoryId)
+            if (error) {
+                alert('カテゴリの削除に失敗しました')
+            } else {
+                setRefreshKey(prev => prev + 1)
+                setSelectedCheckboxCategoryId([])
+            }
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -284,6 +300,7 @@ export default function Categories() {
                                     </button>
                                     <button
                                         className={BUTTON_PRIMARY}
+                                        disabled={isSubmitting}
                                         onClick={() => handleInsertCategories()}
                                     >
                                         追加する
@@ -305,6 +322,7 @@ export default function Categories() {
                                 閉じる</button>
                             <button
                                 className={BUTTON_PRIMARY}
+                                disabled={isSubmitting}
                                 onClick={() => handleUpdateCategories()}
                             >
                                 更新する</button>
@@ -324,6 +342,7 @@ export default function Categories() {
                             </button>
                             <button
                                 className={BUTTON_DANGER}
+                                disabled={isSubmitting}
                                 onClick={() => handleDeleteCategories()}
                             >
                                 削除する

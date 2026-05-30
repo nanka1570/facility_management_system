@@ -39,6 +39,8 @@ export default function Facilities() {
     // 削除
     const [isDeleteClick, setIsDeleteClick] = useState(false)   //削除ボタンクリック
     const [selectedCheckboxFacilityId, setSelectedCheckboxFacilityId] = useState<number[]>([])
+    // 多重送信防止
+    const [isSubmitting, setIsSubmitting] = useState(false)
     // フィルター
     const [filterCategoryId, setFilterCategoryId] = useState<number | null>(null)
 
@@ -87,44 +89,53 @@ export default function Facilities() {
 
     //施設追加
     const handleInsertFacilities = async () => {
-        const { error } = await supabase
-            .from('facilities')
-            .insert({
-                name: newName,
-                category_id: newCategoryId,
-                max_capacity: Number(newMaxCapacity),
-                is_active: newIsActive
-            })
-        if (error) {
-            alert('施設の追加に失敗しました')
-        } else {
-            setRefreshKey(prev => prev + 1)
-            setNewName('')
-            setNewCategoryId(null)
-            setNewMaxCapacity('')
-            setNewIsActive(true)
-            setIsModalOpen(false)
+        setIsSubmitting(true)
+        try {
+            const { error } = await supabase
+                .from('facilities')
+                .insert({
+                    name: newName,
+                    category_id: newCategoryId,
+                    max_capacity: Number(newMaxCapacity),
+                    is_active: newIsActive
+                })
+            if (error) {
+                alert('施設の追加に失敗しました')
+            } else {
+                setRefreshKey(prev => prev + 1)
+                setNewName('')
+                setNewCategoryId(null)
+                setNewMaxCapacity('')
+                setNewIsActive(true)
+                setIsModalOpen(false)
+            }
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
     //施設更新
     const handleUpdateFacilities = async () => {
         if (!selectedFacilityId) return
-
-        const { error } = await supabase
-            .from('facilities')
-            .update({
-                name: editName,
-                category_id: editCategoryId,
-                max_capacity: Number(editMaxCapacity),
-                is_active: editIsActive
-            })
-            .eq('id', selectedFacilityId)
-        if (error) {
-            alert('施設の更新に失敗しました')
-        } else {
-            setRefreshKey(prev => prev + 1)
-            setSelectedFacilityId(null)
+        setIsSubmitting(true)
+        try {
+            const { error } = await supabase
+                .from('facilities')
+                .update({
+                    name: editName,
+                    category_id: editCategoryId,
+                    max_capacity: Number(editMaxCapacity),
+                    is_active: editIsActive
+                })
+                .eq('id', selectedFacilityId)
+            if (error) {
+                alert('施設の更新に失敗しました')
+            } else {
+                setRefreshKey(prev => prev + 1)
+                setSelectedFacilityId(null)
+            }
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -149,16 +160,21 @@ export default function Facilities() {
             return
         }
 
-        //　予約がなければ削除実行
-        const { error } = await supabase
-            .from('facilities')
-            .delete()
-            .in('id', selectedCheckboxFacilityId)
-        if (error) {
-            alert('施設の削除に失敗しました')
-        } else {
-            setRefreshKey(prev => prev + 1)
-            setSelectedCheckboxFacilityId([])
+        setIsSubmitting(true)
+        try {
+            //　予約がなければ削除実行
+            const { error } = await supabase
+                .from('facilities')
+                .delete()
+                .in('id', selectedCheckboxFacilityId)
+            if (error) {
+                alert('施設の削除に失敗しました')
+            } else {
+                setRefreshKey(prev => prev + 1)
+                setSelectedCheckboxFacilityId([])
+            }
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -423,6 +439,7 @@ export default function Facilities() {
                                     </button>
                                     <button
                                         className={BUTTON_PRIMARY}
+                                        disabled={isSubmitting}
                                         onClick={() => handleInsertFacilities()}
                                     >
                                         追加する
@@ -444,6 +461,7 @@ export default function Facilities() {
                                 閉じる</button>
                             <button
                                 className={BUTTON_PRIMARY}
+                                disabled={isSubmitting}
                                 onClick={() => handleUpdateFacilities()}
                             >
                                 更新する</button>
@@ -463,6 +481,7 @@ export default function Facilities() {
                             </button>
                             <button
                                 className={BUTTON_DANGER}
+                                disabled={isSubmitting}
                                 onClick={() => handleDeleteFacilities()}
                             >
                                 削除する

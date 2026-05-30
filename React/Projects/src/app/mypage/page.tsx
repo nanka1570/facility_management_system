@@ -33,6 +33,8 @@ export default function Mypage() {
     const [isModalOpen, setIsModalOpen] = useState(false)
     // 編集
     const [updateDisplayName, setUpdateDisplayName] = useState('')
+    // 多重送信防止
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
         // 初期処理
@@ -86,15 +88,20 @@ export default function Mypage() {
 
     // 編集
     const handleUpdateProfile = async () => {
-        const { error } = await supabase
-            .from('profiles')
-            .update({ display_name: updateDisplayName })
-            .eq('id', userId)
-        if (error) {
-            alert('プロフィールの更新に失敗しました')
-        } else {
-            setRefreshKey(prev => prev + 1)
-            setIsModalOpen(false)
+        setIsSubmitting(true)
+        try {
+            const { error } = await supabase
+                .from('profiles')
+                .update({ display_name: updateDisplayName })
+                .eq('id', userId)
+            if (error) {
+                alert('プロフィールの更新に失敗しました')
+            } else {
+                setRefreshKey(prev => prev + 1)
+                setIsModalOpen(false)
+            }
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -233,6 +240,7 @@ export default function Mypage() {
                                         </button>
                                         <button
                                             className={BUTTON_PRIMARY}
+                                            disabled={isSubmitting}
                                             onClick={() => handleUpdateProfile()}
                                         >
                                             更新する
