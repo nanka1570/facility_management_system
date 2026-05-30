@@ -6,7 +6,10 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
 import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants"
+// カテゴリのtypes
 import { Category } from "@/lib/types"
+// チェックボックス
+import { toggleId } from "@/lib/selection"
 
 export default function Categories() {
     
@@ -204,17 +207,7 @@ export default function Categories() {
                                                 <input
                                                     type="checkbox"
                                                     checked={selectedCheckboxCategoryId.includes(category.id)}
-                                                    onChange={() => {
-                                                        if (selectedCheckboxCategoryId.includes(category.id)) {
-                                                            setSelectedCheckboxCategoryId(
-                                                                selectedCheckboxCategoryId.filter((id) => id !== category.id)
-                                                            )
-                                                        } else {
-                                                            setSelectedCheckboxCategoryId(
-                                                                [...selectedCheckboxCategoryId, category.id]
-                                                            )
-                                                        }
-                                                    }}
+                                                    onChange={() => setSelectedCheckboxCategoryId(toggleId(selectedCheckboxCategoryId, category.id))}
                                                 />
                                             </td>
                                         </>

@@ -10,6 +10,8 @@ import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants
 import { Category, Facility } from "@/lib/types"
 // 予約のステータス
 import { RESERVATION_STATUS } from "@/lib/constants"
+// チェックボックス
+import { toggleId } from "@/lib/selection"
 
 export default function Facilities() {
 
@@ -292,17 +294,7 @@ export default function Facilities() {
                                                     <input
                                                         type="checkbox"
                                                         checked={selectedCheckboxFacilityId.includes(facility.id)}
-                                                        onChange={() => {
-                                                            if (selectedCheckboxFacilityId.includes(facility.id)) {
-                                                                setSelectedCheckboxFacilityId(
-                                                                    selectedCheckboxFacilityId.filter((id) => id !== facility.id)
-                                                                )
-                                                            } else {
-                                                                setSelectedCheckboxFacilityId(
-                                                                    [...selectedCheckboxFacilityId, facility.id]
-                                                                )
-                                                            }
-                                                        }}
+                                                        onChange={() => setSelectedCheckboxFacilityId(toggleId(selectedCheckboxFacilityId, facility.id))}
                                                     />
                                                 </td>
                                             </>

@@ -12,6 +12,8 @@ import { formatDateTime, formatDateTimeLocal, getStatusLabel } from "@/lib/utils
 import { Facility, Reservation } from "@/lib/types"
 // 予約のステータス
 import { RESERVATION_STATUS } from "@/lib/constants"
+// チェックボックス
+import { toggleId } from "@/lib/selection"
 
 export default function Reservations() {
 
@@ -377,17 +379,7 @@ export default function Reservations() {
                                                     <input
                                                         type="checkbox"
                                                         checked={selectedCheckboxReservationId.includes(reservation.id)}
-                                                        onChange={() => {
-                                                            if (selectedCheckboxReservationId.includes(reservation.id)) {
-                                                                setSelectedCheckboxReservationId(
-                                                                    selectedCheckboxReservationId.filter((id) => id !== reservation.id)
-                                                                )
-                                                            } else {
-                                                                setSelectedCheckboxReservationId(
-                                                                    [...selectedCheckboxReservationId, reservation.id]
-                                                                )
-                                                            }
-                                                        }}
+                                                        onChange={() => setSelectedCheckboxReservationId(toggleId(selectedCheckboxReservationId, reservation.id))}
                                                         disabled={
                                                             isCancelClick
                                                                 ? reservation.status !== RESERVATION_STATUS.CONFIRMED
