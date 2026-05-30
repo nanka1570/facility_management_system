@@ -10,3 +10,10 @@ export const RESERVATION_STATUS = {
     CANCELLED: 'cancelled',
     COMPLETED: 'completed',
 } as const
+
+// プロフィールのロール
+export const ROLE = {
+    USER: 'user',
+    ADMIN: 'admin',
+    DEVELOPER: 'developer',
+} as const

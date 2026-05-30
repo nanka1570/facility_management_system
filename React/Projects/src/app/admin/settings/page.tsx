@@ -5,6 +5,8 @@ import { supabase } from "@/lib/supabase"
 import { ModuleSetting } from "@/lib/types"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+// プロフィールのロール
+import { ROLE } from "@/lib/constants"
 
 export default function Settings() {
     
@@ -33,7 +35,7 @@ export default function Settings() {
                 .select('*')
                 .eq('id', session.user.id)
                 .single()
-            if (profileData?.role !== 'developer') {
+            if (profileData?.role !== ROLE.DEVELOPER) {
                 alert('開発者のみアクセスできます')
                 router.push('/dashboard')
                 return
