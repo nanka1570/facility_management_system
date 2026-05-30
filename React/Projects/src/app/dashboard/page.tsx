@@ -4,8 +4,12 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation" //next.jsの画面遷移
 import { useEffect, useState } from "react"
 import Header from "@/components/Header"
-import { Facility, Reservation } from "@/lib/types"
+// ボタンのスタイル
 import { BUTTON_SECONDARY } from "@/lib/constants"
+// 施設・予約のtypes
+import { Facility, Reservation } from "@/lib/types"
+// 予約のステータス
+import { RESERVATION_STATUS } from "@/lib/constants"
 
 export default function Dashboard() {
 
@@ -49,7 +53,7 @@ export default function Dashboard() {
             const { data: reservationData, error: reservationError } = await supabase
                 .from('reservations')
                 .select('*')
-                .eq('status', 'confirmed')
+                .eq('status', RESERVATION_STATUS.CONFIRMED)
             if (reservationError) {
                 alert('予約一覧の取得に失敗しました')
             } else {

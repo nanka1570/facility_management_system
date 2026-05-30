@@ -8,7 +8,10 @@ import { useEffect, useState } from "react"
 import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, BUTTON_SUCCESS } from "@/lib/constants"
 // 日時をフォーマットする関数, timeをdatetime-localに変換する関数, ステータスを日本語に直す関数
 import { formatDateTime, formatDateTimeLocal, getStatusLabel } from "@/lib/utils"
+// 施設・予約のtypes
 import { Facility, Reservation } from "@/lib/types"
+// 予約のステータス
+import { RESERVATION_STATUS } from "@/lib/constants"
 
 export default function Reservations() {
 
@@ -105,7 +108,7 @@ export default function Reservations() {
             .from('reservations')
             .select('id')
             .eq('facility_id', newFacilityId)
-            .eq('status', 'confirmed')
+            .eq('status', RESERVATION_STATUS.CONFIRMED)
             .lt('start_time', new Date(newEndTime).toISOString())
             .gt('end_time', new Date(newStartTime).toISOString())
             .limit(1)
@@ -149,7 +152,7 @@ export default function Reservations() {
             .from('reservations')
             .select('id')
             .eq('facility_id', editFacilityId)
-            .eq('status', 'confirmed')
+            .eq('status', RESERVATION_STATUS.CONFIRMED)
             .neq('id', selectedReservation.id)   // 自分自身を除外
             .lt('start_time', new Date(editEndTime).toISOString())
             .gt('end_time', new Date(editStartTime).toISOString())
@@ -184,7 +187,7 @@ export default function Reservations() {
         const { error } = await supabase
             .from('reservations')
             .update({
-                status: 'cancelled'
+                status: RESERVATION_STATUS.CANCELLED
             })
             .in('id', selectedCheckboxReservationId)
         if (error) {
@@ -200,7 +203,7 @@ export default function Reservations() {
         const { error } = await supabase
             .from('reservations')
             .update({
-                status: 'confirmed'
+                status: RESERVATION_STATUS.CONFIRMED
             })
             .in('id', selectedCheckboxReservationId)
         if (error) {
@@ -321,8 +324,8 @@ export default function Reservations() {
                                     <tr
                                         key={reservation.id}
                                         //ステータスが'cancelled'ならグレーアウトする
-                                        className={`border-t ${((isEditClick || isCancelClick) && reservation.status === 'cancelled') ||
-                                            (isRestoreClick && reservation.status === 'confirmed') ? 'opacity-40' : ''}`}
+                                        className={`border-t ${((isEditClick || isCancelClick) && reservation.status === RESERVATION_STATUS.CANCELLED) ||
+                                            (isRestoreClick && reservation.status === RESERVATION_STATUS.CONFIRMED) ? 'opacity-40' : ''}`}
                                     >
                                         {/* 編集のラジオボタン */}
                                         {isEditClick && (
@@ -340,7 +343,7 @@ export default function Reservations() {
                                                             setEditNumPeople(String(reservation.num_people))
                                                             setEditPurpose(reservation.purpose || '')
                                                         }}
-                                                        disabled={reservation.status !== 'confirmed'}
+                                                        disabled={reservation.status !== RESERVATION_STATUS.CONFIRMED}
                                                     />
                                                 </td>
                                             </>
@@ -366,8 +369,8 @@ export default function Reservations() {
                                                         }}
                                                         disabled={
                                                             isCancelClick
-                                                                ? reservation.status !== 'confirmed'
-                                                                : reservation.status !== 'cancelled'
+                                                                ? reservation.status !== RESERVATION_STATUS.CONFIRMED
+                                                                : reservation.status !== RESERVATION_STATUS.CANCELLED
                                                         }
                                                     />
                                                 </td>
@@ -376,7 +379,7 @@ export default function Reservations() {
                                         <td className="px-4 py-3">{reservation.id}</td>
 
                                         {/* ステータスが'cancelled'以外 かつ ラジオボタンが押されたとき */}
-                                        {reservation.status !== 'cancelled' && selectedReservationId === reservation.id ? (
+                                        {reservation.status !== RESERVATION_STATUS.CANCELLED && selectedReservationId === reservation.id ? (
                                             <>
                                                 <td className="px-4 py-3">
                                                     <select
@@ -440,8 +443,8 @@ export default function Reservations() {
                                                 <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
                                                 <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
                                                 <td
-                                                    className={`px-4 py-3 ${reservation.status === 'completed' ? 'text-green-600 font-semibold' :
-                                                            reservation.status === 'cancelled' ? 'text-red-400' : ''
+                                                    className={`px-4 py-3 ${reservation.status === RESERVATION_STATUS.COMPLETED ? 'text-green-600 font-semibold' :
+                                                            reservation.status === RESERVATION_STATUS.CANCELLED ? 'text-red-400' : ''
                                                         }`}>
                                                     {getStatusLabel(reservation.status)}
                                                 </td>

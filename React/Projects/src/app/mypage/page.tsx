@@ -8,7 +8,10 @@ import { useEffect, useState } from "react"
 import { BUTTON_PRIMARY, BUTTON_SECONDARY } from "@/lib/constants"
 // 日時をフォーマットする関数, ステータスを日本語に直す関数
 import { formatDateTime, getStatusLabel } from "@/lib/utils"
+// 施設・プロフィール・予約のtypes
 import { Facility, Profile, Reservation } from "@/lib/types"
+// 予約のステータス
+import { RESERVATION_STATUS } from "@/lib/constants"
 
 export default function Mypage() {
     
@@ -180,8 +183,8 @@ export default function Mypage() {
                                             </td>
                                             <td
                                                 className={`px-4 py-3
-                                                ${reservation.status === 'completed' ? 'text-green-600 font-semibold' :
-                                                reservation.status === 'cancelled' ? 'text-red-400' : ''}`}
+                                                ${reservation.status === RESERVATION_STATUS.COMPLETED ? 'text-green-600 font-semibold' :
+                                                reservation.status === RESERVATION_STATUS.CANCELLED ? 'text-red-400' : ''}`}
                                             >
                                                 {getStatusLabel(reservation.status)}
                                             </td>

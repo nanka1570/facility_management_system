@@ -8,7 +8,10 @@ import { useEffect, useState } from "react"
 import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants"
 // timeをdatetime-localに変換する関数
 import { formatDateTimeLocal } from "@/lib/utils"
+// 施設・予約のtypes
 import { Facility, Reservation } from "@/lib/types"
+// 予約のステータス
+import { RESERVATION_STATUS } from "@/lib/constants"
 
 export default function Reservations() {
 
@@ -89,7 +92,7 @@ export default function Reservations() {
             .from('reservations')
             .select('id')
             .eq('facility_id', newFacilityId)
-            .eq('status', 'confirmed')
+            .eq('status', RESERVATION_STATUS.CONFIRMED)
             .lt('start_time', new Date(newEndTime).toISOString())
             .gt('end_time', new Date(newStartTime).toISOString())
             .limit(1)
@@ -135,7 +138,7 @@ export default function Reservations() {
             .from('reservations')
             .select('id')
             .eq('facility_id', newFacilityId)
-            .eq('status', 'confirmed')
+            .eq('status', RESERVATION_STATUS.CONFIRMED)
             .neq('id', selectedReservation.id)
             .lt('start_time', new Date(newEndTime).toISOString())
             .gt('end_time', new Date(newStartTime).toISOString())
@@ -174,7 +177,7 @@ export default function Reservations() {
         const { error } = await supabase
             .from('reservations')
             .update({
-                status: 'cancelled'
+                status: RESERVATION_STATUS.CANCELLED
             })
             .eq('id', selectedReservation.id)
         if (error) {
@@ -246,7 +249,7 @@ export default function Reservations() {
                                                     // 時間と施設が一致する予約を探す
                                                     const reservation = reservations.find((r) =>
                                                         r.facility_id === facility.id &&
-                                                        r.status === 'confirmed' &&
+                                                        r.status === RESERVATION_STATUS.CONFIRMED &&
                                                         new Date(r.start_time).getHours() <= timeSlot &&
                                                         new Date(r.end_time).getHours() > timeSlot &&
                                                         new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate

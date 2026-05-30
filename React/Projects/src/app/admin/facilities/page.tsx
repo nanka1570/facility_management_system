@@ -6,7 +6,10 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
 import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants"
+// カテゴリ・施設のtypes
 import { Category, Facility } from "@/lib/types"
+// 予約のステータス
+import { RESERVATION_STATUS } from "@/lib/constants"
 
 export default function Facilities() {
 
@@ -133,7 +136,7 @@ export default function Facilities() {
             .from('reservations')
             .select('id')
             .in('facility_id', selectedCheckboxFacilityId)
-            .eq('status', 'confirmed')
+            .eq('status', RESERVATION_STATUS.CONFIRMED)
             .limit(1)
 
         if (checkError) {
