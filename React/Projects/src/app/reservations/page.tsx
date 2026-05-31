@@ -188,6 +188,8 @@ export default function Reservations() {
     // キャンセル処理
     const handleCancelReservation = async () => {
         if (!selectedReservation) return
+        // キャンセル確認
+        if (!window.confirm('選択した予約をキャンセルしますか？')) return
 
         setIsSubmitting(true)
         try {
