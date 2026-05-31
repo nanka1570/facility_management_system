@@ -1,3 +1,6 @@
+// 予約のステータス
+import { RESERVATION_STATUS } from "./constants"
+
 // 日時をフォーマットする関数
 export const formatDateTime = (dateString: string) => {
         const date = new Date(dateString)
@@ -29,9 +32,9 @@ export const formatDateTimeLocal = (time: string) => {
 // ステータスを日本語に直す関数
 export const getStatusLabel = (status: string) => {
         const statusMap: { [key: string]: string } = {
-            'confirmed': '確定',
-            'cancelled': 'キャンセル',
-            'completed': '完了'
+            [RESERVATION_STATUS.CONFIRMED]: '確定',
+            [RESERVATION_STATUS.CANCELLED]: 'キャンセル',
+            [RESERVATION_STATUS.COMPLETED]: '完了'
         }
         return statusMap[status] || status
     }
