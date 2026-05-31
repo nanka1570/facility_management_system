@@ -45,7 +45,13 @@ export default function Reservations() {
     const [newEndTime, setNewEndTime] = useState('')
     const [newNumPeople, setNewNumPeople] = useState('')
     const [newPurpose, setNewPurpose] = useState('')
-    // 更新
+    // 編集
+    const [editFacilityId, setEditFacilityId] = useState<number | null>(null)
+    const [editStartTime, setEditStartTime] = useState('')
+    const [editEndTime, setEditEndTime] = useState('')
+    const [editNumPeople, setEditNumPeople] = useState('')
+    const [editPurpose, setEditPurpose] = useState('')
+    // 選択した予約
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
     // 多重送信防止
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -145,11 +151,11 @@ export default function Reservations() {
         const { data: overlappingReservations, error: checkError } = await supabase
             .from('reservations')
             .select('id')
-            .eq('facility_id', newFacilityId)
+            .eq('facility_id', editFacilityId)
             .eq('status', RESERVATION_STATUS.CONFIRMED)
             .neq('id', selectedReservation.id)
-            .lt('start_time', new Date(newEndTime).toISOString())
-            .gt('end_time', new Date(newStartTime).toISOString())
+            .lt('start_time', new Date(editEndTime).toISOString())
+            .gt('end_time', new Date(editStartTime).toISOString())
             .limit(1)
 
         if (checkError) {
@@ -167,11 +173,11 @@ export default function Reservations() {
             const { error } = await supabase
                 .from('reservations')
                 .update({
-                    facility_id: selectedReservation.facility_id,
-                    start_time: new Date(newStartTime).toISOString(),
-                    end_time: new Date(newEndTime).toISOString(),
-                    num_people: Number(newNumPeople),
-                    purpose: newPurpose,
+                    facility_id: editFacilityId,
+                    start_time: new Date(editStartTime).toISOString(),
+                    end_time: new Date(editEndTime).toISOString(),
+                    num_people: Number(editNumPeople),
+                    purpose: editPurpose,
                 })
                 .eq('id', selectedReservation.id)
             if (error) {
@@ -179,6 +185,12 @@ export default function Reservations() {
             } else {
                 setRefreshKey(prev => prev + 1)
                 setSelectedReservation(null)
+                setEditFacilityId(null)
+                setEditStartTime('')
+                setEditEndTime('')
+                setEditNumPeople('')
+                setEditPurpose('')
+                setIsDetailModalOpen(false)
             }
         } finally {
             setIsSubmitting(false)
@@ -285,18 +297,18 @@ export default function Reservations() {
                                                             : 'bg-green-50 hover:bg-green-100 cursor-pointer'
                                                     }`}
                                                     onClick={() => {
-                                                        if (!reservation) {
+                                                        if (!reservation) { // 予約が存在しなければ新規登録モーダルを開く
+                                                            setIsModalOpen(true)
                                                             setNewFacilityId(facility.id)
                                                             setNewStartTime(`${selectedDate}T${String(timeSlot).padStart(2, '0')}:00`)
                                                             setNewEndTime(`${selectedDate}T${String(timeSlot + 1).padStart(2, '0')}:00`)
-                                                            setIsModalOpen(true)
-                                                        } else {
+                                                        } else {    // 予約が存在したら詳細モーダルを開く
                                                             setSelectedReservation(reservation)
-                                                            setNewFacilityId(reservation.facility_id)
-                                                            setNewStartTime(formatDateTimeLocal(reservation.start_time))
-                                                            setNewEndTime(formatDateTimeLocal(reservation.end_time))
-                                                            setNewNumPeople(String(reservation.num_people))
-                                                            setNewPurpose(reservation.purpose || '')
+                                                            setEditFacilityId(reservation.facility_id)
+                                                            setEditStartTime(formatDateTimeLocal(reservation.start_time))
+                                                            setEditEndTime(formatDateTimeLocal(reservation.end_time))
+                                                            setEditNumPeople(String(reservation.num_people))
+                                                            setEditPurpose(reservation.purpose || '')
                                                             setIsDetailModalOpen(true)
                                                         }
                                                     }}
@@ -412,7 +424,7 @@ export default function Reservations() {
                                             施設名
                                         </label>
                                         <p className="border rounded px-2 py-1 bg-gray-100">
-                                            {facilities.find(f => f.id === newFacilityId)?.name}
+                                            {facilities.find(f => f.id === editFacilityId)?.name}
                                         </p>
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -422,8 +434,8 @@ export default function Reservations() {
                                         <input
                                             className="border rounded px-2 py-1 bg-gray-100"
                                             type="datetime-local"
-                                            value={newStartTime}
-                                            onChange={(e) => setNewStartTime(e.target.value)}
+                                            value={editStartTime}
+                                            onChange={(e) => setEditStartTime(e.target.value)}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -433,8 +445,8 @@ export default function Reservations() {
                                         <input
                                             className="border rounded px-2 py-1"
                                             type="datetime-local"
-                                            value={newEndTime}
-                                            onChange={(e) => setNewEndTime(e.target.value)}
+                                            value={editEndTime}
+                                            onChange={(e) => setEditEndTime(e.target.value)}
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1">
@@ -444,8 +456,8 @@ export default function Reservations() {
                                         <input
                                             className="border rounded px-2 py-1"
                                             type="number"
-                                            value={newNumPeople}
-                                            onChange={(e) => setNewNumPeople(e.target.value)}
+                                            value={editNumPeople}
+                                            onChange={(e) => setEditNumPeople(e.target.value)}
                                             placeholder="例： 30"
                                         />
                                     </div>
@@ -456,8 +468,8 @@ export default function Reservations() {
                                         <input
                                             className="border rounded px-2 py-1"
                                             type="text"
-                                            value={newPurpose}
-                                            onChange={(e) => setNewPurpose(e.target.value)}
+                                            value={editPurpose}
+                                            onChange={(e) => setEditPurpose(e.target.value)}
                                             placeholder="例： 報告会議"
                                         />
                                     </div>
