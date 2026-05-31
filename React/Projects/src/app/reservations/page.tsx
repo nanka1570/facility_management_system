@@ -109,9 +109,16 @@ export default function Reservations() {
             alert('予約の確認に失敗しました')
             return
         }
+
         // 予約重複チェック
         if (overlappingReservations && overlappingReservations.length > 0) {
             alert('この時間帯はすでに予約が入っています。')
+            return
+        }
+        
+        // 人数必須チェック
+        if (!newNumPeople || Number(newNumPeople) <= 0) {
+            alert('利用人数を正しく入力してください')
             return
         }
         
@@ -302,14 +309,16 @@ export default function Reservations() {
                                                             setNewFacilityId(facility.id)
                                                             setNewStartTime(`${selectedDate}T${String(timeSlot).padStart(2, '0')}:00`)
                                                             setNewEndTime(`${selectedDate}T${String(timeSlot + 1).padStart(2, '0')}:00`)
+                                                            setNewNumPeople('')
+                                                            setNewPurpose('')
                                                         } else {    // 予約が存在したら詳細モーダルを開く
+                                                            setIsDetailModalOpen(true)
                                                             setSelectedReservation(reservation)
                                                             setEditFacilityId(reservation.facility_id)
                                                             setEditStartTime(formatDateTimeLocal(reservation.start_time))
                                                             setEditEndTime(formatDateTimeLocal(reservation.end_time))
                                                             setEditNumPeople(String(reservation.num_people))
                                                             setEditPurpose(reservation.purpose || '')
-                                                            setIsDetailModalOpen(true)
                                                         }
                                                     }}
                                                     >

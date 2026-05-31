@@ -1,5 +1,5 @@
 // 予約のステータス
-import { RESERVATION_STATUS } from "./constants"
+import { RESERVATION_STATUS } from "@/lib/constants"
 
 // 日時をフォーマットする関数
 export const formatDateTime = (dateString: string) => {
