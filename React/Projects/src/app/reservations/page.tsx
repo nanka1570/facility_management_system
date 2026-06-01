@@ -12,6 +12,8 @@ import { formatDateTimeLocal } from "@/lib/utils"
 import { Facility, Reservation } from "@/lib/types"
 // 予約のステータス
 import { RESERVATION_STATUS } from "@/lib/constants"
+// バリデーション
+import { isNonEmpty, isPositiveInt } from "@/lib/validation"
 
 export default function Reservations() {
 
@@ -95,6 +97,25 @@ export default function Reservations() {
 
     // 新規予約
     const handleInsertReservations = async () => {
+        /* バリデーションチェック */
+        // 終了日時必須チェック
+        if (!isNonEmpty(newEndTime)) {
+            alert('終了日時を入力してください')
+            return
+        }
+
+        // 開始・終了の順序チェック
+        if (newEndTime <= newStartTime) {
+            alert('終了日時は開始日時より後を入力してください')
+            return
+        }
+
+        // 人数必須チェック
+        if (!isPositiveInt(newNumPeople)) {
+            alert('利用人数を正しく入力してください')
+            return
+        }
+        
         // 予約重複
         const { data: overlappingReservations, error: checkError } = await supabase
             .from('reservations')
@@ -104,7 +125,6 @@ export default function Reservations() {
             .lt('start_time', new Date(newEndTime).toISOString())
             .gt('end_time', new Date(newStartTime).toISOString())
             .limit(1)
-
         if (checkError) {
             alert('予約の確認に失敗しました')
             return
@@ -113,12 +133,6 @@ export default function Reservations() {
         // 予約重複チェック
         if (overlappingReservations && overlappingReservations.length > 0) {
             alert('この時間帯はすでに予約が入っています。')
-            return
-        }
-        
-        // 人数必須チェック
-        if (!newNumPeople || Number(newNumPeople) <= 0) {
-            alert('利用人数を正しく入力してください')
             return
         }
         
@@ -154,6 +168,26 @@ export default function Reservations() {
     const handleUpdateReservation = async () => {
         // nullチェック
         if (!selectedReservation) return
+
+        /* バリデーションチェック */
+        // 終了日時必須チェック
+        if (!isNonEmpty(editEndTime)) {
+            alert('終了日時を入力してください')
+            return
+        }
+
+        // 開始・終了の順序チェック
+        if (editEndTime <= editStartTime) {
+            alert('終了日時は開始日時より後を入力してください')
+            return
+        }
+
+        // 人数必須チェック
+        if (!isPositiveInt(editNumPeople)) {
+            alert('利用人数を正しく入力してください')
+            return
+        }
+
         // 予約重複
         const { data: overlappingReservations, error: checkError } = await supabase
             .from('reservations')
@@ -164,11 +198,11 @@ export default function Reservations() {
             .lt('start_time', new Date(editEndTime).toISOString())
             .gt('end_time', new Date(editStartTime).toISOString())
             .limit(1)
-
         if (checkError) {
             alert('予約の確認に失敗しました')
             return
         }
+
         // 予約重複チェック
         if (overlappingReservations && overlappingReservations.length > 0) {
             alert('この時間帯はすでに予約が入っています。')
