@@ -12,6 +12,8 @@ import { formatDateTime, getStatusLabel } from "@/lib/utils"
 import { Facility, Profile, Reservation } from "@/lib/types"
 // 予約のステータス
 import { RESERVATION_STATUS } from "@/lib/constants"
+// バリデーション
+import { isNonEmpty } from "@/lib/validation"
 
 export default function Mypage() {
     
@@ -88,6 +90,13 @@ export default function Mypage() {
 
     // 編集
     const handleUpdateProfile = async () => {
+        /* バリデーションチェック */
+        // 表示名必須チェック
+        if (!isNonEmpty(updateDisplayName)) {
+            alert('表示名を入力してください')
+            return
+        }
+
         setIsSubmitting(true)
         try {
             const { error } = await supabase

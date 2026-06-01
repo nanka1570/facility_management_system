@@ -14,6 +14,8 @@ import { Facility, Reservation } from "@/lib/types"
 import { RESERVATION_STATUS } from "@/lib/constants"
 // チェックボックス
 import { toggleId } from "@/lib/selection"
+// バリデーション
+import { isNonEmpty, isPositiveInt } from "@/lib/validation"
 
 export default function Reservations() {
 
@@ -106,6 +108,37 @@ export default function Reservations() {
 
     //新規予約
     const handleInsertReservations = async () => {
+        /* バリデーション */
+        // 施設名必須チェック
+        if (newFacilityId === null) {
+            alert('施設名を選択してください')
+            return
+        }
+
+        // 開始日時必須チェック
+        if (!isNonEmpty(newStartTime)) {
+            alert('開始日時を選択してください')
+            return
+        }
+
+        // 終了日時必須チェック
+        if (!isNonEmpty(newEndTime)) {
+            alert('終了日時を選択してください')
+            return
+        }
+
+        // 開始・終了の順序チェック
+        if (newEndTime <= newStartTime) {
+            alert('終了日時は開始日時より後を入力してください')
+            return
+        }
+
+        // 利用人数必須チェック
+        if (!isPositiveInt(newNumPeople)) {
+            alert('利用人数を入力してください')
+            return
+        }
+
         // 予約重複チェック
         const { data: overlapping, error: checkError } = await supabase
             .from('reservations')
@@ -154,6 +187,38 @@ export default function Reservations() {
     const handleUpdateReservation = async () => {
         // nullチェック
         if (!selectedReservation) return
+
+        /* バリデーション */
+        // 施設名必須チェック
+        if (editFacilityId === null) {
+            alert('施設名を選択してください')
+            return
+        }
+
+        // 開始日時必須チェック
+        if (!isNonEmpty(editStartTime)) {
+            alert('開始日時を選択してください')
+            return
+        }
+        
+        // 終了日時必須チェック
+        if (!isNonEmpty(editEndTime)) {
+            alert('終了日時を選択してください')
+            return
+        }
+
+        // 開始・終了の順序チェック
+        if (editEndTime <= editStartTime) {
+            alert('終了日時は開始日時より後を入力してください')
+            return
+        }
+
+        // 利用人数必須チェック
+        if (!isPositiveInt(editNumPeople)) {
+            alert('利用人数を入力してください')
+            return
+        }
+
 
         // 予約重複チェック
         const { data: overlapping, error: checkError } = await supabase

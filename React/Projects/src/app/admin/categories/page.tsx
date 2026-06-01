@@ -10,6 +10,8 @@ import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants
 import { Category } from "@/lib/types"
 // チェックボックス
 import { toggleId } from "@/lib/selection"
+// バリデーション
+import { isNonEmpty } from "@/lib/validation"
 
 export default function Categories() {
     
@@ -63,6 +65,13 @@ export default function Categories() {
 
     //カテゴリ追加
     const handleInsertCategories = async () => {
+        /* バリデーションチェック */
+        // カテゴリ名必須チェック
+        if (!isNonEmpty(newName)) {
+            alert('カテゴリ名を入力してください')
+            return
+        }
+
         setIsSubmitting(true)
         try {
             const { error } = await supabase
@@ -83,7 +92,16 @@ export default function Categories() {
 
     //カテゴリ更新
     const handleUpdateCategories = async () => {
+        // 選択したカテゴリ
         if (!selectedCategoryId) return
+
+        /* バリデーションチェック */
+        // カテゴリ名必須チェック
+        if (!isNonEmpty(editName)) {
+            alert('カテゴリ名を入力してください')
+            return
+        }
+        
         setIsSubmitting(true)
         try {
             const { error } = await supabase

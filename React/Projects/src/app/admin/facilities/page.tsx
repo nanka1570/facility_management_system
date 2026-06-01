@@ -12,6 +12,8 @@ import { Category, Facility } from "@/lib/types"
 import { RESERVATION_STATUS } from "@/lib/constants"
 // チェックボックス
 import { toggleId } from "@/lib/selection"
+// バリデーション
+import { isNonEmpty, isPositiveInt } from "@/lib/validation"
 
 export default function Facilities() {
 
@@ -27,14 +29,14 @@ export default function Facilities() {
     // 新規登録モーダル
     const [isModalOpen, setIsModalOpen] = useState(false)
     // 新規登録
-    const [newName, setNewName] = useState('')
+    const [newFacilityName, setNewFacilityName] = useState('')
     const [newCategoryId, setNewCategoryId] = useState<number | null>(null)
     const [newMaxCapacity, setNewMaxCapacity] = useState('')
     const [newIsActive, setNewIsActive] = useState(true)
     // 編集
     const [selectedFacilityId, setSelectedFacilityId] = useState<number | null>(null)
     const [editCategoryId, setEditCategoryId] = useState<number | null>(null)
-    const [editName, setEditName] = useState('')
+    const [editFacilityName, setEditFacilityName] = useState('')
     const [editMaxCapacity, setEditMaxCapacity] = useState('')
     const [editIsActive, setEditIsActive] = useState(true)
     const [isEditClick, setIsEditClick] = useState(false)   //編集ボタンクリック
@@ -91,12 +93,31 @@ export default function Facilities() {
 
     //施設追加
     const handleInsertFacilities = async () => {
+        /* バリデーションチェック */
+        // 施設名必須チェック
+        if (!isNonEmpty(newFacilityName)) {
+            alert('施設名を入力してください')
+            return
+        }
+
+        // カテゴリ選択チェック
+        if (newCategoryId === null) {
+            alert('カテゴリを選択してください')
+            return
+        }
+
+        // 最大人数必須チェック
+        if (!isPositiveInt(newMaxCapacity)) {
+            alert('最大人数を正しく入力して下さい')
+            return
+        }
+
         setIsSubmitting(true)
         try {
             const { error } = await supabase
                 .from('facilities')
                 .insert({
-                    name: newName,
+                    name: newFacilityName,
                     category_id: newCategoryId,
                     max_capacity: Number(newMaxCapacity),
                     is_active: newIsActive
@@ -105,7 +126,7 @@ export default function Facilities() {
                 alert('施設の追加に失敗しました')
             } else {
                 setRefreshKey(prev => prev + 1)
-                setNewName('')
+                setNewFacilityName('')
                 setNewCategoryId(null)
                 setNewMaxCapacity('')
                 setNewIsActive(true)
@@ -119,12 +140,31 @@ export default function Facilities() {
     //施設更新
     const handleUpdateFacilities = async () => {
         if (!selectedFacilityId) return
+        /* バリデーションチェック */
+        // 施設名必須チェック
+        if (!isNonEmpty(editFacilityName)) {
+            alert('施設名を入力してください')
+            return
+        }
+
+        // カテゴリ選択チェック
+        if (editCategoryId === null) {
+            alert('カテゴリを選択してください')
+            return
+        }
+
+        // 最大人数必須チェック
+        if (!isPositiveInt(editMaxCapacity)) {
+            alert('最大人数を正しく入力して下さい')
+            return
+        }
+        
         setIsSubmitting(true)
         try {
             const { error } = await supabase
                 .from('facilities')
                 .update({
-                    name: editName,
+                    name: editFacilityName,
                     category_id: editCategoryId,
                     max_capacity: Number(editMaxCapacity),
                     is_active: editIsActive
@@ -277,7 +317,7 @@ export default function Facilities() {
                                                         checked={selectedFacilityId === facility.id}
                                                         onChange={() => {
                                                             setSelectedFacilityId(facility.id)
-                                                            setEditName(facility.name)
+                                                            setEditFacilityName(facility.name)
                                                             setEditCategoryId(facility.category_id)
                                                             setEditMaxCapacity(String(facility.max_capacity))
                                                             setEditIsActive(facility.is_active)
@@ -308,8 +348,8 @@ export default function Facilities() {
                                                 <td className="px-4 py-3">
                                                     <input
                                                         type="text"
-                                                        value={editName}
-                                                        onChange={(e) => setEditName(e.target.value)}
+                                                        value={editFacilityName}
+                                                        onChange={(e) => setEditFacilityName(e.target.value)}
                                                         className="border rounded px-2 py-1 w-full"
                                                     />
                                                 </td>
@@ -377,8 +417,8 @@ export default function Facilities() {
                                         <input
                                             className="border rounded px-2 py-1"
                                             type="text"
-                                            value={newName}
-                                            onChange={(e) => setNewName(e.target.value)}
+                                            value={newFacilityName}
+                                            onChange={(e) => setNewFacilityName(e.target.value)}
                                             placeholder="例： 大会議室"
                                         />
                                     </div>
