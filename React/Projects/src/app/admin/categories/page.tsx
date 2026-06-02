@@ -72,6 +72,7 @@ export default function Categories() {
             return
         }
 
+        // 多重送信防止
         setIsSubmitting(true)
         try {
             const { error } = await supabase
@@ -101,6 +102,7 @@ export default function Categories() {
             return
         }
         
+        // 多重送信防止
         setIsSubmitting(true)
         try {
             const { error } = await supabase
@@ -121,8 +123,28 @@ export default function Categories() {
     //カテゴリ削除（一括）
     const handleDeleteCategories = async () => {
         if (!window.confirm('選択したカテゴリを削除しますか？')) return
+
+        // 多重送信防止
         setIsSubmitting(true)
         try {
+            // カテゴリが施設で使われているかチェック
+            const { data: linkedFacilities, error: checkError } = await supabase
+                .from('facilities')
+                .select('id')
+                .in('category_id', selectedCheckboxCategoryId)
+                .limit(1)
+    
+            if (checkError) {
+                alert('施設の確認に失敗しました')
+                return
+            }
+    
+            if (linkedFacilities && linkedFacilities.length > 0) {
+                alert('使用中のカテゴリは削除できません。先に施設のカテゴリを変更するか削除してください')
+                return
+            }
+
+            // カテゴリ削除
             const { error } = await supabase
                 .from('categories')
                 .delete()

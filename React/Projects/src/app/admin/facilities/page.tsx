@@ -112,6 +112,7 @@ export default function Facilities() {
             return
         }
 
+        // 多重送信防止
         setIsSubmitting(true)
         try {
             const { error } = await supabase
@@ -156,6 +157,7 @@ export default function Facilities() {
             return
         }
         
+        // 多重送信防止
         setIsSubmitting(true)
         try {
             const { error } = await supabase
@@ -180,7 +182,9 @@ export default function Facilities() {
 
     //施設削除（一括）
     const handleDeleteFacilities = async () => {
+        // 削除確認
         if (!window.confirm('選択した施設を削除しますか？')) return
+
         // 削除対象の施設が予約に使われていないかチェック
         const { data: linkedReservations, error: checkError } = await supabase
             .from('reservations')
@@ -195,10 +199,11 @@ export default function Facilities() {
         }
 
         if (linkedReservations && linkedReservations.length > 0) {
-            alert('確定済みの予約がある施設は削除できません。先に予約をキャンセルしてください。')
+            alert('確定済みの予約がある施設は削除できません。先に予約をキャンセルしてください')
             return
         }
 
+        // 多重送信防止
         setIsSubmitting(true)
         try {
             //　予約がなければ削除実行
