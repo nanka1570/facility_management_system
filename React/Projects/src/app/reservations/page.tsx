@@ -116,28 +116,31 @@ export default function Reservations() {
             return
         }
         
-        // 予約重複
-        const { data: overlappingReservations, error: checkError } = await supabase
-            .from('reservations')
-            .select('id')
-            .eq('facility_id', newFacilityId)
-            .eq('status', RESERVATION_STATUS.CONFIRMED)
-            .lt('start_time', new Date(newEndTime).toISOString())
-            .gt('end_time', new Date(newStartTime).toISOString())
-            .limit(1)
-        if (checkError) {
-            alert('予約の確認に失敗しました')
-            return
-        }
-
-        // 予約重複チェック
-        if (overlappingReservations && overlappingReservations.length > 0) {
-            alert('この時間帯はすでに予約が入っています。')
-            return
-        }
         
+        // 多重送信防止
         setIsSubmitting(true)
         try {
+            // 予約重複
+            const { data: overlappingReservations, error: checkError } = await supabase
+                .from('reservations')
+                .select('id')
+                .eq('facility_id', newFacilityId)
+                .eq('status', RESERVATION_STATUS.CONFIRMED)
+                .lt('start_time', new Date(newEndTime).toISOString())
+                .gt('end_time', new Date(newStartTime).toISOString())
+                .limit(1)
+            if (checkError) {
+                alert('予約の確認に失敗しました')
+                return
+            }
+    
+            // 予約重複チェック
+            if (overlappingReservations && overlappingReservations.length > 0) {
+                alert('この時間帯はすでに予約が入っています。')
+                return
+            }
+
+            // 予約登録
             const { error } = await supabase
                 .from('reservations')
                 .insert({
@@ -188,29 +191,32 @@ export default function Reservations() {
             return
         }
 
-        // 予約重複
-        const { data: overlappingReservations, error: checkError } = await supabase
-            .from('reservations')
-            .select('id')
-            .eq('facility_id', editFacilityId)
-            .eq('status', RESERVATION_STATUS.CONFIRMED)
-            .neq('id', selectedReservation.id)
-            .lt('start_time', new Date(editEndTime).toISOString())
-            .gt('end_time', new Date(editStartTime).toISOString())
-            .limit(1)
-        if (checkError) {
-            alert('予約の確認に失敗しました')
-            return
-        }
-
-        // 予約重複チェック
-        if (overlappingReservations && overlappingReservations.length > 0) {
-            alert('この時間帯はすでに予約が入っています。')
-            return
-        }
-
+        
+        // 多重送信防止
         setIsSubmitting(true)
         try {
+            // 予約重複
+            const { data: overlappingReservations, error: checkError } = await supabase
+                .from('reservations')
+                .select('id')
+                .eq('facility_id', editFacilityId)
+                .eq('status', RESERVATION_STATUS.CONFIRMED)
+                .neq('id', selectedReservation.id)
+                .lt('start_time', new Date(editEndTime).toISOString())
+                .gt('end_time', new Date(editStartTime).toISOString())
+                .limit(1)
+            if (checkError) {
+                alert('予約の確認に失敗しました')
+                return
+            }
+    
+            // 予約重複チェック
+            if (overlappingReservations && overlappingReservations.length > 0) {
+                alert('この時間帯はすでに予約が入っています。')
+                return
+            }
+
+            // 予約更新
             const { error } = await supabase
                 .from('reservations')
                 .update({
@@ -244,6 +250,7 @@ export default function Reservations() {
         // キャンセル確認
         if (!window.confirm('選択した予約をキャンセルしますか？')) return
 
+        // 多重送信防止
         setIsSubmitting(true)
         try {
             const { error } = await supabase
