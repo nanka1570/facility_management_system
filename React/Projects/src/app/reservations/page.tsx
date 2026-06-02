@@ -93,7 +93,7 @@ export default function Reservations() {
             }
         }
         init()
-    }, [refreshKey])
+    }, [refreshKey, router])
 
     // 新規予約
     const handleInsertReservations = async () => {
@@ -341,7 +341,7 @@ export default function Reservations() {
                                                 return (
                                                     <td
                                                     key={facility.id}
-                                                    className={`px-4 py-3 border-1 text-center ${
+                                                    className={`px-4 py-3 border text-center ${
                                                         reservation
                                                             ? 'bg-red-100 text-red-700'
                                                             : 'bg-green-50 hover:bg-green-100 cursor-pointer'

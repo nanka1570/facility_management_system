@@ -61,7 +61,7 @@ export default function Categories() {
             }
         }
         init()
-    }, [refreshKey])
+    }, [refreshKey, router])
 
     //カテゴリ追加
     const handleInsertCategories = async () => {

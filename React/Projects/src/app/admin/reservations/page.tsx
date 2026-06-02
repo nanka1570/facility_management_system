@@ -95,7 +95,7 @@ export default function Reservations() {
 
         }
         init()
-    }, [refreshKey])
+    }, [refreshKey, router])
 
 
     //施設名を取得

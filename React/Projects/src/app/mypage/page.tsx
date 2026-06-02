@@ -86,7 +86,7 @@ export default function Mypage() {
             }
         }
         init()
-    }, [refreshKey])
+    }, [refreshKey, router])
 
     // 編集
     const handleUpdateProfile = async () => {

@@ -82,7 +82,7 @@ export default function Facilities() {
             }
         }
         init()
-    }, [refreshKey])
+    }, [refreshKey, router])
 
     //カテゴリ名を取得
     const getCategoryName = (categoryId: number | null) => {

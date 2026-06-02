@@ -22,7 +22,7 @@ export default function Dashboard() {
     // 表示名
     const [ displayName, setDisplayName ] = useState('')
     // 今日の日付
-    const [selectedDate, setSelectedDate] = useState(() => {
+    const [selectedDate] = useState(() => {
         const today = new Date()
         return today.toLocaleDateString('sv-SE')
     })
@@ -71,7 +71,7 @@ export default function Dashboard() {
             }
         }
         init()
-    }, [])
+    }, [router])
 
     return (
         <>

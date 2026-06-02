@@ -55,7 +55,7 @@ export default function Settings() {
             }
         }
         init()
-    }, [refreshKey])
+    }, [refreshKey, router])
 
     const handleUpdateToggle = async (id: number, currentValue: boolean) => {
         setIsSubmitting(true)
