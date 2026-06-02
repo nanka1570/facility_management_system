@@ -289,8 +289,9 @@ export default function Reservations() {
                             date.setDate(date.getDate() - 1)
                             setSelectedDate(date.toLocaleDateString('sv-SE'))
                         }}
-                        className="px-3 py-1 border rounded"
+                        className="px-3 py-1 rounded cursor-pointer"
                         >
+                            ◀
                         </button>
                         <span className="text-lg font-semibold">{selectedDate}</span>
                         <button
@@ -299,8 +300,9 @@ export default function Reservations() {
                             date.setDate(date.getDate() + 1)
                             setSelectedDate(date.toLocaleDateString('sv-SE'))
                         }}
-                        className="px-3 py-1 border rounded"
+                        className="px-3 py-1 rounded cursor-pointer"
                         >
+                            ▶
                         </button>
                     </div>
                     <div className="bg-white rounded shadow overflow-hidden">
