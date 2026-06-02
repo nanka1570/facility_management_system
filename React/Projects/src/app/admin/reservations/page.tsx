@@ -434,8 +434,8 @@ export default function Reservations() {
                                                         onChange={() => {
                                                             setSelectedReservationId(reservation.id)
                                                             setEditFacilityId(reservation.facility_id)
-                                                            setEditStartTime(reservation.start_time)
-                                                            setEditEndTime(reservation.end_time)
+                                                            setEditStartTime(formatDateTimeLocal(reservation.start_time))
+                                                            setEditEndTime(formatDateTimeLocal(reservation.end_time))
                                                             setEditNumPeople(String(reservation.num_people))
                                                             setEditPurpose(reservation.purpose || '')
                                                         }}
