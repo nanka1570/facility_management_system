@@ -171,11 +171,7 @@ export default function Reservations() {
                 alert('新規予約に失敗しました')
             } else {
                 setRefreshKey(prev => prev + 1)
-                setNewFacilityId(null)
-                setNewStartTime('')
-                setNewEndTime('')
-                setNewNumPeople('')
-                setNewPurpose('')
+                resetNewForm()
                 setIsModalOpen(false)
             }
         } finally {
@@ -304,6 +300,15 @@ export default function Reservations() {
         }
     }
 
+    // 新規登録のstateをリセットする関数
+    const resetNewForm = () => {
+        setNewFacilityId(null)
+        setNewStartTime('')
+        setNewEndTime('')
+        setNewNumPeople('')
+        setNewPurpose('')
+    }
+
     //ボタンのONをすべてリセットする関数
     const resetAllModes = () => {
         setIsEditClick(false)
@@ -325,6 +330,7 @@ export default function Reservations() {
                         <button
                             onClick={() => {
                                 resetAllModes()
+                                resetNewForm()
                                 setIsModalOpen(true)
                             }}
                             className={`${BUTTON_PRIMARY} mr-2`}
@@ -464,7 +470,9 @@ export default function Reservations() {
                                                 <td className="px-4 py-3">
                                                     <select
                                                         value={editFacilityId ?? ''}
-                                                        onChange={(e) => setEditFacilityId(Number(e.target.value))}
+                                                        onChange={(e) => setEditFacilityId(
+                                                            e.target.value === '' ?  null :Number(e.target.value)
+                                                        )}
                                                         className="border rounded px-2 py-1"
                                                     >
                                                         <option value="">選択してください</option>
@@ -558,7 +566,9 @@ export default function Reservations() {
                                         <select
                                             className="border rounded px-2 py-1"
                                             value={newFacilityId ?? ''}
-                                            onChange={(e) => setNewFacilityId(Number(e.target.value))}
+                                            onChange={(e) => setNewFacilityId(
+                                                e.target.value === '' ? null : Number(e.target.value)
+                                            )}
                                         >
                                             <option value="">選択してください</option>
                                             {facilities.map((f) => (

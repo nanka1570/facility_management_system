@@ -126,10 +126,7 @@ export default function Facilities() {
                 alert('施設の追加に失敗しました')
             } else {
                 setRefreshKey(prev => prev + 1)
-                setNewFacilityName('')
-                setNewCategoryId(null)
-                setNewMaxCapacity('')
-                setNewIsActive(true)
+                resetNewForm()
                 setIsModalOpen(false)
             }
         } finally {
@@ -220,6 +217,14 @@ export default function Facilities() {
         }
     }
 
+    // 新規登録のstateをリセットする関数
+    const resetNewForm = () => {
+        setNewFacilityName('')
+        setNewCategoryId(null)
+        setNewMaxCapacity('')
+        setNewIsActive(true)
+    }
+
     //ボタンのONをすべてリセットする関数
     const resetAllModes = () => {
         setIsEditClick(false)
@@ -240,6 +245,7 @@ export default function Facilities() {
                         <button
                             onClick={() => {
                                 resetAllModes()
+                                resetNewForm()
                                 setIsModalOpen(true)
                             }}
                             className={`${BUTTON_PRIMARY} mr-2`}
@@ -356,7 +362,9 @@ export default function Facilities() {
                                                 <td className="px-4 py-3">
                                                     <select
                                                         value={editCategoryId ?? ''}
-                                                        onChange={(e) => setEditCategoryId(Number(e.target.value))}
+                                                        onChange={(e) => setEditCategoryId(
+                                                            e.target.value === '' ? null : Number(e.target.value)
+                                                        )}
                                                         className="border rounded px-2 py-1 w-full"
                                                     >
                                                         <option value="">選択してください</option>
@@ -429,7 +437,9 @@ export default function Facilities() {
                                         <select
                                             className="border rounded px-2 py-1"
                                             value={newCategoryId ?? ''}
-                                            onChange={(e) => setNewCategoryId(Number(e.target.value))}
+                                            onChange={(e) => setNewCategoryId(
+                                                e.target.value === '' ? null : Number(e.target.value)
+                                            )}
                                         >
                                             <option value="">選択してください</option>
                                             {categories.map((cat) => (

@@ -18,6 +18,8 @@ export default function Settings() {
     const [moduleSettings, setModuleSettings] = useState<ModuleSetting[]>([])
     // 固定モジュール
     const FIXED_MODULE_IDS = ['M-CORE', 'M-USER', 'M-FACILITY']
+    // 多重送信防止
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     useEffect(() => {
         // 初期処理
@@ -56,14 +58,19 @@ export default function Settings() {
     }, [refreshKey])
 
     const handleUpdateToggle = async (id: number, currentValue: boolean) => {
-        const { error } = await supabase
-            .from('module_settings')
-            .update({ is_enabled: !currentValue })
-            .eq('id', id)
-        if (error) {
-            alert('モジュール設定の更新に失敗しました')
-        } else {
-            setRefreshKey(prev => prev + 1)
+        setIsSubmitting(true)
+        try {
+            const { error } = await supabase
+                .from('module_settings')
+                .update({ is_enabled: !currentValue })
+                .eq('id', id)
+            if (error) {
+                alert('モジュール設定の更新に失敗しました')
+            } else {
+                setRefreshKey(prev => prev + 1)
+            }
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -104,7 +111,7 @@ export default function Settings() {
                                             <input type="checkbox"
                                                 checked={moduleSetting.is_enabled}
                                                 onChange={() => handleUpdateToggle(moduleSetting.id, moduleSetting.is_enabled)}
-                                                disabled={FIXED_MODULE_IDS.includes(moduleSetting.module_id)}
+                                                disabled={FIXED_MODULE_IDS.includes(moduleSetting.module_id) || isSubmitting}
                                              />
                                         </td>
                                     </tr>

@@ -25,12 +25,12 @@ export default function Categories() {
     // 新規登録モーダル
     const [isModalOpen, setIsModalOpen] = useState(false)
     //新規登録
-    const [newName, setNewName] = useState('')
-    const [newSortOrder, setNewSortOrder] = useState(0)
+    const [newCategoryName, setNewCategoryName] = useState('')
+    const [newCategorySortOrder, setNewCategorySortOrder] = useState(0)
     //編集
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null)
-    const [editName, setEditName] = useState('')
-    const [editSortOrder, setEditSortOrder] = useState(0)
+    const [editCategoryName, setEditCategoryName] = useState('')
+    const [editCategorySortOrder, setEditCategorySortOrder] = useState(0)
     const [isEditClick, setIsEditClick] = useState(false)   //編集ボタンクリック
     //削除
     const [selectedCheckboxCategoryId, setSelectedCheckboxCategoryId] = useState<number[]>([])
@@ -67,7 +67,7 @@ export default function Categories() {
     const handleInsertCategories = async () => {
         /* バリデーションチェック */
         // カテゴリ名必須チェック
-        if (!isNonEmpty(newName)) {
+        if (!isNonEmpty(newCategoryName)) {
             alert('カテゴリ名を入力してください')
             return
         }
@@ -76,13 +76,12 @@ export default function Categories() {
         try {
             const { error } = await supabase
                 .from('categories')
-                .insert({ name: newName, sort_order: newSortOrder })
+                .insert({ name: newCategoryName, sort_order: newCategorySortOrder })
             if (error) {
                 alert('カテゴリの追加に失敗しました')
             } else {
                 setRefreshKey(prev => prev + 1)
-                setNewName('')
-                setNewSortOrder(0)
+                resetNewForm()
                 setIsModalOpen(false)
             }
         } finally {
@@ -97,7 +96,7 @@ export default function Categories() {
 
         /* バリデーションチェック */
         // カテゴリ名必須チェック
-        if (!isNonEmpty(editName)) {
+        if (!isNonEmpty(editCategoryName)) {
             alert('カテゴリ名を入力してください')
             return
         }
@@ -106,7 +105,7 @@ export default function Categories() {
         try {
             const { error } = await supabase
                 .from('categories')
-                .update({ name: editName, sort_order: editSortOrder })
+                .update({ name: editCategoryName, sort_order: editCategorySortOrder })
                 .eq('id', selectedCategoryId)
             if (error) {
                 alert('カテゴリの更新に失敗しました')
@@ -139,6 +138,12 @@ export default function Categories() {
         }
     }
 
+    // 新規登録のstateをリセットする関数
+    const resetNewForm = () => {
+        setNewCategoryName('')
+        setNewCategorySortOrder(0)
+    }
+
     //ボタンのONをすべてリセットする関数
     const resetAllModes = () => {
         setIsEditClick(false)
@@ -159,6 +164,7 @@ export default function Categories() {
                         <button
                             onClick={() => {
                                 resetAllModes()
+                                resetNewForm()
                                 setIsModalOpen(true)
                             }}
                             className={`${BUTTON_PRIMARY} mr-2`}
@@ -210,8 +216,8 @@ export default function Categories() {
                                                     checked={selectedCategoryId === category.id}
                                                     onChange={() => {
                                                         setSelectedCategoryId(category.id)
-                                                        setEditName(category.name)
-                                                        setEditSortOrder(category.sort_order)
+                                                        setEditCategoryName(category.name)
+                                                        setEditCategorySortOrder(category.sort_order)
                                                     }}
                                                 />
                                             </td>
@@ -239,16 +245,16 @@ export default function Categories() {
                                             <td className="px-4 py-3">
                                                 <input
                                                     type="text"
-                                                    value={editName}
-                                                    onChange={(e) => setEditName(e.target.value)}
+                                                    value={editCategoryName}
+                                                    onChange={(e) => setEditCategoryName(e.target.value)}
                                                     className="border rounded px-2 py-1 w-full"
                                                 />
                                             </td>
                                             <td className="px-4 py-3">
                                                 <input
                                                     type="number"
-                                                    value={editSortOrder}
-                                                    onChange={(e) => setEditSortOrder(Number(e.target.value))}
+                                                    value={editCategorySortOrder}
+                                                    onChange={(e) => setEditCategorySortOrder(Number(e.target.value))}
                                                     className="border rounded px-2 py-1 w-20"
                                                 />
                                             </td>
@@ -285,8 +291,8 @@ export default function Categories() {
                                         <input
                                             className="border rounded px-2 py-1"
                                             type="text"
-                                            value={newName}
-                                            onChange={(e) => setNewName(e.target.value)}
+                                            value={newCategoryName}
+                                            onChange={(e) => setNewCategoryName(e.target.value)}
                                             placeholder="例：会議室"
                                         />
                                     </div>
@@ -297,8 +303,8 @@ export default function Categories() {
                                         <input
                                             className="border rounded px-2 py-1"
                                             type="number"
-                                            value={newSortOrder}
-                                            onChange={(e) => setNewSortOrder(Number(e.target.value))}
+                                            value={newCategorySortOrder}
+                                            onChange={(e) => setNewCategorySortOrder(Number(e.target.value))}
                                         />
                                     </div>
                                 </div>
