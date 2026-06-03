@@ -16,7 +16,6 @@ import { RESERVATION_STATUS } from "@/lib/constants"
 import { isNonEmpty, isPositiveInt } from "@/lib/validation"
 
 export default function Reservations() {
-
     // 画面遷移
     const router = useRouter()
     // 画面更新
