@@ -1,6 +1,5 @@
 'use client'
 
-import Header from "@/components/Header"
 import { supabase } from "@/lib/supabase"
 import { ModuleSetting } from "@/lib/types"
 import { useRouter } from "next/navigation"
@@ -76,9 +75,6 @@ export default function Settings() {
 
     return (
         <>
-            <div>
-                <Header />
-            </div>
             <main className="p-6">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold">

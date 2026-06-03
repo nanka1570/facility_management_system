@@ -3,7 +3,6 @@
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation" //next.jsの画面遷移
 import { useEffect, useState } from "react"
-import Header from "@/components/Header"
 // ボタンのスタイル
 import { BUTTON_SECONDARY } from "@/lib/constants"
 // 施設・予約のtypes
@@ -97,7 +96,6 @@ export default function Dashboard() {
     return (
         <>
             <div className="bg-gray-100 min-h-screen">
-                <Header />
                 <main className="p-6">
                     <p
                         className="text-xl mb-4"
