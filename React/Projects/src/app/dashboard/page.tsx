@@ -20,7 +20,7 @@ export default function Dashboard() {
     // 施設一覧
     const [facilities, setFacilities] = useState<Facility[]>([])
     // 表示名
-    const [ displayName, setDisplayName ] = useState('')
+    const [displayName, setDisplayName] = useState('')
     // 今日の日付
     const [selectedDate] = useState(() => {
         const today = new Date()
