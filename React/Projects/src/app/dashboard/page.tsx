@@ -1,11 +1,10 @@
 'use client'
 
+import Header from "@/components/Header"
+import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation" //next.jsの画面遷移
 import { useEffect, useState } from "react"
-import Header from "@/components/Header"
-// ボタンのスタイル
-import { BUTTON_SECONDARY } from "@/lib/constants"
 // 施設・予約のtypes
 import { Facility, Reservation } from "@/lib/types"
 // 予約のステータス
@@ -108,12 +107,12 @@ export default function Dashboard() {
                                     )
                                 }
                             )()}
-                            <button
-                                className={BUTTON_SECONDARY}
-                                onClick={() => router.push('/reservations')}
+                            <Link
+                                href={'/reservations'}
+                                className="px-3 py-2 rounded text-blue-500 hover:bg-gray-200 cursor-pointer"
                             >
                                 予約カレンダーへ
-                            </button>
+                            </Link>
                         </div>
                         <div className="flex-1 bg-white p-4 rounded shadow">
                             <h2 className="font-bold mb-2"
