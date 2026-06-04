@@ -37,7 +37,6 @@ export default function Settings() {
                 .eq('id', session.user.id)
                 .single()
             if (profileData?.role !== ROLE.DEVELOPER) {
-                alert('開発者のみアクセスできます')
                 router.push('/dashboard')
                 return
             } else {

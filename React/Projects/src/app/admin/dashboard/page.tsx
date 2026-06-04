@@ -8,8 +8,6 @@ import { useEffect, useState } from "react"
 import { Facility, Reservation, Profile } from "@/lib/types"
 // 予約のステータス
 import { RESERVATION_STATUS } from "@/lib/constants"
-// プロフィールのロール
-import { ROLE } from "@/lib/constants"
 
 export default function Dashboard() {
 
@@ -39,32 +37,15 @@ export default function Dashboard() {
                 return
             }
 
-            // 権限チェック
-            const { data: authCheckData } = await supabase
+            // プロフィールをロード
+            const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('*')
-                .eq('id', session.user.id)
-                .single()
-            if (authCheckData?.role === ROLE.USER) {
-                alert('管理者と開発者のみアクセスできます')
-                router.push('/dashboard')
-                return
-            } else {
-                const { data: profileData, error: profileError } = await supabase
-                    .from('profiles')
-                    .select('*')
-                if (profileError) {
-                    alert('プロフィールの取得に失敗しました')
-                } else {
-                    setProfiles(profileData)
-                }
-            }
-            
-            // プロフィールをロード
-            if (!authCheckData) {
+            if (profileError) {
                 alert('プロフィールの取得に失敗しました')
             } else {
-                setDisplayName(authCheckData.display_name)
+                setProfiles(profileData)
+                setDisplayName(profileData.find(p => p.id === session.user.id)?.display_name ?? '')
             }
 
             // 予約一覧をロード
