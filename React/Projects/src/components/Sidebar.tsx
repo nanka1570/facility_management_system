@@ -6,15 +6,20 @@ import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 // プロフィールのロール
 import { ROLE } from "@/lib/constants"
-
+// アイコン
+import { LayoutDashboard, Building2, FolderTree, CalendarDays, Settings } from "lucide-react"
 export default function Sidebar() {
     
     // 画面遷移
     const router = useRouter()
-    // サイドバーのスタイル1
-    const itemClass = "block w-full text-left px-3 py-2 rounded text-blue-500 hover:bg-gray-200 cursor-pointer"
+    // サイドバーのスタイル
+    const itemClass = "flex items-center gap-2 w-full px-3 py-2 rounded text-blue-500 hover:bg-gray-200 cursor-pointer"
+    // アイコンのスタイル
+    const iconClass = "shrink-0 text-gray-600"
     // 開発者かどうか
     const [isDeveloper, setIsDeveloper] = useState(false)
+    // サイドバーの開閉
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
     useEffect (() => {
         // 初期処理
@@ -46,49 +51,77 @@ export default function Sidebar() {
 
     return (
         <>
-            <aside className="w-56 bg-white shadow min-h-screen p-4">
-                <h2 className="font-bold mb-4">管理メニュー</h2>
-                <button
+            <aside className={`${isSidebarOpen ? 'w-56' : 'w-16'} bg-white shadow min-h-screen p-4`}>
+                <div className="flex items-center justify-between font-bold mb-4">
+                    {isSidebarOpen &&
+                        <h2>管理メニュー</h2>}
+                    <button
+                        className="cursor-pointer"
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                    >
+                        {isSidebarOpen ? '◀' : '▶'}
+                    </button>
+                </div>
+                <Link
+                    href={'/admin/dashboard'}
                     className={itemClass}
-                    onClick={() => router.push('/admin/dashboard')}
                 >
-                    ダッシュボード
-                </button>
+                    <LayoutDashboard
+                        size={18}
+                        className={iconClass}
+                    />
+                    {isSidebarOpen && 'ダッシュボード'}
+                </Link>
                 {/* 施設・予約グループ */}
-                <p className="text-gray-400 text-xs mt-4 mb-1">施設・予約</p>
+                {isSidebarOpen &&
+                    <p className="text-gray-400 text-xs mt-4 mb-1">施設・予約</p>}
                 <Link
                     href={'/admin/facilities'}
                     className={itemClass}
                 >
-                    施設管理
+                    <Building2
+                        size={18}
+                        className={iconClass}
+                    />
+                    {isSidebarOpen && '施設管理'}
                 </Link>
                 <Link
                     href={'/admin/categories'}
                     className={itemClass}
                 >
-                    カテゴリ管理
+                    <FolderTree
+                        size={18}
+                        className={iconClass}
+                    />
+                    {isSidebarOpen && 'カテゴリ管理'}
                 </Link>
                 <Link
                     href={'/admin/reservations'}
                     className={itemClass}
                 >
-                    予約管理
+                    <CalendarDays
+                        size={18}
+                        className={iconClass}
+                    />
+                    {isSidebarOpen && '予約管理'}
                 </Link>
-                {}
                 {/* システムグループ */}
-                {isDeveloper ?  (
-                    <>
-                        <p className="text-gray-400 text-xs mt-4 mb-1">システム</p>
+                {isDeveloper && (
+                    <div>
+                        {isSidebarOpen &&
+                            <p className="text-gray-400 text-xs mt-4 mb-1">システム</p>}
                         <Link
                             href={'/admin/settings'}
                             className={itemClass}
                         >
-                            モジュール設定
+                            <Settings
+                                size={18}
+                                className={iconClass}
+                            />
+                            {isSidebarOpen && 'モジュール設定'}
                         </Link>
-                    </>
-                ) : (
-                    <p></p>
-                ) }
+                    </div>
+                )}
             </aside>
         </>
     )
