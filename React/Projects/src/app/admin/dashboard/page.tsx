@@ -1,10 +1,9 @@
 'use client'
 
+import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation" //next.jsの画面遷移
 import { useEffect, useState } from "react"
-// ボタンのスタイル
-import { BUTTON_SECONDARY } from "@/lib/constants"
 // 施設・予約のtypes
 import { Facility, Reservation, Profile } from "@/lib/types"
 // 予約のステータス
@@ -126,12 +125,12 @@ export default function Dashboard() {
                                     )
                                 }
                             )()}
-                            <button
-                                className={BUTTON_SECONDARY}
-                                onClick={() => router.push('/reservations')}
+                            <Link
+                                href={'/reservations'}
+                                className="px-3 py-2 rounded text-blue-500 hover:bg-gray-200 cursor-pointer"
                             >
                                 予約カレンダーへ
-                            </button>
+                            </Link>
                             <h2 
                                 className="font-bold mb-2"
                             >
@@ -172,47 +171,51 @@ export default function Dashboard() {
                             本日の予約一覧
                         </h2>
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>時間</th>
-                                    <th>施設</th>
-                                    <th>利用者</th>
-                                    <th>目的</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {( () => {
-                                const todayReservations = reservations.filter(
-                                    (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
-                                )
-                                return todayReservations.length > 0 ? (
-                                    todayReservations
-                                        .map(
-                                            (r) => (
-                                                <tr key={r.id} className="text-gray-600 py-1">
-                                                    <td>
-                                                        {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
-                                                    </td>
-                                                    <td>
-                                                        {facilities.find((f) => f.id === r.facility_id)?.name}
-                                                    </td>
-                                                    <td>
-                                                        {profiles.find((p) => p.id === r.user_id)?.display_name}
-                                                    </td>
-                                                    <td>
-                                                        {r.purpose}
-                                                    </td>
-                                                </tr>
-                                            )
-                                    )
+                            {( () => {
+                            const todayReservations = reservations.filter(
+                                (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
+                            )
+                            return todayReservations.length > 0 ? (
+                                <>
+                                    <thead>
+                                        <tr>
+                                            <th>時間</th>
+                                            <th>施設</th>
+                                            <th>利用者</th>
+                                            <th>目的</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                            {todayReservations
+                                                .map(
+                                                    (r) => (
+                                                        <tr key={r.id} className="text-gray-600 py-1">
+                                                            <td>
+                                                                {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
+                                                            </td>
+                                                            <td>
+                                                                {facilities.find((f) => f.id === r.facility_id)?.name}
+                                                            </td>
+                                                            <td>
+                                                                {profiles.find((p) => p.id === r.user_id)?.display_name}
+                                                            </td>
+                                                            <td>
+                                                                {r.purpose}
+                                                            </td>
+                                                        </tr>
+                                                    )
+                                            )}
+                                    </tbody>
+                                </>
                                 ) : (
+                                    <tbody>
                                         <tr>
                                             <td colSpan={4} className="text-gray-500">(予約なし)</td>
                                         </tr>
+                                    </tbody>
                                     )
                                 }
                             )()}
-                            </tbody>
                         </table>
                     </div>
                 </main>
