@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
 // プロフィールのロール
@@ -13,6 +13,8 @@ export default function Sidebar({ isMobileOpen }: { isMobileOpen: boolean }) {
     
     // 画面遷移
     const router = useRouter()
+    // パス
+    const pathname = usePathname()
     // サイドバーのスタイル
     const itemClass = "flex items-center gap-2 w-full px-3 py-2 rounded text-blue-500 hover:bg-gray-200 cursor-pointer"
     // アイコンのスタイル
@@ -63,7 +65,7 @@ export default function Sidebar({ isMobileOpen }: { isMobileOpen: boolean }) {
                 </div>
                 <Link
                     href={'/admin/dashboard'}
-                    className={itemClass}
+                    className={`${itemClass} ${pathname === '/admin/dashboard' ? 'bg-blue-100' : ''}`}
                 >
                     <LayoutDashboard
                         size={18}
@@ -83,7 +85,7 @@ export default function Sidebar({ isMobileOpen }: { isMobileOpen: boolean }) {
                 </p>
                 <Link
                     href={'/admin/facilities'}
-                    className={itemClass}
+                    className={`${itemClass} ${pathname === '/admin/facilities' ? 'bg-blue-100' : ''}`}
                 >
                     <Building2
                         size={18}
@@ -97,7 +99,7 @@ export default function Sidebar({ isMobileOpen }: { isMobileOpen: boolean }) {
                 </Link>
                 <Link
                     href={'/admin/categories'}
-                    className={itemClass}
+                    className={`${itemClass} ${pathname === '/admin/categories' ? 'bg-blue-100' : ''}`}
                 >
                     <FolderTree
                         size={18}
@@ -111,7 +113,7 @@ export default function Sidebar({ isMobileOpen }: { isMobileOpen: boolean }) {
                 </Link>
                 <Link
                     href={'/admin/reservations'}
-                    className={itemClass}
+                    className={`${itemClass} ${pathname === '/admin/reservations' ? 'bg-blue-100' : ''}`}
                 >
                     <CalendarDays
                         size={18}
@@ -133,7 +135,7 @@ export default function Sidebar({ isMobileOpen }: { isMobileOpen: boolean }) {
                         </p>
                         <Link
                             href={'/admin/settings'}
-                            className={itemClass}
+                            className={`${itemClass} ${pathname === '/admin/settings' ? 'bg-blue-100' : ''}`}
                         >
                             <Settings
                                 size={18}
