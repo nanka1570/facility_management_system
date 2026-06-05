@@ -1,6 +1,5 @@
 'use client'
 
-import Header from "@/components/Header"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation" //next.jsの画面遷移
@@ -75,7 +74,6 @@ export default function Dashboard() {
     return (
         <>
             <div className="bg-gray-100 min-h-screen">
-                <Header />
                 <main className="p-6">
                     <p
                     className="text-xl mb-4"

@@ -1,6 +1,5 @@
 'use client'
 
-import Header from "@/components/Header"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -272,9 +271,6 @@ export default function Reservations() {
     
     return (
         <>
-            <div>
-                <Header />
-            </div>
             <main className="p-6">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold">予約カレンダー</h1>
