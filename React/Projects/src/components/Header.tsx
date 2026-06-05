@@ -3,7 +3,7 @@
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 
-export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
+export default function Header({ onMenuClick, homeHref='/dashboard' }: { onMenuClick?: () => void; homeHref?:string }) {
     // 画面遷移
     const router = useRouter()
 
@@ -26,7 +26,7 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
                     </button>
                 )}
                 <h1
-                    onClick={() => router.push('/dashboard')}
+                    onClick={() => router.push(homeHref)}
                     className="cursor-pointer"
                 >
                     施設管理システム
@@ -34,13 +34,13 @@ export default function Header({ onMenuClick }: { onMenuClick?: () => void }) {
             </div>
             <div className="flex gap-4">
                 <button
-                    className="cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
+                    className="md:hidden cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
                     onClick={() => router.push('/reservations')}
                 >
                     予約
                 </button>
                 <button
-                    className="cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
+                    className="md:hidden cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
                     onClick={() => router.push('/mypage')}
                 >
                     マイページ

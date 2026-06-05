@@ -1,6 +1,5 @@
 'use client'
 
-import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
@@ -8,8 +7,9 @@ import { supabase } from "@/lib/supabase"
 import { ROLE } from "@/lib/constants"
 // アイコン
 import { LayoutDashboard, Building2, FolderTree, CalendarDays, Settings } from "lucide-react"
+import Link from "next/link"
 
-export default function Sidebar({ isMobileOpen }: { isMobileOpen: boolean }) {
+export default function AdminSidebar({ isMobileOpen }: { isMobileOpen: boolean }) {
     
     // 画面遷移
     const router = useRouter()
@@ -49,7 +49,7 @@ export default function Sidebar({ isMobileOpen }: { isMobileOpen: boolean }) {
 
     return (
         <>
-            <aside className={`${isMobileOpen ? 'block' : 'hidden'} md:block w-56 ${isExpanded ? '' : 'md:w-16'} bg-white shadow min-h-screen p-4`}>
+            <aside className={`${isMobileOpen ? 'block' : 'hidden'} md:block w-56 ${isExpanded ? '' : 'md:w-16'} bg-white shadow p-4`}>
                 <div className="flex items-center justify-between font-bold mb-4">
                     <h2
                         className={isExpanded ? '' : 'md:hidden'}

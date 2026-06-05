@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { ROLE } from "@/lib/constants"
 import Header from "@/components/Header"
-import Sidebar from "@/components/Sidebar"
+import AdminSidebar from "@/components/AdminSidebar"
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
     const router = useRouter()
@@ -36,10 +36,17 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
     return (
         <>
-            <Header onMenuClick={() => setIsMobileOpen(!isMobileOpen)}/>
-            <div className="flex">
-                <Sidebar isMobileOpen={isMobileOpen}/>
-                <main className="flex-1">{children}</main>
+            <div className="flex flex-col h-screen">
+                <Header
+                    onMenuClick={() => setIsMobileOpen(!isMobileOpen)}
+                    homeHref="/admin/dashboard"
+                />
+                <div className="flex flex-1 overflow-hidden">
+                    <AdminSidebar isMobileOpen={isMobileOpen}/>
+                    <main className="flex-1 overflow-auto bg-gray-100">
+                        {children}
+                    </main>
+                </div>
             </div>
         </>
     )

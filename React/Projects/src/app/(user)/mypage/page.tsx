@@ -43,7 +43,6 @@ export default function Mypage() {
             // ログインチェック
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
-                router.push('/')
                 return
             }
 

@@ -62,7 +62,6 @@ export default function Reservations() {
             // ログインチェック
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
-                router.push('/')
                 return
             }
 

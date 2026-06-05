@@ -1,6 +1,5 @@
 'use client'
 
-import Link from "next/link"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation" //next.jsの画面遷移
 import { useEffect, useState } from "react"
@@ -8,6 +7,7 @@ import { useEffect, useState } from "react"
 import { Facility, Reservation } from "@/lib/types"
 // 予約のステータス
 import { RESERVATION_STATUS } from "@/lib/constants"
+import Link from "next/link"
 
 export default function Dashboard() {
 
@@ -31,7 +31,6 @@ export default function Dashboard() {
             // ログインチェック
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
-                router.push('/')
                 return
             }
             
@@ -73,7 +72,7 @@ export default function Dashboard() {
 
     return (
         <>
-            <div className="bg-gray-100 min-h-screen">
+            <div>
                 <main className="p-6">
                     <p
                     className="text-xl mb-4"
