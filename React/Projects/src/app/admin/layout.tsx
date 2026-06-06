@@ -8,9 +8,14 @@ import Header from "@/components/Header"
 import AdminSidebar from "@/components/AdminSidebar"
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
+    
     const router = useRouter()
     // ハンバーガーメニュー（サイドバー）開閉
     const [isMobileOpen, setIsMobileOpen] = useState(false)
+    // 開発者・管理者かどうか
+    const [isAdmin, setIsAdmin] = useState(false)
+    // 開発者かどうか
+    const [isDeveloper, setIsDeveloper] = useState(false)
 
     useEffect(() => {
         // 権限チェック
@@ -28,6 +33,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             // 管理者・開発者以外（ユーザー）を弾く
             if (!authData || authData?.role === ROLE.USER) {
                 router.push('/dashboard') 
+            } else {    // 管理者・開発者の場合
+                setIsAdmin(true)
+            }
+            // 開発者の場合true
+            if (authData && authData?.role === ROLE.DEVELOPER) {
+                setIsDeveloper(true)
             }
         }
         authCheck()
@@ -40,9 +51,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 <Header
                     onMenuClick={() => setIsMobileOpen(!isMobileOpen)}
                     homeHref="/admin/dashboard"
+                    isAdmin={isAdmin}
                 />
                 <div className="flex flex-1 overflow-hidden">
-                    <AdminSidebar isMobileOpen={isMobileOpen} onClose={() => setIsMobileOpen(false)}/>
+                    <AdminSidebar
+                        isMobileOpen={isMobileOpen}
+                        onClose={() => setIsMobileOpen(false)}
+                        isDeveloper={isDeveloper}
+                    />
                     <main className="flex-1 overflow-auto bg-gray-100">
                         {children}
                     </main>

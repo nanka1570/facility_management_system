@@ -2,42 +2,16 @@
 
 import { supabase } from "@/lib/supabase"
 import { usePathname, useRouter } from "next/navigation"
-import { useEffect, useState } from "react";
-import { ROLE } from "@/lib/constants";
 import Link from "next/link";
 
-export default function Header({ onMenuClick, homeHref='/dashboard' }: { onMenuClick?: () => void; homeHref?:string }) {
+export default function Header({ onMenuClick, homeHref='/dashboard', isAdmin=false }: { onMenuClick?: () => void; homeHref?:string; isAdmin?:boolean }) {
+    
     // 画面遷移
     const router = useRouter()
     // パス
     const pathname = usePathname()
     // 管理者画面のパス
     const isAdminArea = pathname.startsWith('/admin')
-    // 開発者かどうか
-    const [isAdmin, setIsAdmin] = useState(false)
-
-    useEffect (() => {
-        // 初期処理
-        const init = async () => {
-            // ログインチェック
-            const { data: {session} } = await supabase.auth.getSession()
-            if (!session) {
-                router.push('/')
-                return
-            }
-
-            // 開発者・管理者チェック
-            const { data: authData } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single()
-            if (authData && authData?.role !== ROLE.USER) {
-                setIsAdmin(true)
-            }
-        }
-        init()
-    }, [router])
 
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut()

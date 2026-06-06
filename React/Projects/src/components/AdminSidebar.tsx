@@ -1,51 +1,21 @@
 'use client'
 
-import { usePathname, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { supabase } from "@/lib/supabase"
-// プロフィールのロール
-import { ROLE } from "@/lib/constants"
+import { usePathname, } from "next/navigation"
+import { useState } from "react"
 // アイコン
 import { LayoutDashboard, Building2, FolderTree, CalendarDays, Settings } from "lucide-react"
 import Link from "next/link"
 
-export default function AdminSidebar({ isMobileOpen, onClose }: { isMobileOpen: boolean; onClose: () => void }) {
+export default function AdminSidebar({ isMobileOpen, onClose, isDeveloper }: { isMobileOpen: boolean; onClose: () => void, isDeveloper?: boolean }) {
     
-    // 画面遷移
-    const router = useRouter()
     // パス
     const pathname = usePathname()
     // サイドバーのスタイル
     const itemClass = "flex items-center gap-2 w-full px-3 py-2 rounded text-blue-500 hover:bg-gray-200 cursor-pointer"
     // アイコンのスタイル
     const iconClass = "shrink-0 text-gray-600"
-    // 開発者かどうか
-    const [isDeveloper, setIsDeveloper] = useState(false)
     // サイドバーの折りたたみ
     const [isExpanded, setIsExpanded] = useState(true)
-
-    useEffect (() => {
-        // 初期処理
-        const init = async () => {
-            // ログインチェック
-            const { data: {session} } = await supabase.auth.getSession()
-            if (!session) {
-                router.push('/')
-                return
-            }
-
-            // 開発者チェック
-            const { data: authData } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single()
-            if (authData?.role === ROLE.DEVELOPER) {
-                setIsDeveloper(true)
-            }
-        }
-        init()
-    }, [router])
 
     return (
         <>
