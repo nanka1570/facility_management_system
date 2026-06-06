@@ -275,21 +275,22 @@ export default function Facilities() {
 
             {/* フィルター */}
             {/* カテゴリー */}
-            <select
-                value={filterCategoryId ?? ''}
-                onChange={(e) => setFilterCategoryId(
-                e.target.value === '' ? null : Number(e.target.value)
-                )}
-                className={INPUT}
-            >
-                <option value="">すべて</option>
-                {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                        {cat.name}
-                    </option>
-                ))}
-
-            </select>
+            <div className="flex gap-4 mb-4">
+                <select
+                    value={filterCategoryId ?? ''}
+                    onChange={(e) => setFilterCategoryId(
+                    e.target.value === '' ? null : Number(e.target.value)
+                    )}
+                    className={INPUT}
+                >
+                    <option value="">すべて</option>
+                    {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                            {cat.name}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
             {/* テーブル */}
             <div className={`${CARD} overflow-x-auto`}>

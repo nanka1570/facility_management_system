@@ -3,10 +3,11 @@
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation" //next.jsの画面遷移
 import { useEffect, useState } from "react"
+import { CalendarX } from "lucide-react"
 // 施設・予約のtypes
 import { Facility, Reservation, Profile } from "@/lib/types"
 // 予約のステータス
-import { CARD, RESERVATION_STATUS, STAT_NUMBER } from "@/lib/constants"
+import { BUTTON_PRIMARY, CARD, RESERVATION_STATUS, STAT_NUMBER } from "@/lib/constants"
 import Link from "next/link"
 
 export default function Dashboard() {
@@ -80,122 +81,141 @@ export default function Dashboard() {
             >
                 こんにちは、{displayName}さん
             </p>
-            <div className="flex gap-4">
-                <div className={`${CARD} flex-1 p-4`}>
+            <div className="space-y-4">
+
+                <div className="flex gap-4">
+                    <div className={`${CARD} flex-1 p-4`}>
+                        <h2 
+                            className="text-lg font-semibold text-gray-700 mb-2"
+                        >
+                            今日の予約
+                        </h2>
+                        {( () => {
+                            const todayReservations = reservations.filter(
+                                (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
+                            )
+                            return todayReservations.length > 0 ? (
+                                todayReservations.map(
+                                    (r) => (
+                                        <p key={r.id} className="text-gray-600 py-1">
+                                            {facilities.find(f => f.id === r.facility_id)?.name}
+                                        </p>
+                                    )
+                                )
+                            ) : (
+                                    <div>
+                                        <CalendarX size={32} className="mx-auto mb-2" />
+                                        <p
+                                            className="text-gray-400 text-center py-8"
+                                        >
+                                            予約はまだありません
+                                        </p>
+                                    </div>
+                                )
+                            }
+                        )()}
+                        <Link
+                            href={'/reservations'}
+                            className={BUTTON_PRIMARY}
+                        >
+                            予約カレンダーへ
+                        </Link>
+                        <h2 
+                            className="text-lg font-semibold text-gray-700 mb-2"
+                        >
+                            施設数
+                        </h2>
+                        <p className={`${STAT_NUMBER} pl-2`}>
+                            {facilities.length}
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <div className={`${CARD} flex-1 p-4`}>
+                        <h2 className="text-lg font-semibold text-gray-700 mb-2"
+                        >
+                            今月の予約数
+                        </h2>
+                        <p className={`${STAT_NUMBER} pl-2`}>
+                            {reservations
+                                .filter((r) => 
+                                    new Date(r.start_time).toLocaleDateString('sv-SE').slice(0, 7) === selectedDate.slice(0, 7))
+                                .length
+                            }
+                        </p>
+                        <h2 
+                            className="text-lg font-semibold text-gray-700 mb-2"
+                        >
+                            ユーザー数
+                        </h2>
+                        <p className={`${STAT_NUMBER} pl-2`}>
+                            {profiles.length}
+                        </p>
+                    </div>
+                </div>
+                <div className={`${CARD} flex-1 p-4 overflow-x-auto`}>
                     <h2 
                         className="text-lg font-semibold text-gray-700 mb-2"
                     >
-                        今日の予約
+                        本日の予約一覧
                     </h2>
-                    {( () => {
+                    <table className="w-full">
+                        {( () => {
                         const todayReservations = reservations.filter(
                             (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
                         )
                         return todayReservations.length > 0 ? (
-                            todayReservations.map(
-                                (r) => (
-                                    <p key={r.id} className="text-gray-600 py-1">
-                                        {facilities.find(f => f.id === r.facility_id)?.name}
-                                    </p>
+                            <>
+                                <thead>
+                                    <tr>
+                                        <th className="px-4 py-3 text-left text-sm text-gray-600">時間</th>
+                                        <th className="px-4 py-3 text-left text-sm text-gray-600">施設</th>
+                                        <th className="px-4 py-3 text-left text-sm text-gray-600">利用者</th>
+                                        <th className="px-4 py-3 text-left text-sm text-gray-600">目的</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                        {todayReservations
+                                            .map(
+                                                (r) => (
+                                                    <tr key={r.id} className="border-t hover:bg-gray-50">
+                                                        <td className="px-4 py-3">
+                                                            {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
+                                                        </td>
+                                                        <td className="px-4 py-3">
+                                                            {facilities.find((f) => f.id === r.facility_id)?.name}
+                                                        </td>
+                                                        <td className="px-4 py-3">
+                                                            {profiles.find((p) => p.id === r.user_id)?.display_name}
+                                                        </td>
+                                                        <td className="px-4 py-3">
+                                                            {r.purpose}
+                                                        </td>
+                                                    </tr>
+                                                )
+                                        )}
+                                </tbody>
+                            </>
+                            ) : (
+                                <tbody>
+                                    <tr>
+                                        <td colSpan={4} className="text-gray-500">
+                                            <div>
+                                                <CalendarX size={32} className="mx-auto mb-2" />
+                                                <p
+                                                    className="text-gray-400 text-center py-8"
+                                                >
+                                                    予約はまだありません
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
                                 )
-                            )
-                        ) : (
-                                <p className="text-gray-500">(予約なし)</p>
-                            )
-                        }
-                    )()}
-                    <Link
-                        href={'/reservations'}
-                        className="px-3 py-2 rounded text-blue-500 hover:bg-gray-200 cursor-pointer"
-                    >
-                        予約カレンダーへ
-                    </Link>
-                    <h2 
-                        className="text-lg font-semibold text-gray-700 mb-2"
-                    >
-                        施設数
-                    </h2>
-                    <p className={`${STAT_NUMBER} pl-2`}>
-                        {facilities.length}
-                    </p>
+                            }
+                        )()}
+                    </table>
                 </div>
-            </div>
-            <div>
-                <div className={`${CARD} flex-1 p-4`}>
-                    <h2 className="text-lg font-semibold text-gray-700 mb-2"
-                    >
-                        今月の予約数
-                    </h2>
-                    <p className={`${STAT_NUMBER} pl-2`}>
-                        {reservations
-                            .filter((r) => 
-                                new Date(r.start_time).toLocaleDateString('sv-SE').slice(0, 7) === selectedDate.slice(0, 7))
-                            .length
-                        }
-                    </p>
-                    <h2 
-                        className="text-lg font-semibold text-gray-700 mb-2"
-                    >
-                        ユーザー数
-                    </h2>
-                    <p className={`${STAT_NUMBER} pl-2`}>
-                        {profiles.length}
-                    </p>
-                </div>
-            </div>
-            <div>
-                <h2 
-                    className="text-lg font-semibold text-gray-700 mb-2"
-                >
-                    本日の予約一覧
-                </h2>
-                <table>
-                    {( () => {
-                    const todayReservations = reservations.filter(
-                        (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
-                    )
-                    return todayReservations.length > 0 ? (
-                        <>
-                            <thead>
-                                <tr>
-                                    <th>時間</th>
-                                    <th>施設</th>
-                                    <th>利用者</th>
-                                    <th>目的</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                    {todayReservations
-                                        .map(
-                                            (r) => (
-                                                <tr key={r.id} className="text-gray-600 py-1">
-                                                    <td>
-                                                        {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
-                                                    </td>
-                                                    <td>
-                                                        {facilities.find((f) => f.id === r.facility_id)?.name}
-                                                    </td>
-                                                    <td>
-                                                        {profiles.find((p) => p.id === r.user_id)?.display_name}
-                                                    </td>
-                                                    <td>
-                                                        {r.purpose}
-                                                    </td>
-                                                </tr>
-                                            )
-                                    )}
-                            </tbody>
-                        </>
-                        ) : (
-                            <tbody>
-                                <tr>
-                                    <td colSpan={4} className="text-gray-500">(予約なし)</td>
-                                </tr>
-                            </tbody>
-                            )
-                        }
-                    )()}
-                </table>
             </div>
         </>
     )

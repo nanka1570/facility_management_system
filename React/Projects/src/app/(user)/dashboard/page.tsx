@@ -3,6 +3,7 @@
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation" //next.jsの画面遷移
 import { useEffect, useState } from "react"
+import { CalendarX } from "lucide-react"
 // 施設・予約のtypes
 import { Facility, Reservation } from "@/lib/types"
 // 予約のステータス
@@ -98,7 +99,14 @@ export default function Dashboard() {
                                 )
                             )
                         ) : (
-                                <p className="text-gray-500">(予約なし)</p>
+                            <div>
+                                <CalendarX size={32} className="mx-auto mb-2" />
+                                <p
+                                    className="text-gray-400 text-center py-8"
+                                >
+                                    予約はまだありません
+                                </p>
+                            </div>
                             )
                         }
                     )()}

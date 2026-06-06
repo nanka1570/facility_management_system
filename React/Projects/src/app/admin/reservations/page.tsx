@@ -388,27 +388,32 @@ export default function Reservations() {
                     </button>
                 </div>
             </div>
+
             {/* フィルター */}
             {/* 施設 */}
-            <select
-                value={filterFacilityId ?? ''}
-                onChange={(e) => setFilterFacilityId(
-                e.target.value === '' ? null : Number(e.target.value)
-                )}
-                className={INPUT}
-                >
-                <option value="">すべて</option>
-                {facilities.map((fac) => (
-                    <option key={fac.id} value={fac.id}>
-                        {fac.name}
-                    </option>
-                ))}
-                </select>
+            <div className="flex gap-4 mb-4">
+                <select
+                    value={filterFacilityId ?? ''}
+                    onChange={(e) => setFilterFacilityId(
+                    e.target.value === '' ? null : Number(e.target.value)
+                    )}
+                    className={INPUT}
+                    >
+                    <option value="">すべて</option>
+                    {facilities.map((fac) => (
+                        <option key={fac.id} value={fac.id}>
+                            {fac.name}
+                        </option>
+                    ))}
+                    </select>
+            </div>
+
             {/* 日付 */}
             <input
                 type="date"
                 value={filterDate}
                 onChange={(e) => setFilterDate(e.target.value)}
+                className={INPUT}
                 />
 
             {/* テーブル */}
