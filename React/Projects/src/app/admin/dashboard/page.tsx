@@ -75,131 +75,127 @@ export default function Dashboard() {
 
     return (
         <>
-            <div>
-                <main className="p-6">
-                    <p
-                        className="text-xl mb-4"
+            <p
+                className="text-xl mb-4"
+            >
+                こんにちは、{displayName}さん
+            </p>
+            <div className="flex gap-4">
+                <div className="flex-1 bg-white p-4 rounded shadow">
+                    <h2 
+                        className="font-bold mb-2"
                     >
-                        こんにちは、{displayName}さん
-                    </p>
-                    <div className="flex gap-4">
-                        <div className="flex-1 bg-white p-4 rounded shadow">
-                            <h2 
-                                className="font-bold mb-2"
-                            >
-                                今日の予約
-                            </h2>
-                            {( () => {
-                                const todayReservations = reservations.filter(
-                                    (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
+                        今日の予約
+                    </h2>
+                    {( () => {
+                        const todayReservations = reservations.filter(
+                            (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
+                        )
+                        return todayReservations.length > 0 ? (
+                            todayReservations.map(
+                                (r) => (
+                                    <p key={r.id} className="text-gray-600 py-1">
+                                        {facilities.find(f => f.id === r.facility_id)?.name}
+                                    </p>
                                 )
-                                return todayReservations.length > 0 ? (
-                                    todayReservations.map(
-                                        (r) => (
-                                            <p key={r.id} className="text-gray-600 py-1">
-                                                {facilities.find(f => f.id === r.facility_id)?.name}
-                                            </p>
-                                        )
-                                    )
-                                ) : (
-                                        <p className="text-gray-500">(予約なし)</p>
-                                    )
-                                }
-                            )()}
-                            <Link
-                                href={'/reservations'}
-                                className="px-3 py-2 rounded text-blue-500 hover:bg-gray-200 cursor-pointer"
-                            >
-                                予約カレンダーへ
-                            </Link>
-                            <h2 
-                                className="font-bold mb-2"
-                            >
-                                施設数
-                            </h2>
-                            <p>
-                                {facilities.length}
-                            </p>
-                        </div>
-                    </div>
-                    <div>
-                        <div className="flex-1 bg-white p-4 rounded shadow">
-                            <h2 className="font-bold mb-2"
-                            >
-                                今月の予約数
-                            </h2>
-                            <p>
-                                {reservations
-                                    .filter((r) => 
-                                        new Date(r.start_time).toLocaleDateString('sv-SE').slice(0, 7) === selectedDate.slice(0, 7))
-                                    .length
-                                }
-                            </p>
-                            <h2 
-                                className="font-bold mb-2"
-                            >
-                                ユーザー数
-                            </h2>
-                            <p>
-                                {profiles.length}
-                            </p>
-                        </div>
-                    </div>
-                    <div>
-                        <h2 
-                            className="font-bold mb-2"
-                        >
-                            本日の予約一覧
-                        </h2>
-                        <table>
-                            {( () => {
-                            const todayReservations = reservations.filter(
-                                (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
                             )
-                            return todayReservations.length > 0 ? (
-                                <>
-                                    <thead>
-                                        <tr>
-                                            <th>時間</th>
-                                            <th>施設</th>
-                                            <th>利用者</th>
-                                            <th>目的</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                            {todayReservations
-                                                .map(
-                                                    (r) => (
-                                                        <tr key={r.id} className="text-gray-600 py-1">
-                                                            <td>
-                                                                {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
-                                                            </td>
-                                                            <td>
-                                                                {facilities.find((f) => f.id === r.facility_id)?.name}
-                                                            </td>
-                                                            <td>
-                                                                {profiles.find((p) => p.id === r.user_id)?.display_name}
-                                                            </td>
-                                                            <td>
-                                                                {r.purpose}
-                                                            </td>
-                                                        </tr>
-                                                    )
-                                            )}
-                                    </tbody>
-                                </>
-                                ) : (
-                                    <tbody>
-                                        <tr>
-                                            <td colSpan={4} className="text-gray-500">(予約なし)</td>
-                                        </tr>
-                                    </tbody>
-                                    )
-                                }
-                            )()}
-                        </table>
-                    </div>
-                </main>
+                        ) : (
+                                <p className="text-gray-500">(予約なし)</p>
+                            )
+                        }
+                    )()}
+                    <Link
+                        href={'/reservations'}
+                        className="px-3 py-2 rounded text-blue-500 hover:bg-gray-200 cursor-pointer"
+                    >
+                        予約カレンダーへ
+                    </Link>
+                    <h2 
+                        className="font-bold mb-2"
+                    >
+                        施設数
+                    </h2>
+                    <p>
+                        {facilities.length}
+                    </p>
+                </div>
+            </div>
+            <div>
+                <div className="flex-1 bg-white p-4 rounded shadow">
+                    <h2 className="font-bold mb-2"
+                    >
+                        今月の予約数
+                    </h2>
+                    <p>
+                        {reservations
+                            .filter((r) => 
+                                new Date(r.start_time).toLocaleDateString('sv-SE').slice(0, 7) === selectedDate.slice(0, 7))
+                            .length
+                        }
+                    </p>
+                    <h2 
+                        className="font-bold mb-2"
+                    >
+                        ユーザー数
+                    </h2>
+                    <p>
+                        {profiles.length}
+                    </p>
+                </div>
+            </div>
+            <div>
+                <h2 
+                    className="font-bold mb-2"
+                >
+                    本日の予約一覧
+                </h2>
+                <table>
+                    {( () => {
+                    const todayReservations = reservations.filter(
+                        (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
+                    )
+                    return todayReservations.length > 0 ? (
+                        <>
+                            <thead>
+                                <tr>
+                                    <th>時間</th>
+                                    <th>施設</th>
+                                    <th>利用者</th>
+                                    <th>目的</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    {todayReservations
+                                        .map(
+                                            (r) => (
+                                                <tr key={r.id} className="text-gray-600 py-1">
+                                                    <td>
+                                                        {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
+                                                    </td>
+                                                    <td>
+                                                        {facilities.find((f) => f.id === r.facility_id)?.name}
+                                                    </td>
+                                                    <td>
+                                                        {profiles.find((p) => p.id === r.user_id)?.display_name}
+                                                    </td>
+                                                    <td>
+                                                        {r.purpose}
+                                                    </td>
+                                                </tr>
+                                            )
+                                    )}
+                            </tbody>
+                        </>
+                        ) : (
+                            <tbody>
+                                <tr>
+                                    <td colSpan={4} className="text-gray-500">(予約なし)</td>
+                                </tr>
+                            </tbody>
+                            )
+                        }
+                    )()}
+                </table>
             </div>
         </>
     )

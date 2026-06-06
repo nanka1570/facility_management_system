@@ -114,148 +114,146 @@ export default function Mypage() {
 
     return (
         <>
-            <main className="p-6">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold">マイページ</h1>
+            </div>
+            {/* プロフィール */}
+            <div>
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold">マイページ</h1>
+                    <h2 className="text-xl font-bold">
+                        プロフィール
+                    </h2>
+                    <button
+                        className={`${BUTTON_PRIMARY} mr-2`}
+                        onClick={() => {
+                            setIsModalOpen(true)
+                            setUpdateDisplayName(profile?.display_name || '')
+                        }}
+                    >
+                        編集
+                    </button>
                 </div>
-                {/* プロフィール */}
-                <div>
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-bold">
-                            プロフィール
-                        </h2>
-                        <button
-                            className={`${BUTTON_PRIMARY} mr-2`}
-                            onClick={() => {
-                                setIsModalOpen(true)
-                                setUpdateDisplayName(profile?.display_name || '')
-                            }}
-                        >
-                            編集
-                        </button>
-                    </div>
-                    <div className="bg-white rounded shadow p-6">
-                        <div className="flex flex-col gap-8">
-                            <div className="flex gap-2">
-                                <p className="text-gray-500">表示名: </p>
-                                <p>{profile?.display_name}</p>
-                            </div>
-                            <div className="flex gap-2">
-                                <p className="text-gray-500">メール: </p>
-                                <p>{profile?.email}</p>
-                            </div>
-                            <div className="flex gap-2">
-                                <p className="text-gray-500">権限: </p>
-                                <p>{profile?.role}</p>
-                            </div>
+                <div className="bg-white rounded shadow p-6">
+                    <div className="flex flex-col gap-8">
+                        <div className="flex gap-2">
+                            <p className="text-gray-500">表示名: </p>
+                            <p>{profile?.display_name}</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <p className="text-gray-500">メール: </p>
+                            <p>{profile?.email}</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <p className="text-gray-500">権限: </p>
+                            <p>{profile?.role}</p>
                         </div>
                     </div>
                 </div>
-                {/* 予約履歴 */}
-                <div>
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-bold">
-                            予約履歴
-                        </h2>
-                        <button
-                            className={BUTTON_SECONDARY}
-                            onClick={() => setDisplayAll(!displayAll)}
-                        >
-                            {displayAll ? '直近5件のみ表示' : 'すべて表示'}
-                        </button>
-                    </div>
-                    <div className="bg-white rounded shadow overflow-hidden">
-                        <table className="w-full">
-                            <thead className="bg-gray-50">
-                                <tr className="border-t">
-                                    <th className="px-4 py-3 text-left">開始日時</th>
-                                    <th className="px-4 py-3 text-left">終了日時</th>
-                                    <th className="px-4 py-3 text-left">施設</th>
-                                    <th className="px-4 py-3 text-left">ステータス</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {(displayAll ? 
-                                reservations : 
-                                reservations.slice(0,5))
-                                    .map((reservation) => (
-                                        <tr
-                                            key={reservation.id}
-                                            className="border-t"
-                                        >
-                                            <td className="px-4 py-3">
-                                                {formatDateTime(reservation.start_time)}
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                {formatDateTime(reservation.end_time)}
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                {facilities.find(f => f.id === reservation.facility_id)?.name}
-                                            </td>
-                                            <td
-                                                className={`px-4 py-3
-                                                ${reservation.status === RESERVATION_STATUS.COMPLETED ? 'text-green-600 font-semibold' :
-                                                reservation.status === RESERVATION_STATUS.CANCELLED ? 'text-red-400' : ''}`}
-                                            >
-                                                {getStatusLabel(reservation.status)}
-                                            </td>
-                                        </tr>
-                                    ))
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+            </div>
+            {/* 予約履歴 */}
+            <div>
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-bold">
+                        予約履歴
+                    </h2>
+                    <button
+                        className={BUTTON_SECONDARY}
+                        onClick={() => setDisplayAll(!displayAll)}
+                    >
+                        {displayAll ? '直近5件のみ表示' : 'すべて表示'}
+                    </button>
                 </div>
-                {/* 編集モーダル */}
-                {isModalOpen ? (
-                    <>
+                <div className="bg-white rounded shadow overflow-hidden">
+                    <table className="w-full">
+                        <thead className="bg-gray-50">
+                            <tr className="border-t">
+                                <th className="px-4 py-3 text-left">開始日時</th>
+                                <th className="px-4 py-3 text-left">終了日時</th>
+                                <th className="px-4 py-3 text-left">施設</th>
+                                <th className="px-4 py-3 text-left">ステータス</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {(displayAll ? 
+                            reservations : 
+                            reservations.slice(0,5))
+                                .map((reservation) => (
+                                    <tr
+                                        key={reservation.id}
+                                        className="border-t"
+                                    >
+                                        <td className="px-4 py-3">
+                                            {formatDateTime(reservation.start_time)}
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            {formatDateTime(reservation.end_time)}
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            {facilities.find(f => f.id === reservation.facility_id)?.name}
+                                        </td>
+                                        <td
+                                            className={`px-4 py-3
+                                            ${reservation.status === RESERVATION_STATUS.COMPLETED ? 'text-green-600 font-semibold' :
+                                            reservation.status === RESERVATION_STATUS.CANCELLED ? 'text-red-400' : ''}`}
+                                        >
+                                            {getStatusLabel(reservation.status)}
+                                        </td>
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {/* 編集モーダル */}
+            {isModalOpen ? (
+                <>
+                    <div
+                        className="fixed inset-0 bg-black/50 flex justify-center items-center"
+                        onClick={() => (setIsModalOpen(false))}
+                    >
                         <div
-                            className="fixed inset-0 bg-black/50 flex justify-center items-center"
-                            onClick={() => (setIsModalOpen(false))}
+                            className="bg-white rounded shadow p-6 w-125"
+                            onClick={(e) => (e.stopPropagation())}
                         >
-                            <div
-                                className="bg-white rounded shadow p-6 w-125"
-                                onClick={(e) => (e.stopPropagation())}
-                            >
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex flex-col gap-1">
-                                        <label>表示名: </label>
-                                        <input
-                                            type="text"
-                                            className="border rounded px-2 py-1"
-                                            value={updateDisplayName}
-                                            onChange={(e) => setUpdateDisplayName(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-gray-500">メール</p>
-                                        <p className="text-gray-500 border rounded px-2 py-1 bg-gray-100">{profile?.email}</p>
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <p className="text-gray-500">権限</p>
-                                        <p className="text-gray-500 border rounded px-2 py-1 bg-gray-100">{profile?.role}</p>
-                                    </div>
-                                    <div className="mt-4">
-                                        <button
-                                            onClick={() => setIsModalOpen(false)}
-                                            className={`${BUTTON_SECONDARY} mr-2`}
-                                        >
-                                            閉じる
-                                        </button>
-                                        <button
-                                            className={BUTTON_PRIMARY}
-                                            disabled={isSubmitting}
-                                            onClick={() => handleUpdateProfile()}
-                                        >
-                                            更新する
-                                        </button>
-                                    </div>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex flex-col gap-1">
+                                    <label>表示名: </label>
+                                    <input
+                                        type="text"
+                                        className="border rounded px-2 py-1"
+                                        value={updateDisplayName}
+                                        onChange={(e) => setUpdateDisplayName(e.target.value)}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-gray-500">メール</p>
+                                    <p className="text-gray-500 border rounded px-2 py-1 bg-gray-100">{profile?.email}</p>
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <p className="text-gray-500">権限</p>
+                                    <p className="text-gray-500 border rounded px-2 py-1 bg-gray-100">{profile?.role}</p>
+                                </div>
+                                <div className="mt-4">
+                                    <button
+                                        onClick={() => setIsModalOpen(false)}
+                                        className={`${BUTTON_SECONDARY} mr-2`}
+                                    >
+                                        閉じる
+                                    </button>
+                                    <button
+                                        className={BUTTON_PRIMARY}
+                                        disabled={isSubmitting}
+                                        onClick={() => handleUpdateProfile()}
+                                    >
+                                        更新する
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </>    
-                ): null}
-            </main>
+                    </div>
+                </>    
+            ): null}
         </>
     )
 }

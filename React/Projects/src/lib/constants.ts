@@ -1,8 +1,8 @@
 // src/lib/constants.ts
-export const BUTTON_PRIMARY = "bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500"
-export const BUTTON_DANGER = "bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
-export const BUTTON_SECONDARY = "bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
-export const BUTTON_SUCCESS = "bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500"
+export const BUTTON_PRIMARY = "inline-block bg-blue-500 text-white px-5 py-3 rounded-xl shadow-sm hover:bg-blue-600 font-semibold cursor-pointer"
+export const BUTTON_DANGER = "inline-block bg-red-500 text-white px-5 py-3 rounded-xl shadow-sm hover:bg-red-600 font-semibold cursor-pointer"
+export const BUTTON_SECONDARY = "inline-block bg-gray-200 text-gray-700 px-5 py-3 rounded-xl shadow-sm hover:bg-gray-300 font-semibold cursor-pointer"
+export const BUTTON_SUCCESS = "inline-block bg-green-500 text-white px-5 py-3 rounded-xl shadow-sm hover:bg-green-600 font-semibold cursor-pointer"
 
 // 予約のステータス
 export const RESERVATION_STATUS = {

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 // 施設・予約のtypes
 import { Facility, Reservation } from "@/lib/types"
 // 予約のステータス
-import { RESERVATION_STATUS } from "@/lib/constants"
+import { BUTTON_PRIMARY, RESERVATION_STATUS } from "@/lib/constants"
 import Link from "next/link"
 
 export default function Dashboard() {
@@ -72,60 +72,56 @@ export default function Dashboard() {
 
     return (
         <>
-            <div>
-                <main className="p-6">
-                    <p
-                    className="text-xl mb-4"
+            <p
+            className="text-xl mb-4"
+            >
+                こんにちは、{displayName}さん
+            </p>
+            <div className="flex gap-4">
+                <div className="flex-1 bg-white p-6 rounded-xl shadow-sm">
+                    <h2 
+                    className="font-bold mb-2"
                     >
-                        こんにちは、{displayName}さん
-                    </p>
-                    <div className="flex gap-4">
-                        <div className="flex-1 bg-white p-4 rounded shadow">
-                            <h2 
-                            className="font-bold mb-2"
-                            >
-                                今日の予約
-                            </h2>
-                            {( () => {
-                                const todayReservations = reservations.filter(
-                                    (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
+                        今日の予約
+                    </h2>
+                    {( () => {
+                        const todayReservations = reservations.filter(
+                            (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
+                        )
+                        return todayReservations.length > 0 ? (
+                            todayReservations.map(
+                                (r) => (
+                                    <p key={r.id} className="text-gray-600 py-1">
+                                        {facilities.find(f => f.id === r.facility_id)?.name}
+                                        {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
+                                    </p>
                                 )
-                                return todayReservations.length > 0 ? (
-                                    todayReservations.map(
-                                        (r) => (
-                                            <p key={r.id} className="text-gray-600 py-1">
-                                                {facilities.find(f => f.id === r.facility_id)?.name}
-                                                {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
-                                            </p>
-                                        )
-                                    )
-                                ) : (
-                                        <p className="text-gray-500">(予約なし)</p>
-                                    )
-                                }
-                            )()}
-                            <Link
-                                href={'/reservations'}
-                                className="px-3 py-2 rounded text-blue-500 hover:bg-gray-200 cursor-pointer"
-                            >
-                                予約カレンダーへ
-                            </Link>
-                        </div>
-                        <div className="flex-1 bg-white p-4 rounded shadow">
-                            <h2 className="font-bold mb-2"
-                            >
-                                今月の予約数
-                            </h2>
-                            <p>
-                                {reservations
-                                    .filter((r) => 
-                                        new Date(r.start_time).toLocaleDateString('sv-SE').slice(0, 7) === selectedDate.slice(0, 7))
-                                    .length
-                                }
-                            </p>
-                        </div>
-                    </div>
-                </main>
+                            )
+                        ) : (
+                                <p className="text-gray-500">(予約なし)</p>
+                            )
+                        }
+                    )()}
+                    <Link
+                        href={'/reservations'}
+                        className={BUTTON_PRIMARY}
+                    >
+                        予約カレンダーへ
+                    </Link>
+                </div>
+                <div className="flex-1 bg-white p-6 rounded-xl shadow-sm">
+                    <h2 className="font-bold mb-2"
+                    >
+                        今月の予約数
+                    </h2>
+                    <p>
+                        {reservations
+                            .filter((r) => 
+                                new Date(r.start_time).toLocaleDateString('sv-SE').slice(0, 7) === selectedDate.slice(0, 7))
+                            .length
+                        }
+                    </p>
+                </div>
             </div>
         </>
     )

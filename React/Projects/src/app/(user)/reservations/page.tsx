@@ -270,287 +270,285 @@ export default function Reservations() {
     
     return (
         <>
-            <main className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold">予約カレンダー</h1>
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold">予約カレンダー</h1>
+            </div>
+            {/* 予約カレンダー */}
+            <div>
+                <div className="flex items-center gap-4 mb-4">
+                    <button
+                    onClick={() => {
+                        const date = new Date(selectedDate)
+                        date.setDate(date.getDate() - 1)
+                        setSelectedDate(date.toLocaleDateString('sv-SE'))
+                    }}
+                    className="px-3 py-1 rounded cursor-pointer"
+                    >
+                        ◀
+                    </button>
+                    <span className="text-lg font-semibold">{selectedDate}</span>
+                    <button
+                    onClick={() => {
+                        const date = new Date(selectedDate)
+                        date.setDate(date.getDate() + 1)
+                        setSelectedDate(date.toLocaleDateString('sv-SE'))
+                    }}
+                    className="px-3 py-1 rounded cursor-pointer"
+                    >
+                        ▶
+                    </button>
                 </div>
-                {/* 予約カレンダー */}
-                <div>
-                    <div className="flex items-center gap-4 mb-4">
-                        <button
-                        onClick={() => {
-                            const date = new Date(selectedDate)
-                            date.setDate(date.getDate() - 1)
-                            setSelectedDate(date.toLocaleDateString('sv-SE'))
-                        }}
-                        className="px-3 py-1 rounded cursor-pointer"
-                        >
-                            ◀
-                        </button>
-                        <span className="text-lg font-semibold">{selectedDate}</span>
-                        <button
-                        onClick={() => {
-                            const date = new Date(selectedDate)
-                            date.setDate(date.getDate() + 1)
-                            setSelectedDate(date.toLocaleDateString('sv-SE'))
-                        }}
-                        className="px-3 py-1 rounded cursor-pointer"
-                        >
-                            ▶
-                        </button>
-                    </div>
-                    <div className="bg-white rounded shadow overflow-hidden">
-                        <table className="w-full">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-3"></th>
-                                    {facilities
-                                        .map((facility) => (
-                                            <th
-                                                key={facility.id}
-                                            >
-                                                {facility.name}
-                                            </th>
-                                        ))
-                                    }
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {timeSlots
-                                    .map((timeSlot) => (
-                                        <tr key={timeSlot} className="border-t">
-                                            <td className="bg-gray-50 px-4 py-3 font-mono">
-                                                {timeSlot}:00
-                                            </td>
-                                            {facilities
-                                                .map((facility) => {
-                                                    // 時間と施設が一致する予約を探す
-                                                    const reservation = reservations.find((r) =>
-                                                        r.facility_id === facility.id &&
-                                                        r.status === RESERVATION_STATUS.CONFIRMED &&
-                                                        new Date(r.start_time).getHours() <= timeSlot &&
-                                                        new Date(r.end_time).getHours() > timeSlot &&
-                                                        new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
-                                                )
-                                                return (
-                                                    <td
-                                                    key={facility.id}
-                                                    className={`px-4 py-3 border text-center ${
-                                                        reservation
-                                                            ? 'bg-red-100 text-red-700'
-                                                            : 'bg-green-50 hover:bg-green-100 cursor-pointer'
-                                                    }`}
-                                                    onClick={() => {
-                                                        if (!reservation) { // 予約が存在しなければ新規登録モーダルを開く
-                                                            setIsModalOpen(true)
-                                                            setNewFacilityId(facility.id)
-                                                            setNewStartTime(`${selectedDate}T${String(timeSlot).padStart(2, '0')}:00`)
-                                                            setNewEndTime(`${selectedDate}T${String(timeSlot + 1).padStart(2, '0')}:00`)
-                                                            setNewNumPeople('')
-                                                            setNewPurpose('')
-                                                        } else {    // 予約が存在したら詳細モーダルを開く
-                                                            setIsDetailModalOpen(true)
-                                                            setSelectedReservation(reservation)
-                                                            setEditFacilityId(reservation.facility_id)
-                                                            setEditStartTime(formatDateTimeLocal(reservation.start_time))
-                                                            setEditEndTime(formatDateTimeLocal(reservation.end_time))
-                                                            setEditNumPeople(String(reservation.num_people))
-                                                            setEditPurpose(reservation.purpose || '')
-                                                        }
-                                                    }}
-                                                    >
-                                                        {reservation ? 'x' : 'o'}
-                                                    </td>
-                                                )
-                                                })
-                                            }
-                                        </tr>
+                <div className="bg-white rounded shadow overflow-hidden">
+                    <table className="w-full">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="px-4 py-3"></th>
+                                {facilities
+                                    .map((facility) => (
+                                        <th
+                                            key={facility.id}
+                                        >
+                                            {facility.name}
+                                        </th>
                                     ))
                                 }
-                            </tbody>
-                        </table>
-                    </div>
-                    {/* 新規登録モーダル */}
-                    {isModalOpen ? (
-                        <div 
-                            className="fixed inset-0 bg-black/50 flex justify-center items-center"
-                            onClick={() => (setIsModalOpen(false))}
-                        >
-                            <div
-                                className="bg-white rounded shadow p-6 w-125"
-                                onClick={(e) => (e.stopPropagation())}
-                            >
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            施設名
-                                        </label>
-                                        <p className="border rounded px-2 py-1 bg-gray-100">
-                                            {facilities.find(f => f.id === newFacilityId)?.name}
-                                        </p>
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            開始日時
-                                        </label>
-                                        <input
-                                            className="border rounded px-2 py-1 bg-gray-100"
-                                            type="datetime-local"
-                                            value={newStartTime}
-                                            readOnly
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            終了日時
-                                        </label>
-                                        <input
-                                            className="border rounded px-2 py-1"
-                                            type="datetime-local"
-                                            value={newEndTime}
-                                            onChange={(e) => setNewEndTime(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            利用人数
-                                        </label>
-                                        <input
-                                            className="border rounded px-2 py-1"
-                                            type="number"
-                                            value={newNumPeople}
-                                            onChange={(e) => setNewNumPeople(e.target.value)}
-                                            placeholder="例： 30"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            利用目的
-                                        </label>
-                                        <input
-                                            className="border rounded px-2 py-1"
-                                            type="text"
-                                            value={newPurpose}
-                                            onChange={(e) => setNewPurpose(e.target.value)}
-                                            placeholder="例： 報告会議"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="mt-4">
-                                    <button
-                                        onClick={() => setIsModalOpen(false)}
-                                        className={`${BUTTON_SECONDARY} mr-2`}
-                                    >
-                                        閉じる
-                                    </button>
-                                    <button
-                                        className={BUTTON_PRIMARY}
-                                        disabled={isSubmitting}
-                                        onClick={() => handleInsertReservations()}
-                                    >
-                                        予約する
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ) : null}
-                    {/* 詳細モーダル */}
-                    {isDetailModalOpen ? (
-                        <div 
-                            className="fixed inset-0 bg-black/50 flex justify-center items-center"
-                            onClick={() => (setIsDetailModalOpen(false))}
-                        >
-                            <div
-                                className="bg-white rounded shadow p-6 w-125"
-                                onClick={(e) => (e.stopPropagation())}
-                            >
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            施設名
-                                        </label>
-                                        <p className="border rounded px-2 py-1 bg-gray-100">
-                                            {facilities.find(f => f.id === editFacilityId)?.name}
-                                        </p>
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            開始日時
-                                        </label>
-                                        <input
-                                            className="border rounded px-2 py-1 bg-gray-100"
-                                            type="datetime-local"
-                                            value={editStartTime}
-                                            onChange={(e) => setEditStartTime(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            終了日時
-                                        </label>
-                                        <input
-                                            className="border rounded px-2 py-1"
-                                            type="datetime-local"
-                                            value={editEndTime}
-                                            onChange={(e) => setEditEndTime(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            利用人数
-                                        </label>
-                                        <input
-                                            className="border rounded px-2 py-1"
-                                            type="number"
-                                            value={editNumPeople}
-                                            onChange={(e) => setEditNumPeople(e.target.value)}
-                                            placeholder="例： 30"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            利用目的
-                                        </label>
-                                        <input
-                                            className="border rounded px-2 py-1"
-                                            type="text"
-                                            value={editPurpose}
-                                            onChange={(e) => setEditPurpose(e.target.value)}
-                                            placeholder="例： 報告会議"
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <button
-                                        onClick={() => setIsDetailModalOpen(false)}
-                                        className={`${BUTTON_SECONDARY} mr-2`}
-                                    >
-                                        閉じる
-                                    </button>
-                                    {selectedReservation?.user_id === userId ? (
-                                        <>
-                                            <button
-                                                className={BUTTON_DANGER}
-                                                disabled={isSubmitting}
-                                                onClick={() => handleCancelReservation()}
-                                            >
-                                                予約をキャンセルする
-                                            </button>
-                                            <button
-                                                className={BUTTON_PRIMARY}
-                                                disabled={isSubmitting}
-                                                onClick={() => handleUpdateReservation()}
-                                            >
-                                                更新する
-                                            </button>
-                                        </>
-                                    ): null}
-                                </div>
-                            </div>
-                        </div>
-                    ) : null}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {timeSlots
+                                .map((timeSlot) => (
+                                    <tr key={timeSlot} className="border-t">
+                                        <td className="bg-gray-50 px-4 py-3 font-mono">
+                                            {timeSlot}:00
+                                        </td>
+                                        {facilities
+                                            .map((facility) => {
+                                                // 時間と施設が一致する予約を探す
+                                                const reservation = reservations.find((r) =>
+                                                    r.facility_id === facility.id &&
+                                                    r.status === RESERVATION_STATUS.CONFIRMED &&
+                                                    new Date(r.start_time).getHours() <= timeSlot &&
+                                                    new Date(r.end_time).getHours() > timeSlot &&
+                                                    new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
+                                            )
+                                            return (
+                                                <td
+                                                key={facility.id}
+                                                className={`px-4 py-3 border text-center ${
+                                                    reservation
+                                                        ? 'bg-red-100 text-red-700'
+                                                        : 'bg-green-50 hover:bg-green-100 cursor-pointer'
+                                                }`}
+                                                onClick={() => {
+                                                    if (!reservation) { // 予約が存在しなければ新規登録モーダルを開く
+                                                        setIsModalOpen(true)
+                                                        setNewFacilityId(facility.id)
+                                                        setNewStartTime(`${selectedDate}T${String(timeSlot).padStart(2, '0')}:00`)
+                                                        setNewEndTime(`${selectedDate}T${String(timeSlot + 1).padStart(2, '0')}:00`)
+                                                        setNewNumPeople('')
+                                                        setNewPurpose('')
+                                                    } else {    // 予約が存在したら詳細モーダルを開く
+                                                        setIsDetailModalOpen(true)
+                                                        setSelectedReservation(reservation)
+                                                        setEditFacilityId(reservation.facility_id)
+                                                        setEditStartTime(formatDateTimeLocal(reservation.start_time))
+                                                        setEditEndTime(formatDateTimeLocal(reservation.end_time))
+                                                        setEditNumPeople(String(reservation.num_people))
+                                                        setEditPurpose(reservation.purpose || '')
+                                                    }
+                                                }}
+                                                >
+                                                    {reservation ? 'x' : 'o'}
+                                                </td>
+                                            )
+                                            })
+                                        }
+                                    </tr>
+                                ))
+                            }
+                        </tbody>
+                    </table>
                 </div>
-            </main>
+                {/* 新規登録モーダル */}
+                {isModalOpen ? (
+                    <div 
+                        className="fixed inset-0 bg-black/50 flex justify-center items-center"
+                        onClick={() => (setIsModalOpen(false))}
+                    >
+                        <div
+                            className="bg-white rounded shadow p-6 w-125"
+                            onClick={(e) => (e.stopPropagation())}
+                        >
+                            <div className="flex flex-col gap-4">
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        施設名
+                                    </label>
+                                    <p className="border rounded px-2 py-1 bg-gray-100">
+                                        {facilities.find(f => f.id === newFacilityId)?.name}
+                                    </p>
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        開始日時
+                                    </label>
+                                    <input
+                                        className="border rounded px-2 py-1 bg-gray-100"
+                                        type="datetime-local"
+                                        value={newStartTime}
+                                        readOnly
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        終了日時
+                                    </label>
+                                    <input
+                                        className="border rounded px-2 py-1"
+                                        type="datetime-local"
+                                        value={newEndTime}
+                                        onChange={(e) => setNewEndTime(e.target.value)}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        利用人数
+                                    </label>
+                                    <input
+                                        className="border rounded px-2 py-1"
+                                        type="number"
+                                        value={newNumPeople}
+                                        onChange={(e) => setNewNumPeople(e.target.value)}
+                                        placeholder="例： 30"
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        利用目的
+                                    </label>
+                                    <input
+                                        className="border rounded px-2 py-1"
+                                        type="text"
+                                        value={newPurpose}
+                                        onChange={(e) => setNewPurpose(e.target.value)}
+                                        placeholder="例： 報告会議"
+                                    />
+                                </div>
+                            </div>
+                            <div className="mt-4">
+                                <button
+                                    onClick={() => setIsModalOpen(false)}
+                                    className={`${BUTTON_SECONDARY} mr-2`}
+                                >
+                                    閉じる
+                                </button>
+                                <button
+                                    className={BUTTON_PRIMARY}
+                                    disabled={isSubmitting}
+                                    onClick={() => handleInsertReservations()}
+                                >
+                                    予約する
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ) : null}
+                {/* 詳細モーダル */}
+                {isDetailModalOpen ? (
+                    <div 
+                        className="fixed inset-0 bg-black/50 flex justify-center items-center"
+                        onClick={() => (setIsDetailModalOpen(false))}
+                    >
+                        <div
+                            className="bg-white rounded shadow p-6 w-125"
+                            onClick={(e) => (e.stopPropagation())}
+                        >
+                            <div className="flex flex-col gap-4">
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        施設名
+                                    </label>
+                                    <p className="border rounded px-2 py-1 bg-gray-100">
+                                        {facilities.find(f => f.id === editFacilityId)?.name}
+                                    </p>
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        開始日時
+                                    </label>
+                                    <input
+                                        className="border rounded px-2 py-1 bg-gray-100"
+                                        type="datetime-local"
+                                        value={editStartTime}
+                                        onChange={(e) => setEditStartTime(e.target.value)}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        終了日時
+                                    </label>
+                                    <input
+                                        className="border rounded px-2 py-1"
+                                        type="datetime-local"
+                                        value={editEndTime}
+                                        onChange={(e) => setEditEndTime(e.target.value)}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        利用人数
+                                    </label>
+                                    <input
+                                        className="border rounded px-2 py-1"
+                                        type="number"
+                                        value={editNumPeople}
+                                        onChange={(e) => setEditNumPeople(e.target.value)}
+                                        placeholder="例： 30"
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        利用目的
+                                    </label>
+                                    <input
+                                        className="border rounded px-2 py-1"
+                                        type="text"
+                                        value={editPurpose}
+                                        onChange={(e) => setEditPurpose(e.target.value)}
+                                        placeholder="例： 報告会議"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <button
+                                    onClick={() => setIsDetailModalOpen(false)}
+                                    className={`${BUTTON_SECONDARY} mr-2`}
+                                >
+                                    閉じる
+                                </button>
+                                {selectedReservation?.user_id === userId ? (
+                                    <>
+                                        <button
+                                            className={BUTTON_DANGER}
+                                            disabled={isSubmitting}
+                                            onClick={() => handleCancelReservation()}
+                                        >
+                                            予約をキャンセルする
+                                        </button>
+                                        <button
+                                            className={BUTTON_PRIMARY}
+                                            disabled={isSubmitting}
+                                            onClick={() => handleUpdateReservation()}
+                                        >
+                                            更新する
+                                        </button>
+                                    </>
+                                ): null}
+                            </div>
+                        </div>
+                    </div>
+                ) : null}
+            </div>
         </>
     )
 }

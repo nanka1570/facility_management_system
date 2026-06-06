@@ -346,389 +346,387 @@ export default function Reservations() {
 
     return (
         <>
-            <main className="p-6">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold">予約管理</h1>
-                    <div>
-                        <button
-                            onClick={() => {
-                                resetAllModes()
-                                resetNewForm()
-                                setIsModalOpen(true)
-                            }}
-                            className={`${BUTTON_PRIMARY} mr-2`}
-                        >
-                            新規予約
-                        </button>
-                        <button
-                            onClick={() => {
-                                resetAllModes()
-                                setIsEditClick(true)
-                            }}
-                            className={`${BUTTON_PRIMARY} mr-2`}
-                        >
-                            編集
-                        </button>
-                        <button
-                            onClick={() => {
-                                resetAllModes()
-                                setIsCancelClick(true)
-                            }}
-                            className={`${BUTTON_DANGER} mr-2`}
-                        >
-                            予約キャンセル
-                        </button>
-                        <button
-                            onClick={() => {
-                                resetAllModes()
-                                setIsRestoreClick(true)
-                            }}
-                            className={BUTTON_SUCCESS}
-                        >
-                            予約復元
-                        </button>
-                    </div>
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-bold">予約管理</h1>
+                <div>
+                    <button
+                        onClick={() => {
+                            resetAllModes()
+                            resetNewForm()
+                            setIsModalOpen(true)
+                        }}
+                        className={`${BUTTON_PRIMARY} mr-2`}
+                    >
+                        新規予約
+                    </button>
+                    <button
+                        onClick={() => {
+                            resetAllModes()
+                            setIsEditClick(true)
+                        }}
+                        className={`${BUTTON_PRIMARY} mr-2`}
+                    >
+                        編集
+                    </button>
+                    <button
+                        onClick={() => {
+                            resetAllModes()
+                            setIsCancelClick(true)
+                        }}
+                        className={`${BUTTON_DANGER} mr-2`}
+                    >
+                        予約キャンセル
+                    </button>
+                    <button
+                        onClick={() => {
+                            resetAllModes()
+                            setIsRestoreClick(true)
+                        }}
+                        className={BUTTON_SUCCESS}
+                    >
+                        予約復元
+                    </button>
                 </div>
-                {/* フィルター */}
-                {/* 施設 */}
-                <select
-                 value={filterFacilityId ?? ''}
-                 onChange={(e) => setFilterFacilityId(
-                    e.target.value === '' ? null : Number(e.target.value)
-                 )}
-                 className="border rounded px-2 py-1"
-                 >
-                    <option value="">すべて</option>
-                    {facilities.map((fac) => (
-                        <option key={fac.id} value={fac.id}>
-                            {fac.name}
-                        </option>
-                    ))}
-                 </select>
-                {/* 日付 */}
-                <input
-                 type="date"
-                 value={filterDate}
-                 onChange={(e) => setFilterDate(e.target.value)}
-                 />
+            </div>
+            {/* フィルター */}
+            {/* 施設 */}
+            <select
+                value={filterFacilityId ?? ''}
+                onChange={(e) => setFilterFacilityId(
+                e.target.value === '' ? null : Number(e.target.value)
+                )}
+                className="border rounded px-2 py-1"
+                >
+                <option value="">すべて</option>
+                {facilities.map((fac) => (
+                    <option key={fac.id} value={fac.id}>
+                        {fac.name}
+                    </option>
+                ))}
+                </select>
+            {/* 日付 */}
+            <input
+                type="date"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+                />
 
-                {/* テーブル */}
-                <div className="bg-white rounded shadow overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                {(isEditClick || isCancelClick || isRestoreClick) && <th className="px-4 py-3"></th>}
-                                <th className="px-4 py-3 text-left">ID</th>
-                                <th className="px-4 py-3 text-left">施設名</th>
-                                <th className="px-4 py-3 text-left">開始日時</th>
-                                <th className="px-4 py-3 text-left">終了日時</th>
-                                <th className="px-4 py-3 text-left">ステータス</th>
-                                <th className="px-4 py-3 text-left">利用人数</th>
-                                <th className="px-4 py-3 text-left">利用目的</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {reservations
-                                .filter((reservation) => 
-                                    filterFacilityId === null
-                                    ? true
-                                    : reservation.facility_id === filterFacilityId
-                                )
-                                .filter((reservation) => 
-                                    filterDate === ''
-                                    ? true
-                                    : new Date(reservation.start_time).toLocaleDateString('sv-SE') === filterDate
-                                )
-                                .map((reservation) => (
-                                    <tr
-                                        key={reservation.id}
-                                        //ステータスが'cancelled'ならグレーアウトする
-                                        className={`border-t ${((isEditClick || isCancelClick) && reservation.status === RESERVATION_STATUS.CANCELLED) ||
-                                            (isRestoreClick && reservation.status === RESERVATION_STATUS.CONFIRMED) ? 'opacity-40' : ''}`}
-                                    >
-                                        {/* 編集のラジオボタン */}
-                                        {isEditClick && (
-                                            <>
-                                                <td className="px-4 py-3">
-                                                    <input
-                                                        type="radio"
-                                                        name="editTarget"
-                                                        checked={selectedReservationId === reservation.id}
-                                                        onChange={() => {
-                                                            setSelectedReservationId(reservation.id)
-                                                            setEditFacilityId(reservation.facility_id)
-                                                            setEditStartTime(formatDateTimeLocal(reservation.start_time))
-                                                            setEditEndTime(formatDateTimeLocal(reservation.end_time))
-                                                            setEditNumPeople(String(reservation.num_people))
-                                                            setEditPurpose(reservation.purpose || '')
-                                                        }}
-                                                        disabled={reservation.status !== RESERVATION_STATUS.CONFIRMED}
-                                                    />
-                                                </td>
-                                            </>
-                                        )}
+            {/* テーブル */}
+            <div className="bg-white rounded shadow overflow-x-auto">
+                <table className="w-full">
+                    <thead className="bg-gray-50">
+                        <tr>
+                            {(isEditClick || isCancelClick || isRestoreClick) && <th className="px-4 py-3"></th>}
+                            <th className="px-4 py-3 text-left">ID</th>
+                            <th className="px-4 py-3 text-left">施設名</th>
+                            <th className="px-4 py-3 text-left">開始日時</th>
+                            <th className="px-4 py-3 text-left">終了日時</th>
+                            <th className="px-4 py-3 text-left">ステータス</th>
+                            <th className="px-4 py-3 text-left">利用人数</th>
+                            <th className="px-4 py-3 text-left">利用目的</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {reservations
+                            .filter((reservation) => 
+                                filterFacilityId === null
+                                ? true
+                                : reservation.facility_id === filterFacilityId
+                            )
+                            .filter((reservation) => 
+                                filterDate === ''
+                                ? true
+                                : new Date(reservation.start_time).toLocaleDateString('sv-SE') === filterDate
+                            )
+                            .map((reservation) => (
+                                <tr
+                                    key={reservation.id}
+                                    //ステータスが'cancelled'ならグレーアウトする
+                                    className={`border-t ${((isEditClick || isCancelClick) && reservation.status === RESERVATION_STATUS.CANCELLED) ||
+                                        (isRestoreClick && reservation.status === RESERVATION_STATUS.CONFIRMED) ? 'opacity-40' : ''}`}
+                                >
+                                    {/* 編集のラジオボタン */}
+                                    {isEditClick && (
+                                        <>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="radio"
+                                                    name="editTarget"
+                                                    checked={selectedReservationId === reservation.id}
+                                                    onChange={() => {
+                                                        setSelectedReservationId(reservation.id)
+                                                        setEditFacilityId(reservation.facility_id)
+                                                        setEditStartTime(formatDateTimeLocal(reservation.start_time))
+                                                        setEditEndTime(formatDateTimeLocal(reservation.end_time))
+                                                        setEditNumPeople(String(reservation.num_people))
+                                                        setEditPurpose(reservation.purpose || '')
+                                                    }}
+                                                    disabled={reservation.status !== RESERVATION_STATUS.CONFIRMED}
+                                                />
+                                            </td>
+                                        </>
+                                    )}
 
-                                        {/* 予約キャンセル・予約復元のチェックボックス */}
-                                        {(isCancelClick || isRestoreClick) && (
-                                            <>
-                                                <td className="px-4 py-3">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedCheckboxReservationId.includes(reservation.id)}
-                                                        onChange={() => setSelectedCheckboxReservationId(toggleId(selectedCheckboxReservationId, reservation.id))}
-                                                        disabled={
-                                                            isCancelClick
-                                                                ? reservation.status !== RESERVATION_STATUS.CONFIRMED
-                                                                : reservation.status !== RESERVATION_STATUS.CANCELLED
-                                                        }
-                                                    />
-                                                </td>
-                                            </>
-                                        )}
-                                        <td className="px-4 py-3">{reservation.id}</td>
+                                    {/* 予約キャンセル・予約復元のチェックボックス */}
+                                    {(isCancelClick || isRestoreClick) && (
+                                        <>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedCheckboxReservationId.includes(reservation.id)}
+                                                    onChange={() => setSelectedCheckboxReservationId(toggleId(selectedCheckboxReservationId, reservation.id))}
+                                                    disabled={
+                                                        isCancelClick
+                                                            ? reservation.status !== RESERVATION_STATUS.CONFIRMED
+                                                            : reservation.status !== RESERVATION_STATUS.CANCELLED
+                                                    }
+                                                />
+                                            </td>
+                                        </>
+                                    )}
+                                    <td className="px-4 py-3">{reservation.id}</td>
 
-                                        {/* ステータスが'cancelled'以外 かつ ラジオボタンが押されたとき */}
-                                        {reservation.status !== RESERVATION_STATUS.CANCELLED && selectedReservationId === reservation.id ? (
-                                            <>
-                                                <td className="px-4 py-3">
-                                                    <select
-                                                        value={editFacilityId ?? ''}
-                                                        onChange={(e) => setEditFacilityId(
-                                                            e.target.value === '' ?  null :Number(e.target.value)
-                                                        )}
-                                                        className="border rounded px-2 py-1"
-                                                    >
-                                                        <option value="">選択してください</option>
-                                                        {facilities.map((f) => (
-                                                            <option key={f.id} value={f.id}>
-                                                                {f.name}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <input
-                                                        className="border rounded px-2 py-1"
-                                                        type="datetime-local"
-                                                        value={formatDateTimeLocal(editStartTime)}
-                                                        onChange={(e) => setEditStartTime(e.target.value)}
-                                                    />
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <input
-                                                        className="border rounded px-2 py-1"
-                                                        type="datetime-local"
-                                                        value={formatDateTimeLocal(editEndTime)}
-                                                        onChange={(e) => setEditEndTime(e.target.value)}
-                                                    />
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <input
-                                                        className="border rounded px-2 py-1"
-                                                        type="text"
-                                                        value={getStatusLabel(reservation.status)}
-                                                        readOnly
-                                                    />
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <input
-                                                        className="border rounded px-2 py-1"
-                                                        type="number"
-                                                        value={editNumPeople}
-                                                        onChange={(e) => setEditNumPeople(e.target.value)}
-                                                    />
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <input
-                                                        className="border rounded px-2 py-1"
-                                                        type="text"
-                                                        value={editPurpose}
-                                                        onChange={(e) => setEditPurpose(e.target.value)}
-                                                    />
-                                                </td>
-                                            </>
-                                        ) : (
-                                            <>
-                                                {/* 予約一覧 */}
-                                                <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
-                                                <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
-                                                <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
-                                                <td
-                                                    className={`px-4 py-3 ${reservation.status === RESERVATION_STATUS.COMPLETED ? 'text-green-600 font-semibold' :
-                                                            reservation.status === RESERVATION_STATUS.CANCELLED ? 'text-red-400' : ''
-                                                        }`}>
-                                                    {getStatusLabel(reservation.status)}
-                                                </td>
-                                                <td className="px-4 py-3">{reservation.num_people}</td>
-                                                <td className="px-4 py-3">{reservation.purpose}</td>
-                                            </>
-                                        )}
+                                    {/* ステータスが'cancelled'以外 かつ ラジオボタンが押されたとき */}
+                                    {reservation.status !== RESERVATION_STATUS.CANCELLED && selectedReservationId === reservation.id ? (
+                                        <>
+                                            <td className="px-4 py-3">
+                                                <select
+                                                    value={editFacilityId ?? ''}
+                                                    onChange={(e) => setEditFacilityId(
+                                                        e.target.value === '' ?  null :Number(e.target.value)
+                                                    )}
+                                                    className="border rounded px-2 py-1"
+                                                >
+                                                    <option value="">選択してください</option>
+                                                    {facilities.map((f) => (
+                                                        <option key={f.id} value={f.id}>
+                                                            {f.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    className="border rounded px-2 py-1"
+                                                    type="datetime-local"
+                                                    value={formatDateTimeLocal(editStartTime)}
+                                                    onChange={(e) => setEditStartTime(e.target.value)}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    className="border rounded px-2 py-1"
+                                                    type="datetime-local"
+                                                    value={formatDateTimeLocal(editEndTime)}
+                                                    onChange={(e) => setEditEndTime(e.target.value)}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    className="border rounded px-2 py-1"
+                                                    type="text"
+                                                    value={getStatusLabel(reservation.status)}
+                                                    readOnly
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    className="border rounded px-2 py-1"
+                                                    type="number"
+                                                    value={editNumPeople}
+                                                    onChange={(e) => setEditNumPeople(e.target.value)}
+                                                />
+                                            </td>
+                                            <td className="px-4 py-3">
+                                                <input
+                                                    className="border rounded px-2 py-1"
+                                                    type="text"
+                                                    value={editPurpose}
+                                                    onChange={(e) => setEditPurpose(e.target.value)}
+                                                />
+                                            </td>
+                                        </>
+                                    ) : (
+                                        <>
+                                            {/* 予約一覧 */}
+                                            <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
+                                            <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
+                                            <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
+                                            <td
+                                                className={`px-4 py-3 ${reservation.status === RESERVATION_STATUS.COMPLETED ? 'text-green-600 font-semibold' :
+                                                        reservation.status === RESERVATION_STATUS.CANCELLED ? 'text-red-400' : ''
+                                                    }`}>
+                                                {getStatusLabel(reservation.status)}
+                                            </td>
+                                            <td className="px-4 py-3">{reservation.num_people}</td>
+                                            <td className="px-4 py-3">{reservation.purpose}</td>
+                                        </>
+                                    )}
 
 
-                                    </tr>
-                                ))}
-                        </tbody>
-                    </table>
-                </div>
-                {/* 新規登録モーダル */}
-                {isModalOpen ? (
-                    <>
+                                </tr>
+                            ))}
+                    </tbody>
+                </table>
+            </div>
+            {/* 新規登録モーダル */}
+            {isModalOpen ? (
+                <>
+                    <div
+                        className="fixed inset-0 bg-black/50 flex justify-center items-center"
+                        onClick={() => (setIsModalOpen(false))}
+                    >
                         <div
-                            className="fixed inset-0 bg-black/50 flex justify-center items-center"
-                            onClick={() => (setIsModalOpen(false))}
+                            className="bg-white rounded shadow p-6 w-125"
+                            onClick={(e) => (e.stopPropagation())}
                         >
-                            <div
-                                className="bg-white rounded shadow p-6 w-125"
-                                onClick={(e) => (e.stopPropagation())}
-                            >
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            施設名
-                                        </label>
-                                        <select
-                                            className="border rounded px-2 py-1"
-                                            value={newFacilityId ?? ''}
-                                            onChange={(e) => setNewFacilityId(
-                                                e.target.value === '' ? null : Number(e.target.value)
-                                            )}
-                                        >
-                                            <option value="">選択してください</option>
-                                            {facilities.map((f) => (
-                                                <option key={f.id} value={f.id}>
-                                                    {f.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            開始日時
-                                        </label>
-                                        <input
-                                            className="border rounded px-2 py-1"
-                                            type="datetime-local"
-                                            value={newStartTime}
-                                            onChange={(e) => setNewStartTime(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            終了日時
-                                        </label>
-                                        <input
-                                            className="border rounded px-2 py-1"
-                                            type="datetime-local"
-                                            value={newEndTime}
-                                            onChange={(e) => setNewEndTime(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            利用人数
-                                        </label>
-                                        <input
-                                            className="border rounded px-2 py-1"
-                                            type="number"
-                                            value={newNumPeople}
-                                            onChange={(e) => setNewNumPeople(e.target.value)}
-                                            placeholder="例： 30"
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-1">
-                                        <label>
-                                            利用目的
-                                        </label>
-                                        <input
-                                            className="border rounded px-2 py-1"
-                                            type="text"
-                                            value={newPurpose}
-                                            onChange={(e) => setNewPurpose(e.target.value)}
-                                            placeholder="例： 報告会議"
-                                        />
-                                    </div>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        施設名
+                                    </label>
+                                    <select
+                                        className="border rounded px-2 py-1"
+                                        value={newFacilityId ?? ''}
+                                        onChange={(e) => setNewFacilityId(
+                                            e.target.value === '' ? null : Number(e.target.value)
+                                        )}
+                                    >
+                                        <option value="">選択してください</option>
+                                        {facilities.map((f) => (
+                                            <option key={f.id} value={f.id}>
+                                                {f.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
-                                <div className="mt-4">
-                                    <button
-                                        onClick={() => setIsModalOpen(false)}
-                                        className={`${BUTTON_SECONDARY} mr-2`}
-                                    >
-                                        閉じる
-                                    </button>
-                                    <button
-                                        className={BUTTON_PRIMARY}
-                                        disabled={isSubmitting}
-                                        onClick={() => handleInsertReservations()}
-                                    >
-                                        予約する
-                                    </button>
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        開始日時
+                                    </label>
+                                    <input
+                                        className="border rounded px-2 py-1"
+                                        type="datetime-local"
+                                        value={newStartTime}
+                                        onChange={(e) => setNewStartTime(e.target.value)}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        終了日時
+                                    </label>
+                                    <input
+                                        className="border rounded px-2 py-1"
+                                        type="datetime-local"
+                                        value={newEndTime}
+                                        onChange={(e) => setNewEndTime(e.target.value)}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        利用人数
+                                    </label>
+                                    <input
+                                        className="border rounded px-2 py-1"
+                                        type="number"
+                                        value={newNumPeople}
+                                        onChange={(e) => setNewNumPeople(e.target.value)}
+                                        placeholder="例： 30"
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <label>
+                                        利用目的
+                                    </label>
+                                    <input
+                                        className="border rounded px-2 py-1"
+                                        type="text"
+                                        value={newPurpose}
+                                        onChange={(e) => setNewPurpose(e.target.value)}
+                                        placeholder="例： 報告会議"
+                                    />
                                 </div>
                             </div>
+                            <div className="mt-4">
+                                <button
+                                    onClick={() => setIsModalOpen(false)}
+                                    className={`${BUTTON_SECONDARY} mr-2`}
+                                >
+                                    閉じる
+                                </button>
+                                <button
+                                    className={BUTTON_PRIMARY}
+                                    disabled={isSubmitting}
+                                    onClick={() => handleInsertReservations()}
+                                >
+                                    予約する
+                                </button>
+                            </div>
                         </div>
-                    </>
-                ) : null}
+                    </div>
+                </>
+            ) : null}
 
-                {/* 予約編集 */}
-                {isEditClick && (
-                    <>
-                        <div>
-                            <button
-                                onClick={() => resetAllModes()}
-                                className={`${BUTTON_SECONDARY} mr-2`}
-                            >
-                                閉じる</button>
-                            <button
-                                className={BUTTON_PRIMARY}
-                                disabled={isSubmitting}
-                                onClick={() => handleUpdateReservation()}
-                            >
-                                更新する</button>
-                        </div>
-                    </>
-                )}
+            {/* 予約編集 */}
+            {isEditClick && (
+                <>
+                    <div>
+                        <button
+                            onClick={() => resetAllModes()}
+                            className={`${BUTTON_SECONDARY} mr-2`}
+                        >
+                            閉じる</button>
+                        <button
+                            className={BUTTON_PRIMARY}
+                            disabled={isSubmitting}
+                            onClick={() => handleUpdateReservation()}
+                        >
+                            更新する</button>
+                    </div>
+                </>
+            )}
 
-                {/* 予約キャンセル */}
-                {isCancelClick && (
-                    <>
-                        <div>
-                            <button
-                                onClick={() => resetAllModes()}
-                                className={`${BUTTON_SECONDARY} mr-2`}
-                            >
-                                閉じる
-                            </button>
-                            <button
-                                className={BUTTON_DANGER}
-                                disabled={isSubmitting}
-                                onClick={() => handleCancelReservation()}
-                            >
-                                予約をキャンセルする
-                            </button>
-                        </div>
-                    </>
-                )}
+            {/* 予約キャンセル */}
+            {isCancelClick && (
+                <>
+                    <div>
+                        <button
+                            onClick={() => resetAllModes()}
+                            className={`${BUTTON_SECONDARY} mr-2`}
+                        >
+                            閉じる
+                        </button>
+                        <button
+                            className={BUTTON_DANGER}
+                            disabled={isSubmitting}
+                            onClick={() => handleCancelReservation()}
+                        >
+                            予約をキャンセルする
+                        </button>
+                    </div>
+                </>
+            )}
 
-                {/* 予約復元 */}
-                {isRestoreClick && (
-                    <>
-                        <div>
-                            <button
-                                onClick={() => resetAllModes()}
-                                className={`${BUTTON_SECONDARY} mr-2`}
-                            >
-                                閉じる
-                            </button>
-                            <button
-                                className={BUTTON_SUCCESS}
-                                disabled={isSubmitting}
-                                onClick={() => handleRestoreReservation()}
-                            >
-                                予約を復元する
-                            </button>
-                        </div>
-                    </>
-                )}
-            </main>
+            {/* 予約復元 */}
+            {isRestoreClick && (
+                <>
+                    <div>
+                        <button
+                            onClick={() => resetAllModes()}
+                            className={`${BUTTON_SECONDARY} mr-2`}
+                        >
+                            閉じる
+                        </button>
+                        <button
+                            className={BUTTON_SUCCESS}
+                            disabled={isSubmitting}
+                            onClick={() => handleRestoreReservation()}
+                        >
+                            予約を復元する
+                        </button>
+                    </div>
+                </>
+            )}
         </>
     )
 }
