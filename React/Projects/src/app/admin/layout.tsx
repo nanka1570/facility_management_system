@@ -59,7 +59,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                         onClose={() => setIsMobileOpen(false)}
                         isDeveloper={isDeveloper}
                     />
-                    <main className="flex-1 overflow-auto bg-gray-100">
+                    <main className="flex-1 overflow-auto bg-gray-100 p-6">
                         {children}
                     </main>
                 </div>

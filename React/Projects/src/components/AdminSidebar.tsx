@@ -5,17 +5,16 @@ import { useState } from "react"
 // アイコン
 import { LayoutDashboard, Building2, FolderTree, CalendarDays, Settings } from "lucide-react"
 import Link from "next/link"
+import { SIDEBAR_ICON, SIDEBAR_ITEM } from "@/lib/constants"
 
 export default function AdminSidebar({ isMobileOpen, onClose, isDeveloper }: { isMobileOpen: boolean; onClose: () => void, isDeveloper?: boolean }) {
     
     // パス
     const pathname = usePathname()
-    // サイドバーのスタイル
-    const itemClass = "flex items-center gap-2 w-full px-3 py-2 rounded text-blue-500 hover:bg-gray-200 cursor-pointer"
-    // アイコンのスタイル
-    const iconClass = "shrink-0 text-gray-600"
     // サイドバーの折りたたみ
     const [isExpanded, setIsExpanded] = useState(true)
+    // リンククラス
+    const linkClass = `${SIDEBAR_ITEM} ${isExpanded ? '' : 'justify-center'}`
 
     return (
         <>
@@ -43,12 +42,12 @@ export default function AdminSidebar({ isMobileOpen, onClose, isDeveloper }: { i
                 </div>
                 <Link
                     href={'/admin/dashboard'}
-                    className={`${itemClass} ${pathname === '/admin/dashboard' ? 'bg-blue-100' : ''}`}
+                    className={`${linkClass} ${pathname === '/admin/dashboard' ? 'bg-blue-100' : ''}`}
                     onClick={() => onClose()}
                 >
                     <LayoutDashboard
                         size={18}
-                        className={iconClass}
+                        className={SIDEBAR_ICON}
                     />
                     <span
                         className={isExpanded ? '' : 'md:hidden'}
@@ -64,12 +63,12 @@ export default function AdminSidebar({ isMobileOpen, onClose, isDeveloper }: { i
                 </p>
                 <Link
                     href={'/admin/facilities'}
-                    className={`${itemClass} ${pathname === '/admin/facilities' ? 'bg-blue-100' : ''}`}
+                    className={`${linkClass} ${pathname === '/admin/facilities' ? 'bg-blue-100' : ''}`}
                     onClick={() => onClose()}
                 >
                     <Building2
                         size={18}
-                        className={iconClass}
+                        className={SIDEBAR_ICON}
                     />
                     <span
                         className={isExpanded ? '' : 'md:hidden'}
@@ -79,12 +78,12 @@ export default function AdminSidebar({ isMobileOpen, onClose, isDeveloper }: { i
                 </Link>
                 <Link
                     href={'/admin/categories'}
-                    className={`${itemClass} ${pathname === '/admin/categories' ? 'bg-blue-100' : ''}`}
+                    className={`${linkClass} ${pathname === '/admin/categories' ? 'bg-blue-100' : ''}`}
                     onClick={() => onClose()}
                 >
                     <FolderTree
                         size={18}
-                        className={iconClass}
+                        className={SIDEBAR_ICON}
                     />
                     <span
                         className={isExpanded ? '' : 'md:hidden'}
@@ -94,12 +93,12 @@ export default function AdminSidebar({ isMobileOpen, onClose, isDeveloper }: { i
                 </Link>
                 <Link
                     href={'/admin/reservations'}
-                    className={`${itemClass} ${pathname === '/admin/reservations' ? 'bg-blue-100' : ''}`}
+                    className={`${linkClass} ${pathname === '/admin/reservations' ? 'bg-blue-100' : ''}`}
                     onClick={() => onClose()}
                 >
                     <CalendarDays
                         size={18}
-                        className={iconClass}
+                        className={SIDEBAR_ICON}
                     />
                     <span
                         className={isExpanded ? '' : 'md:hidden'}
@@ -117,12 +116,12 @@ export default function AdminSidebar({ isMobileOpen, onClose, isDeveloper }: { i
                         </p>
                         <Link
                             href={'/admin/settings'}
-                            className={`${itemClass} ${pathname === '/admin/settings' ? 'bg-blue-100' : ''}`}
+                            className={`${linkClass} ${pathname === '/admin/settings' ? 'bg-blue-100' : ''}`}
                             onClick={() => onClose()}
                         >
                             <Settings
                                 size={18}
-                                className={iconClass}
+                                className={SIDEBAR_ICON}
                             />
                             <span
                                 className={isExpanded ? '' : 'md:hidden'}

@@ -9,9 +9,14 @@ export const BUTTON_SUCCESS = "inline-block bg-green-500 text-white px-5 py-3 ro
 
 // カードスタイル
 export const CARD = "bg-white rounded-xl shadow-sm"
-
 // フォームスタイル
 export const INPUT = "border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-400 focus:outline-none"
+// numberのスタイル
+export const STAT_NUMBER = "text-3xl font-bold text-gray-800"
+// サイドバースタイル
+export const SIDEBAR_ITEM = "flex items-center gap-2 w-full px-3 py-2 rounded text-blue-500 hover:bg-gray-200 cursor-pointer"
+// サイドバーアイコンスタイル
+export const SIDEBAR_ICON = "shrink-0 text-gray-600"
 
 // 予約のステータス
 export const RESERVATION_STATUS = {

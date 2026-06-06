@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 // 施設・予約のtypes
 import { Facility, Reservation } from "@/lib/types"
 // 予約のステータス
-import { BUTTON_PRIMARY, RESERVATION_STATUS } from "@/lib/constants"
+import { BUTTON_PRIMARY, RESERVATION_STATUS, STAT_NUMBER } from "@/lib/constants"
 import Link from "next/link"
 
 export default function Dashboard() {
@@ -73,14 +73,14 @@ export default function Dashboard() {
     return (
         <>
             <p
-            className="text-xl mb-4"
+                className="text-xl mb-4"
             >
                 こんにちは、{displayName}さん
             </p>
             <div className="flex gap-4">
                 <div className="flex-1 bg-white p-6 rounded-xl shadow-sm">
                     <h2 
-                    className="text-lg font-semibold text-gray-700 mb-2"
+                        className="text-lg font-semibold text-gray-700 mb-2"
                     >
                         今日の予約
                     </h2>
@@ -110,11 +110,12 @@ export default function Dashboard() {
                     </Link>
                 </div>
                 <div className="flex-1 bg-white p-6 rounded-xl shadow-sm">
-                    <h2 className="text-lg font-semibold text-gray-700 mb-2"
+                    <h2
+                        className="text-lg font-semibold text-gray-700 mb-2"
                     >
                         今月の予約数
                     </h2>
-                    <p>
+                    <p className={`${STAT_NUMBER} pl-2`}>
                         {reservations
                             .filter((r) => 
                                 new Date(r.start_time).toLocaleDateString('sv-SE').slice(0, 7) === selectedDate.slice(0, 7))

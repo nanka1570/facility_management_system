@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 // 施設・予約のtypes
 import { Facility, Reservation, Profile } from "@/lib/types"
 // 予約のステータス
-import { CARD, RESERVATION_STATUS } from "@/lib/constants"
+import { CARD, RESERVATION_STATUS, STAT_NUMBER } from "@/lib/constants"
 import Link from "next/link"
 
 export default function Dashboard() {
@@ -115,7 +115,7 @@ export default function Dashboard() {
                     >
                         施設数
                     </h2>
-                    <p>
+                    <p className={`${STAT_NUMBER} pl-2`}>
                         {facilities.length}
                     </p>
                 </div>
@@ -126,7 +126,7 @@ export default function Dashboard() {
                     >
                         今月の予約数
                     </h2>
-                    <p>
+                    <p className={`${STAT_NUMBER} pl-2`}>
                         {reservations
                             .filter((r) => 
                                 new Date(r.start_time).toLocaleDateString('sv-SE').slice(0, 7) === selectedDate.slice(0, 7))
@@ -138,7 +138,7 @@ export default function Dashboard() {
                     >
                         ユーザー数
                     </h2>
-                    <p>
+                    <p className={`${STAT_NUMBER} pl-2`}>
                         {profiles.length}
                     </p>
                 </div>
