@@ -9,7 +9,7 @@ import { ROLE } from "@/lib/constants"
 import { LayoutDashboard, Building2, FolderTree, CalendarDays, Settings } from "lucide-react"
 import Link from "next/link"
 
-export default function AdminSidebar({ isMobileOpen }: { isMobileOpen: boolean }) {
+export default function AdminSidebar({ isMobileOpen, onClose }: { isMobileOpen: boolean; onClose: () => void }) {
     
     // 画面遷移
     const router = useRouter()
@@ -49,7 +49,15 @@ export default function AdminSidebar({ isMobileOpen }: { isMobileOpen: boolean }
 
     return (
         <>
-            <aside className={`${isMobileOpen ? 'block' : 'hidden'} md:block w-56 ${isExpanded ? '' : 'md:w-16'} bg-white shadow p-4`}>
+            {isMobileOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-30 md:hidden"
+                    onClick={() => onClose()}
+                />
+            )}
+            <aside className={`${isMobileOpen ? 'block' : 'hidden'}
+                             md:block fixed inset-y-0 left-0 z-40 md:static md:z-auto w-56 
+                             ${isExpanded ? '' : 'md:w-16'} bg-white shadow p-4 `}>
                 <div className="flex items-center justify-between font-bold mb-4">
                     <h2
                         className={isExpanded ? '' : 'md:hidden'}
@@ -66,6 +74,7 @@ export default function AdminSidebar({ isMobileOpen }: { isMobileOpen: boolean }
                 <Link
                     href={'/admin/dashboard'}
                     className={`${itemClass} ${pathname === '/admin/dashboard' ? 'bg-blue-100' : ''}`}
+                    onClick={() => onClose()}
                 >
                     <LayoutDashboard
                         size={18}
@@ -86,6 +95,7 @@ export default function AdminSidebar({ isMobileOpen }: { isMobileOpen: boolean }
                 <Link
                     href={'/admin/facilities'}
                     className={`${itemClass} ${pathname === '/admin/facilities' ? 'bg-blue-100' : ''}`}
+                    onClick={() => onClose()}
                 >
                     <Building2
                         size={18}
@@ -100,6 +110,7 @@ export default function AdminSidebar({ isMobileOpen }: { isMobileOpen: boolean }
                 <Link
                     href={'/admin/categories'}
                     className={`${itemClass} ${pathname === '/admin/categories' ? 'bg-blue-100' : ''}`}
+                    onClick={() => onClose()}
                 >
                     <FolderTree
                         size={18}
@@ -114,6 +125,7 @@ export default function AdminSidebar({ isMobileOpen }: { isMobileOpen: boolean }
                 <Link
                     href={'/admin/reservations'}
                     className={`${itemClass} ${pathname === '/admin/reservations' ? 'bg-blue-100' : ''}`}
+                    onClick={() => onClose()}
                 >
                     <CalendarDays
                         size={18}
@@ -136,6 +148,7 @@ export default function AdminSidebar({ isMobileOpen }: { isMobileOpen: boolean }
                         <Link
                             href={'/admin/settings'}
                             className={`${itemClass} ${pathname === '/admin/settings' ? 'bg-blue-100' : ''}`}
+                            onClick={() => onClose()}
                         >
                             <Settings
                                 size={18}
@@ -144,7 +157,7 @@ export default function AdminSidebar({ isMobileOpen }: { isMobileOpen: boolean }
                             <span
                                 className={isExpanded ? '' : 'md:hidden'}
                             >
-                                モジュール設定                  
+                                モジュール設定
                             </span>
                         </Link>
                     </div>

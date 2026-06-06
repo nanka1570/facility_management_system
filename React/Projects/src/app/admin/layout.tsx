@@ -26,7 +26,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 .eq('id', session.user.id)
                 .single()
             // 管理者・開発者以外（ユーザー）を弾く
-            if (authData?.role === ROLE.USER) {
+            if (!authData || authData?.role === ROLE.USER) {
                 router.push('/dashboard') 
             }
         }
@@ -42,7 +42,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     homeHref="/admin/dashboard"
                 />
                 <div className="flex flex-1 overflow-hidden">
-                    <AdminSidebar isMobileOpen={isMobileOpen}/>
+                    <AdminSidebar isMobileOpen={isMobileOpen} onClose={() => setIsMobileOpen(false)}/>
                     <main className="flex-1 overflow-auto bg-gray-100">
                         {children}
                     </main>

@@ -32,7 +32,7 @@ export default function Header({ onMenuClick, homeHref='/dashboard' }: { onMenuC
                 .select('*')
                 .eq('id', session.user.id)
                 .single()
-            if (authData?.role !== ROLE.USER) {
+            if (authData && authData?.role !== ROLE.USER) {
                 setIsAdmin(true)
             }
         }
@@ -47,7 +47,7 @@ export default function Header({ onMenuClick, homeHref='/dashboard' }: { onMenuC
     }
 
     return(
-        <header className="bg-white p-4 shadow flex justify-between">
+        <header className="bg-white p-4 shadow flex justify-between items-center">
             <div className="flex items-center gap-3">
                 {onMenuClick && (
                     <button
@@ -64,19 +64,23 @@ export default function Header({ onMenuClick, homeHref='/dashboard' }: { onMenuC
                     施設管理システム
                 </h1>
             </div>
-            <div className="flex gap-4">
-                <Link
-                    className="md:hidden cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
-                    href={'/reservations'}
-                >
-                    予約
-                </Link>
-                <Link
-                    className="md:hidden cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
-                    href={'/mypage'}
-                >
-                    マイページ
-                </Link>
+            <div className="flex items-center gap-4">
+                {!isAdminArea &&
+                    <>
+                        <Link
+                            className="md:hidden cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
+                            href={'/reservations'}
+                        >
+                            予約
+                        </Link>
+                        <Link
+                            className="md:hidden cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200"
+                            href={'/mypage'}
+                        >
+                            マイページ
+                        </Link>
+                    </>
+                }
                 <Link
                     className={`${isAdmin ? '' : 'hidden'} cursor-pointer text-blue-500 px-3 py-1 rounded hover:text-blue-700 hover:bg-gray-200`}
                     href={isAdminArea ? '/dashboard' : '/admin/dashboard'}
