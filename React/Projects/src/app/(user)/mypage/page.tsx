@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
-import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD } from "@/lib/constants"
+import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD, INPUT } from "@/lib/constants"
 // 日時をフォーマットする関数, ステータスを日本語に直す関数
 import { formatDateTime, getStatusLabel } from "@/lib/utils"
 // 施設・プロフィール・予約のtypes
@@ -222,18 +222,18 @@ export default function Mypage() {
                                     <label>表示名: </label>
                                     <input
                                         type="text"
-                                        className="border rounded px-2 py-1"
                                         value={updateDisplayName}
                                         onChange={(e) => setUpdateDisplayName(e.target.value)}
+                                        className={INPUT}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1">
                                     <p className="text-gray-500">メール</p>
-                                    <p className="text-gray-500 border rounded px-2 py-1 bg-gray-100">{profile?.email}</p>
+                                    <p className="text-gray-500 border rounded-lg px-3 py-2 bg-gray-100">{profile?.email}</p>
                                 </div>
                                 <div className="flex flex-col gap-1">
                                     <p className="text-gray-500">権限</p>
-                                    <p className="text-gray-500 border rounded px-2 py-1 bg-gray-100">{profile?.role}</p>
+                                    <p className="text-gray-500 border rounded-lg px-3 py-2 bg-gray-100">{profile?.role}</p>
                                 </div>
                                 <div className="mt-4">
                                     <button

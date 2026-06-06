@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
-import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, CARD } from "@/lib/constants"
+import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, CARD, INPUT } from "@/lib/constants"
 // カテゴリ・施設のtypes
 import { Category, Facility } from "@/lib/types"
 // 予約のステータス
@@ -280,7 +280,7 @@ export default function Facilities() {
                 onChange={(e) => setFilterCategoryId(
                 e.target.value === '' ? null : Number(e.target.value)
                 )}
-                className="border rounded px-2 py-1 bg-white"
+                className={INPUT}
             >
                 <option value="">すべて</option>
                 {categories.map((cat) => (
@@ -320,6 +320,7 @@ export default function Facilities() {
                                                 <input
                                                     type="radio"
                                                     name="editTarget"
+                                                    className={INPUT}
                                                     checked={selectedFacilityId === facility.id}
                                                     onChange={() => {
                                                         setSelectedFacilityId(facility.id)
@@ -341,6 +342,7 @@ export default function Facilities() {
                                                     type="checkbox"
                                                     checked={selectedCheckboxFacilityId.includes(facility.id)}
                                                     onChange={() => setSelectedCheckboxFacilityId(toggleId(selectedCheckboxFacilityId, facility.id))}
+                                                    className={INPUT}
                                                 />
                                             </td>
                                         </>
@@ -356,7 +358,7 @@ export default function Facilities() {
                                                     type="text"
                                                     value={editFacilityName}
                                                     onChange={(e) => setEditFacilityName(e.target.value)}
-                                                    className="border rounded px-2 py-1 w-full"
+                                                    className={`${INPUT} w-full`}
                                                 />
                                             </td>
                                             <td className="px-4 py-3">
@@ -365,7 +367,7 @@ export default function Facilities() {
                                                     onChange={(e) => setEditCategoryId(
                                                         e.target.value === '' ? null : Number(e.target.value)
                                                     )}
-                                                    className="border rounded px-2 py-1 w-full"
+                                                    className={`${INPUT} w-full`}
                                                 >
                                                     <option value="">選択してください</option>
                                                     {categories.map((cat) => (
@@ -380,7 +382,7 @@ export default function Facilities() {
                                                     type="number"
                                                     value={editMaxCapacity}
                                                     onChange={(e) => setEditMaxCapacity(e.target.value)}
-                                                    className="border rounded px-2 py-1 w-20"
+                                                    className={`${INPUT} w-20`}
                                                 />
                                             </td>
                                             <td className="px-4 py-3">
@@ -388,6 +390,7 @@ export default function Facilities() {
                                                     type="checkbox"
                                                     checked={editIsActive}
                                                     onChange={(e) => setEditIsActive(e.target.checked)}
+                                                    className={INPUT}
                                                 />
                                             </td>
                                         </>
@@ -423,11 +426,11 @@ export default function Facilities() {
                                         施設名
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="text"
                                         value={newFacilityName}
                                         onChange={(e) => setNewFacilityName(e.target.value)}
                                         placeholder="例： 大会議室"
+                                        className={INPUT}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -435,11 +438,11 @@ export default function Facilities() {
                                         カテゴリ
                                     </label>
                                     <select
-                                        className="border rounded px-2 py-1"
                                         value={newCategoryId ?? ''}
                                         onChange={(e) => setNewCategoryId(
                                             e.target.value === '' ? null : Number(e.target.value)
                                         )}
+                                        className={INPUT}
                                     >
                                         <option value="">選択してください</option>
                                         {categories.map((cat) => (
@@ -454,11 +457,11 @@ export default function Facilities() {
                                         最大人数
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="number"
                                         value={newMaxCapacity}
                                         onChange={(e) => setNewMaxCapacity(e.target.value)}
                                         placeholder="例： 30"
+                                        className={INPUT}
                                     />
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -469,6 +472,7 @@ export default function Facilities() {
                                         type="checkbox"
                                         checked={newIsActive}
                                         onChange={(e) => setNewIsActive(e.target.checked)}
+                                        className={INPUT}
                                     />
                                 </div>
                             </div>

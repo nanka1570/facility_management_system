@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
-import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, BUTTON_SUCCESS, CARD } from "@/lib/constants"
+import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, BUTTON_SUCCESS, CARD, INPUT } from "@/lib/constants"
 // 日時をフォーマットする関数, timeをdatetime-localに変換する関数, ステータスを日本語に直す関数
 import { formatDateTime, formatDateTimeLocal, getStatusLabel } from "@/lib/utils"
 // 施設・予約のtypes
@@ -395,7 +395,7 @@ export default function Reservations() {
                 onChange={(e) => setFilterFacilityId(
                 e.target.value === '' ? null : Number(e.target.value)
                 )}
-                className="border rounded px-2 py-1"
+                className={INPUT}
                 >
                 <option value="">すべて</option>
                 {facilities.map((fac) => (
@@ -462,6 +462,7 @@ export default function Reservations() {
                                                         setEditPurpose(reservation.purpose || '')
                                                     }}
                                                     disabled={reservation.status !== RESERVATION_STATUS.CONFIRMED}
+                                                    className={INPUT}
                                                 />
                                             </td>
                                         </>
@@ -480,6 +481,7 @@ export default function Reservations() {
                                                             ? reservation.status !== RESERVATION_STATUS.CONFIRMED
                                                             : reservation.status !== RESERVATION_STATUS.CANCELLED
                                                     }
+                                                    className={INPUT}
                                                 />
                                             </td>
                                         </>
@@ -495,7 +497,7 @@ export default function Reservations() {
                                                     onChange={(e) => setEditFacilityId(
                                                         e.target.value === '' ?  null :Number(e.target.value)
                                                     )}
-                                                    className="border rounded px-2 py-1"
+                                                    className={INPUT}
                                                 >
                                                     <option value="">選択してください</option>
                                                     {facilities.map((f) => (
@@ -507,42 +509,42 @@ export default function Reservations() {
                                             </td>
                                             <td className="px-4 py-3">
                                                 <input
-                                                    className="border rounded px-2 py-1"
                                                     type="datetime-local"
                                                     value={formatDateTimeLocal(editStartTime)}
                                                     onChange={(e) => setEditStartTime(e.target.value)}
+                                                    className={INPUT}
                                                 />
                                             </td>
                                             <td className="px-4 py-3">
                                                 <input
-                                                    className="border rounded px-2 py-1"
                                                     type="datetime-local"
                                                     value={formatDateTimeLocal(editEndTime)}
                                                     onChange={(e) => setEditEndTime(e.target.value)}
+                                                    className={INPUT}
                                                 />
                                             </td>
                                             <td className="px-4 py-3">
                                                 <input
-                                                    className="border rounded px-2 py-1"
                                                     type="text"
                                                     value={getStatusLabel(reservation.status)}
                                                     readOnly
+                                                    className={INPUT}
                                                 />
                                             </td>
                                             <td className="px-4 py-3">
                                                 <input
-                                                    className="border rounded px-2 py-1"
                                                     type="number"
                                                     value={editNumPeople}
                                                     onChange={(e) => setEditNumPeople(e.target.value)}
+                                                    className={INPUT}
                                                 />
                                             </td>
                                             <td className="px-4 py-3">
                                                 <input
-                                                    className="border rounded px-2 py-1"
                                                     type="text"
                                                     value={editPurpose}
                                                     onChange={(e) => setEditPurpose(e.target.value)}
+                                                    className={INPUT}
                                                 />
                                             </td>
                                         </>
@@ -586,11 +588,11 @@ export default function Reservations() {
                                         施設名
                                     </label>
                                     <select
-                                        className="border rounded px-2 py-1"
                                         value={newFacilityId ?? ''}
                                         onChange={(e) => setNewFacilityId(
                                             e.target.value === '' ? null : Number(e.target.value)
                                         )}
+                                        className={INPUT}
                                     >
                                         <option value="">選択してください</option>
                                         {facilities.map((f) => (
@@ -605,10 +607,10 @@ export default function Reservations() {
                                         開始日時
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="datetime-local"
                                         value={newStartTime}
                                         onChange={(e) => setNewStartTime(e.target.value)}
+                                                    className={INPUT}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -616,10 +618,10 @@ export default function Reservations() {
                                         終了日時
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="datetime-local"
                                         value={newEndTime}
                                         onChange={(e) => setNewEndTime(e.target.value)}
+                                        className={INPUT}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -627,11 +629,11 @@ export default function Reservations() {
                                         利用人数
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="number"
                                         value={newNumPeople}
                                         onChange={(e) => setNewNumPeople(e.target.value)}
                                         placeholder="例： 30"
+                                        className={INPUT}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -639,11 +641,11 @@ export default function Reservations() {
                                         利用目的
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="text"
                                         value={newPurpose}
                                         onChange={(e) => setNewPurpose(e.target.value)}
                                         placeholder="例： 報告会議"
+                                        className={INPUT}
                                     />
                                 </div>
                             </div>

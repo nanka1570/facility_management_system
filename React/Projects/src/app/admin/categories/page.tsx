@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
-import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, CARD } from "@/lib/constants"
+import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, CARD, INPUT } from "@/lib/constants"
 // カテゴリのtypes
 import { Category } from "@/lib/types"
 // チェックボックス
@@ -236,6 +236,7 @@ export default function Categories() {
                                                     setEditCategoryName(category.name)
                                                     setEditCategorySortOrder(category.sort_order)
                                                 }}
+                                                className={INPUT}
                                             />
                                         </td>
                                     </>
@@ -249,6 +250,7 @@ export default function Categories() {
                                                 type="checkbox"
                                                 checked={selectedCheckboxCategoryId.includes(category.id)}
                                                 onChange={() => setSelectedCheckboxCategoryId(toggleId(selectedCheckboxCategoryId, category.id))}
+                                                className={INPUT}
                                             />
                                         </td>
                                     </>
@@ -264,7 +266,7 @@ export default function Categories() {
                                                 type="text"
                                                 value={editCategoryName}
                                                 onChange={(e) => setEditCategoryName(e.target.value)}
-                                                className="border rounded px-2 py-1 w-full"
+                                                className={`${INPUT} w-full`}
                                             />
                                         </td>
                                         <td className="px-4 py-3">
@@ -272,7 +274,7 @@ export default function Categories() {
                                                 type="number"
                                                 value={editCategorySortOrder}
                                                 onChange={(e) => setEditCategorySortOrder(Number(e.target.value))}
-                                                className="border rounded px-2 py-1 w-20"
+                                                className={`${INPUT} w-20`}
                                             />
                                         </td>
                                     </>
@@ -306,11 +308,11 @@ export default function Categories() {
                                         カテゴリ名
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="text"
                                         value={newCategoryName}
                                         onChange={(e) => setNewCategoryName(e.target.value)}
                                         placeholder="例：会議室"
+                                        className={INPUT}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -318,10 +320,10 @@ export default function Categories() {
                                         並び順
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="number"
                                         value={newCategorySortOrder}
                                         onChange={(e) => setNewCategorySortOrder(Number(e.target.value))}
+                                        className={INPUT}
                                     />
                                 </div>
                             </div>
@@ -333,9 +335,9 @@ export default function Categories() {
                                     閉じる
                                 </button>
                                 <button
-                                    className={BUTTON_PRIMARY}
                                     disabled={isSubmitting}
                                     onClick={() => handleInsertCategories()}
+                                    className={BUTTON_PRIMARY}
                                 >
                                     追加する
                                 </button>

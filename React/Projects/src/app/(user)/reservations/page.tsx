@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
-import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, CARD } from "@/lib/constants"
+import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, CARD, INPUT } from "@/lib/constants"
 // timeをdatetime-localに変換する関数
 import { formatDateTimeLocal } from "@/lib/utils"
 // 施設・予約のtypes
@@ -385,7 +385,7 @@ export default function Reservations() {
                                     <label>
                                         施設名
                                     </label>
-                                    <p className="border rounded px-2 py-1 bg-gray-100">
+                                    <p className="border rounded-lg px-3 py-2 bg-gray-100">
                                         {facilities.find(f => f.id === newFacilityId)?.name}
                                     </p>
                                 </div>
@@ -394,10 +394,10 @@ export default function Reservations() {
                                         開始日時
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1 bg-gray-100"
                                         type="datetime-local"
                                         value={newStartTime}
                                         readOnly
+                                        className={`${INPUT} bg-gray-100`}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -405,10 +405,10 @@ export default function Reservations() {
                                         終了日時
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="datetime-local"
                                         value={newEndTime}
                                         onChange={(e) => setNewEndTime(e.target.value)}
+                                        className={INPUT}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -416,11 +416,11 @@ export default function Reservations() {
                                         利用人数
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="number"
                                         value={newNumPeople}
                                         onChange={(e) => setNewNumPeople(e.target.value)}
                                         placeholder="例： 30"
+                                        className={INPUT}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -428,11 +428,11 @@ export default function Reservations() {
                                         利用目的
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="text"
                                         value={newPurpose}
                                         onChange={(e) => setNewPurpose(e.target.value)}
                                         placeholder="例： 報告会議"
+                                        className={INPUT}
                                     />
                                 </div>
                             </div>
@@ -469,7 +469,7 @@ export default function Reservations() {
                                     <label>
                                         施設名
                                     </label>
-                                    <p className="border rounded px-2 py-1 bg-gray-100">
+                                    <p className="border rounded-lg px-3 py-2 bg-gray-100">
                                         {facilities.find(f => f.id === editFacilityId)?.name}
                                     </p>
                                 </div>
@@ -478,10 +478,10 @@ export default function Reservations() {
                                         開始日時
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1 bg-gray-100"
                                         type="datetime-local"
                                         value={editStartTime}
                                         onChange={(e) => setEditStartTime(e.target.value)}
+                                        className={`${INPUT} bg-gray-100`}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -489,10 +489,10 @@ export default function Reservations() {
                                         終了日時
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="datetime-local"
                                         value={editEndTime}
                                         onChange={(e) => setEditEndTime(e.target.value)}
+                                        className={INPUT}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -500,11 +500,11 @@ export default function Reservations() {
                                         利用人数
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="number"
                                         value={editNumPeople}
                                         onChange={(e) => setEditNumPeople(e.target.value)}
                                         placeholder="例： 30"
+                                        className={INPUT}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1">
@@ -512,11 +512,11 @@ export default function Reservations() {
                                         利用目的
                                     </label>
                                     <input
-                                        className="border rounded px-2 py-1"
                                         type="text"
                                         value={editPurpose}
                                         onChange={(e) => setEditPurpose(e.target.value)}
                                         placeholder="例： 報告会議"
+                                        className={INPUT}
                                     />
                                 </div>
                             </div>
