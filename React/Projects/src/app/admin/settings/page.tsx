@@ -5,7 +5,7 @@ import { ModuleSetting } from "@/lib/types"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // プロフィールのロール
-import { ROLE } from "@/lib/constants"
+import { CARD, ROLE } from "@/lib/constants"
 
 export default function Settings() {
     
@@ -75,17 +75,18 @@ export default function Settings() {
     return (
         <>
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold">
+                <h1 className="text-2xl font-bold text-gray-800">
                     モジュール設定
-                </h2>
+                </h1>
             </div>
-            <div className="bg-white rounded shadow overflow-hidden">
+            {/* テーブル */}
+            <div className={`${CARD} overflow-hidden`}>
                 <table className="w-full">
                     <thead className="bg-gray-50">
                         <tr className="border-t">
-                            <th className="px-4 py-3 text-left">ID</th>
-                            <th className="px-4 py-3 text-left">モジュール名</th>
-                            <th className="px-4 py-3 text-left">状態</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">ID</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">モジュール名</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">状態</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,7 +94,7 @@ export default function Settings() {
                             .map((moduleSetting) => (
                                 <tr 
                                     key={moduleSetting.id}
-                                    className="border-t"
+                                    className="border-t hover:bg-gray-50"
                                 >
                                     <td className="px-4 py-3">
                                         {moduleSetting.id}

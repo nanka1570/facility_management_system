@@ -33,7 +33,7 @@ export default function Header({ onMenuClick, homeHref='/dashboard', isAdmin=fal
                 )}
                 <h1
                     onClick={() => router.push(homeHref)}
-                    className="cursor-pointer"
+                    className="text-2xl font-bold cursor-pointer"
                 >
                     施設管理システム
                 </h1>

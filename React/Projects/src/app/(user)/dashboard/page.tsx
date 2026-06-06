@@ -80,7 +80,7 @@ export default function Dashboard() {
             <div className="flex gap-4">
                 <div className="flex-1 bg-white p-6 rounded-xl shadow-sm">
                     <h2 
-                    className="font-bold mb-2"
+                    className="text-lg font-semibold text-gray-700 mb-2"
                     >
                         今日の予約
                     </h2>
@@ -110,7 +110,7 @@ export default function Dashboard() {
                     </Link>
                 </div>
                 <div className="flex-1 bg-white p-6 rounded-xl shadow-sm">
-                    <h2 className="font-bold mb-2"
+                    <h2 className="text-lg font-semibold text-gray-700 mb-2"
                     >
                         今月の予約数
                     </h2>

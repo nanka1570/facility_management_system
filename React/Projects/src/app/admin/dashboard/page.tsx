@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 // 施設・予約のtypes
 import { Facility, Reservation, Profile } from "@/lib/types"
 // 予約のステータス
-import { RESERVATION_STATUS } from "@/lib/constants"
+import { CARD, RESERVATION_STATUS } from "@/lib/constants"
 import Link from "next/link"
 
 export default function Dashboard() {
@@ -81,9 +81,9 @@ export default function Dashboard() {
                 こんにちは、{displayName}さん
             </p>
             <div className="flex gap-4">
-                <div className="flex-1 bg-white p-4 rounded shadow">
+                <div className={`${CARD} flex-1 p-4`}>
                     <h2 
-                        className="font-bold mb-2"
+                        className="text-lg font-semibold text-gray-700 mb-2"
                     >
                         今日の予約
                     </h2>
@@ -111,7 +111,7 @@ export default function Dashboard() {
                         予約カレンダーへ
                     </Link>
                     <h2 
-                        className="font-bold mb-2"
+                        className="text-lg font-semibold text-gray-700 mb-2"
                     >
                         施設数
                     </h2>
@@ -121,8 +121,8 @@ export default function Dashboard() {
                 </div>
             </div>
             <div>
-                <div className="flex-1 bg-white p-4 rounded shadow">
-                    <h2 className="font-bold mb-2"
+                <div className={`${CARD} flex-1 p-4`}>
+                    <h2 className="text-lg font-semibold text-gray-700 mb-2"
                     >
                         今月の予約数
                     </h2>
@@ -134,7 +134,7 @@ export default function Dashboard() {
                         }
                     </p>
                     <h2 
-                        className="font-bold mb-2"
+                        className="text-lg font-semibold text-gray-700 mb-2"
                     >
                         ユーザー数
                     </h2>
@@ -145,7 +145,7 @@ export default function Dashboard() {
             </div>
             <div>
                 <h2 
-                    className="font-bold mb-2"
+                    className="text-lg font-semibold text-gray-700 mb-2"
                 >
                     本日の予約一覧
                 </h2>

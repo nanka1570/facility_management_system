@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
-import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants"
+import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, CARD } from "@/lib/constants"
 // カテゴリのtypes
 import { Category } from "@/lib/types"
 // チェックボックス
@@ -176,7 +176,7 @@ export default function Categories() {
     return (
         <>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">カテゴリ管理</h1>
+                <h1 className="text-2xl font-bold text-gray-800">カテゴリ管理</h1>
                 <div>
                     <button
                         onClick={() => {
@@ -210,19 +210,19 @@ export default function Categories() {
             </div>
 
             {/* テーブル */}
-            <div className="bg-white rounded shadow overflow-x-auto">
+            <div className={`${CARD} overflow-x-auto`}>
                 <table className="w-full">
                     <thead className="bg-gray-50">
                         <tr>
                             {(isEditClick || isDeleteClick) && <th className="px-4 py-3"></th>}
-                            <th className="px-4 py-3 text-left">ID</th>
-                            <th className="px-4 py-3 text-left">カテゴリ名</th>
-                            <th className="px-4 py-3 text-left">表示順</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">ID</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">カテゴリ名</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">表示順</th>
                         </tr>
                     </thead>
                     <tbody>
                         {categories.map((category) => (
-                            <tr key={category.id} className="border-t">
+                            <tr key={category.id} className="border-t hover:bg-gray-50">
                                 {/* 編集のラジオボタン */}
                                 {isEditClick && (
                                     <>
@@ -297,7 +297,7 @@ export default function Categories() {
                         onClick={() => (setIsModalOpen(false))}
                     >
                         <div
-                            className="bg-white rounded shadow p-6 w-125"
+                            className={`${CARD} p-6 w-125`}
                             onClick={(e) => (e.stopPropagation())}
                         >
                             <div className="flex flex-col gap-4">

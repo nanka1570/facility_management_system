@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
-import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants"
+import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, CARD } from "@/lib/constants"
 // timeをdatetime-localに変換する関数
 import { formatDateTimeLocal } from "@/lib/utils"
 // 施設・予約のtypes
@@ -271,7 +271,7 @@ export default function Reservations() {
     return (
         <>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">予約カレンダー</h1>
+                <h1 className="text-2xl font-bold text-gray-800">予約カレンダー</h1>
             </div>
             {/* 予約カレンダー */}
             <div>
@@ -298,11 +298,12 @@ export default function Reservations() {
                         ▶
                     </button>
                 </div>
-                <div className="bg-white rounded shadow overflow-hidden">
+                {/* テーブル */}
+                <div className={`${CARD} overflow-hidden`}>
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th className="px-4 py-3"></th>
+                                <th className="px-4 py-3 text-sm font-semibold text-gray-600"></th>
                                 {facilities
                                     .map((facility) => (
                                         <th
@@ -317,7 +318,7 @@ export default function Reservations() {
                         <tbody>
                             {timeSlots
                                 .map((timeSlot) => (
-                                    <tr key={timeSlot} className="border-t">
+                                    <tr key={timeSlot} className="border-t hover:bg-gray-50">
                                         <td className="bg-gray-50 px-4 py-3 font-mono">
                                             {timeSlot}:00
                                         </td>
@@ -376,7 +377,7 @@ export default function Reservations() {
                         onClick={() => (setIsModalOpen(false))}
                     >
                         <div
-                            className="bg-white rounded shadow p-6 w-125"
+                            className={`${CARD} p-6 w-125`}
                             onClick={(e) => (e.stopPropagation())}
                         >
                             <div className="flex flex-col gap-4">
@@ -460,7 +461,7 @@ export default function Reservations() {
                         onClick={() => (setIsDetailModalOpen(false))}
                     >
                         <div
-                            className="bg-white rounded shadow p-6 w-125"
+                            className={`${CARD} p-6 w-125`}
                             onClick={(e) => (e.stopPropagation())}
                         >
                             <div className="flex flex-col gap-4">

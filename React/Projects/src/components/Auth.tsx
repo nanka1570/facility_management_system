@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
+import { CARD } from "@/lib/constants"
 
 export default function Auth() {
     const [isLoginMode, setIsLoginMode] = useState(true)
@@ -47,7 +48,7 @@ export default function Auth() {
     return (
         <>
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+                <div className={`${CARD} p-8 w-full max-w-md`}>
                     <h1 className="text-2xl font-bold text-center mb-6">
                         施設管理システム
                     </h1>

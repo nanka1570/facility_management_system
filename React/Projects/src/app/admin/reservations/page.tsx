@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
-import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, BUTTON_SUCCESS } from "@/lib/constants"
+import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, BUTTON_SUCCESS, CARD } from "@/lib/constants"
 // 日時をフォーマットする関数, timeをdatetime-localに変換する関数, ステータスを日本語に直す関数
 import { formatDateTime, formatDateTimeLocal, getStatusLabel } from "@/lib/utils"
 // 施設・予約のtypes
@@ -347,7 +347,7 @@ export default function Reservations() {
     return (
         <>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">予約管理</h1>
+                <h1 className="text-2xl font-bold text-gray-800">予約管理</h1>
                 <div>
                     <button
                         onClick={() => {
@@ -412,18 +412,18 @@ export default function Reservations() {
                 />
 
             {/* テーブル */}
-            <div className="bg-white rounded shadow overflow-x-auto">
+            <div className={`${CARD} overflow-x-auto`}>
                 <table className="w-full">
                     <thead className="bg-gray-50">
                         <tr>
                             {(isEditClick || isCancelClick || isRestoreClick) && <th className="px-4 py-3"></th>}
-                            <th className="px-4 py-3 text-left">ID</th>
-                            <th className="px-4 py-3 text-left">施設名</th>
-                            <th className="px-4 py-3 text-left">開始日時</th>
-                            <th className="px-4 py-3 text-left">終了日時</th>
-                            <th className="px-4 py-3 text-left">ステータス</th>
-                            <th className="px-4 py-3 text-left">利用人数</th>
-                            <th className="px-4 py-3 text-left">利用目的</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">ID</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">施設名</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">開始日時</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">終了日時</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">ステータス</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">利用人数</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">利用目的</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -442,8 +442,8 @@ export default function Reservations() {
                                 <tr
                                     key={reservation.id}
                                     //ステータスが'cancelled'ならグレーアウトする
-                                    className={`border-t ${((isEditClick || isCancelClick) && reservation.status === RESERVATION_STATUS.CANCELLED) ||
-                                        (isRestoreClick && reservation.status === RESERVATION_STATUS.CONFIRMED) ? 'opacity-40' : ''}`}
+                                    className={`border-t hover:bg-gray-50 ${((isEditClick || isCancelClick) && reservation.status === RESERVATION_STATUS.CANCELLED) ||
+                                              (isRestoreClick && reservation.status === RESERVATION_STATUS.CONFIRMED) ? 'opacity-40' : ''}`}
                                 >
                                     {/* 編集のラジオボタン */}
                                     {isEditClick && (
@@ -577,7 +577,7 @@ export default function Reservations() {
                         onClick={() => (setIsModalOpen(false))}
                     >
                         <div
-                            className="bg-white rounded shadow p-6 w-125"
+                            className={`${CARD} p-6 w-125`}
                             onClick={(e) => (e.stopPropagation())}
                         >
                             <div className="flex flex-col gap-4">

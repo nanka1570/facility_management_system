@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
-import { BUTTON_PRIMARY, BUTTON_SECONDARY } from "@/lib/constants"
+import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD } from "@/lib/constants"
 // 日時をフォーマットする関数, ステータスを日本語に直す関数
 import { formatDateTime, getStatusLabel } from "@/lib/utils"
 // 施設・プロフィール・予約のtypes
@@ -115,12 +115,12 @@ export default function Mypage() {
     return (
         <>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">マイページ</h1>
+                <h1 className="text-2xl font-bold text-gray-800">マイページ</h1>
             </div>
             {/* プロフィール */}
             <div>
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold">
+                    <h2 className="text-lg font-semibold text-gray-700">
                         プロフィール
                     </h2>
                     <button
@@ -133,7 +133,7 @@ export default function Mypage() {
                         編集
                     </button>
                 </div>
-                <div className="bg-white rounded shadow p-6">
+                <div className={`${CARD} p-6`}>
                     <div className="flex flex-col gap-8">
                         <div className="flex gap-2">
                             <p className="text-gray-500">表示名: </p>
@@ -153,7 +153,7 @@ export default function Mypage() {
             {/* 予約履歴 */}
             <div>
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold">
+                    <h2 className="text-lg font-semibold text-gray-700">
                         予約履歴
                     </h2>
                     <button
@@ -163,14 +163,15 @@ export default function Mypage() {
                         {displayAll ? '直近5件のみ表示' : 'すべて表示'}
                     </button>
                 </div>
-                <div className="bg-white rounded shadow overflow-hidden">
+                {/* テーブル */}
+                <div className={`${CARD} overflow-hidden`}>
                     <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr className="border-t">
-                                <th className="px-4 py-3 text-left">開始日時</th>
-                                <th className="px-4 py-3 text-left">終了日時</th>
-                                <th className="px-4 py-3 text-left">施設</th>
-                                <th className="px-4 py-3 text-left">ステータス</th>
+                                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">開始日時</th>
+                                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">終了日時</th>
+                                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">施設</th>
+                                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">ステータス</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -180,7 +181,7 @@ export default function Mypage() {
                                 .map((reservation) => (
                                     <tr
                                         key={reservation.id}
-                                        className="border-t"
+                                        className="border-t hover:bg-gray-50"
                                     >
                                         <td className="px-4 py-3">
                                             {formatDateTime(reservation.start_time)}
@@ -213,7 +214,7 @@ export default function Mypage() {
                         onClick={() => (setIsModalOpen(false))}
                     >
                         <div
-                            className="bg-white rounded shadow p-6 w-125"
+                            className={`${CARD} p-6 w-125`}
                             onClick={(e) => (e.stopPropagation())}
                         >
                             <div className="flex flex-col gap-4">

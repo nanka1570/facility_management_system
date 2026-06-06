@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // ボタンのスタイル
-import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY } from "@/lib/constants"
+import { BUTTON_PRIMARY, BUTTON_DANGER, BUTTON_SECONDARY, CARD } from "@/lib/constants"
 // カテゴリ・施設のtypes
 import { Category, Facility } from "@/lib/types"
 // 予約のステータス
@@ -240,7 +240,7 @@ export default function Facilities() {
     return (
         <>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">施設管理</h1>
+                <h1 className="text-2xl font-bold text-gray-800">施設管理</h1>
                 <div>
                     <button
                         onClick={() => {
@@ -280,7 +280,7 @@ export default function Facilities() {
                 onChange={(e) => setFilterCategoryId(
                 e.target.value === '' ? null : Number(e.target.value)
                 )}
-                className="border rounded px-2 py-1"
+                className="border rounded px-2 py-1 bg-white"
             >
                 <option value="">すべて</option>
                 {categories.map((cat) => (
@@ -292,16 +292,16 @@ export default function Facilities() {
             </select>
 
             {/* テーブル */}
-            <div className="bg-white rounded shadow overflow-x-auto">
+            <div className={`${CARD} overflow-x-auto`}>
                 <table className="w-full">
                     <thead className="bg-gray-50">
                         <tr>
                             {(isEditClick || isDeleteClick) && <th className="px-4 py-3"></th>}
-                            <th className="px-4 py-3 text-left">ID</th>
-                            <th className="px-4 py-3 text-left">施設名</th>
-                            <th className="px-4 py-3 text-left">カテゴリ名</th>
-                            <th className="px-4 py-3 text-left">最大人数</th>
-                            <th className="px-4 py-3 text-left">利用可否</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">ID</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">施設名</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">カテゴリ名</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">最大人数</th>
+                            <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">利用可否</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -312,7 +312,7 @@ export default function Facilities() {
                                     : facility.category_id === filterCategoryId
                                 )
                             .map((facility) => (
-                                <tr key={facility.id} className="border-t">
+                                <tr key={facility.id} className="border-t hover:bg-gray-50">
                                     {/* 編集のラジオボタン */}
                                     {isEditClick && (
                                         <>
@@ -414,7 +414,7 @@ export default function Facilities() {
                         onClick={() => (setIsModalOpen(false))}
                     >
                         <div
-                            className="bg-white rounded shadow p-6 w-125"
+                            className={`${CARD} p-6 w-125`}
                             onClick={(e) => (e.stopPropagation())}
                         >
                             <div className="flex flex-col gap-4">
