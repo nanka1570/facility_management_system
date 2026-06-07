@@ -11,6 +11,7 @@ import { Category } from "@/lib/types"
 import { toggleId } from "@/lib/selection"
 // バリデーション
 import { isNonEmpty } from "@/lib/validation"
+import Loading from "@/components/Loading"
 
 export default function Categories() {
     
@@ -36,31 +37,41 @@ export default function Categories() {
     const [isDeleteClick, setIsDeleteClick] = useState(false)   //削除ボタンクリック
     // 多重送信防止
     const [isSubmitting, setIsSubmitting] = useState(false)
+    // ロード
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         // 初期処理
         const init = async () => {
-            //ログインチェック
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) {
-                router.push('/')
-                return
-            }
 
-            //カテゴリ一覧を表示
-            const { data: categoryData, error: categoryError } = await supabase
-                .from('categories')
-                .select('*')
-                .order('sort_order', { ascending: true })
-
-            if (categoryError) {
-                alert('カテゴリ一覧の取得に失敗しました')
-            } else {
-                setCategories(categoryData)
+            try {
+                //ログインチェック
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) {
+                    router.push('/')
+                    return
+                }
+    
+                //カテゴリ一覧を表示
+                const { data: categoryData, error: categoryError } = await supabase
+                    .from('categories')
+                    .select('*')
+                    .order('sort_order', { ascending: true })
+    
+                if (categoryError) {
+                    alert('カテゴリ一覧の取得に失敗しました')
+                } else {
+                    setCategories(categoryData)
+                }
+            } finally {
+                setIsLoading(false)
             }
         }
         init()
     }, [refreshKey, router])
+    
+    // ローディング
+    if (isLoading) return <Loading />
 
     //カテゴリ追加
     const handleInsertCategories = async () => {

@@ -8,6 +8,7 @@ import { CalendarX } from "lucide-react"
 import { Facility, Reservation, Profile } from "@/lib/types"
 // 予約のステータス
 import { CARD, RESERVATION_STATUS, STAT_NUMBER } from "@/lib/constants"
+import Loading from "@/components/Loading"
 
 export default function Dashboard() {
 
@@ -26,52 +27,61 @@ export default function Dashboard() {
         const today = new Date()
         return today.toLocaleDateString('sv-SE')
     })
+    // ロード
+    const [isLoading, setIsLoading] = useState(true)
     
     useEffect(() => {
         // 初期処理
         const init = async () => {
-            // ログインチェック
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) {
-                router.push('/')
-                return
-            }
 
-            // プロフィールをロード
-            const { data: profileData, error: profileError } = await supabase
-                .from('profiles')
-                .select('*')
-            if (profileError) {
-                alert('プロフィールの取得に失敗しました')
-            } else {
-                setProfiles(profileData)
-                setDisplayName(profileData.find(p => p.id === session.user.id)?.display_name ?? '')
+            try {
+                // ログインチェック
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) {
+                    router.push('/')
+                    return
+                }
+    
+                // プロフィールをロード
+                const { data: profileData, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                if (profileError) {
+                    alert('プロフィールの取得に失敗しました')
+                } else {
+                    setProfiles(profileData)
+                    setDisplayName(profileData.find(p => p.id === session.user.id)?.display_name ?? '')
+                }
+    
+                // 予約一覧をロード
+                const { data: reservationData, error: reservationError } = await supabase
+                    .from('reservations')
+                    .select('*')
+                    .eq('status', RESERVATION_STATUS.CONFIRMED)
+                if (reservationError) {
+                    alert('予約一覧の取得に失敗しました')
+                } else {
+                    setReservations(reservationData)
+                }
+    
+                // 施設一覧をロード
+                const { data: facilityData, error: facilityError } = await supabase
+                    .from('facilities')
+                    .select('*')
+                if (facilityError) {
+                    alert('施設一覧の取得に失敗しました')
+                } else {
+                    setFacilities(facilityData)
+                }
+            } finally {
+                setIsLoading(false)
             }
-
-            // 予約一覧をロード
-            const { data: reservationData, error: reservationError } = await supabase
-                .from('reservations')
-                .select('*')
-                .eq('status', RESERVATION_STATUS.CONFIRMED)
-            if (reservationError) {
-                alert('予約一覧の取得に失敗しました')
-            } else {
-                setReservations(reservationData)
-            }
-
-            // 施設一覧をロード
-            const { data: facilityData, error: facilityError } = await supabase
-                .from('facilities')
-                .select('*')
-            if (facilityError) {
-                alert('施設一覧の取得に失敗しました')
-            } else {
-                setFacilities(facilityData)
-            }
-
         }
         init()
     }, [router])
+    
+    // ローディング
+    if (isLoading) return <Loading />
 
     return (
         <>

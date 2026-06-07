@@ -16,6 +16,7 @@ import { toggleId } from "@/lib/selection"
 // バリデーション
 import { isNonEmpty, isPositiveInt } from "@/lib/validation"
 import StatusBadge from "@/components/StatusBadge"
+import Loading from "@/components/Loading"
 
 export default function Reservations() {
 
@@ -57,46 +58,54 @@ export default function Reservations() {
     // フィルター
     const [filterFacilityId, setFilterFacilityId] = useState<number | null>(null)
     const [filterDate, setFilterDate] = useState('')
+    // ロード
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         // 初期処理
         const init = async () => {
-            // ログインチェック
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) {
-                router.push('/')
-                return
-            }
 
-            // UUIDをユーザーIDとしてセット
-            setUserId(session.user.id)
-
-            // 予約一覧をロード
-            const { data: reservationData, error: reservationError } = await supabase
-                .from('reservations')
-                .select('*')
-                .order('id', { ascending: true })
+            try {
+                // ログインチェック
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) {
+                    router.push('/')
+                    return
+                }
     
-            if (reservationError) {
-                alert('予約一覧の取得に失敗しました')
-            } else {
-                setReservations(reservationData)
+                // UUIDをユーザーIDとしてセット
+                setUserId(session.user.id)
+    
+                // 予約一覧をロード
+                const { data: reservationData, error: reservationError } = await supabase
+                    .from('reservations')
+                    .select('*')
+                    .order('id', { ascending: true })
+        
+                if (reservationError) {
+                    alert('予約一覧の取得に失敗しました')
+                } else {
+                    setReservations(reservationData)
+                }
+    
+                // 施設一覧をロード
+                const { data: facilityData, error: facilityError } = await supabase
+                    .from('facilities')
+                    .select('*')
+                if (facilityError) {
+                    alert('施設一覧の取得に失敗しました')
+                } else {
+                    setFacilities(facilityData)
+                }
+            } finally {
+                setIsLoading(false)
             }
-
-            // 施設一覧をロード
-            const { data: facilityData, error: facilityError } = await supabase
-                .from('facilities')
-                .select('*')
-            if (facilityError) {
-                alert('施設一覧の取得に失敗しました')
-            } else {
-                setFacilities(facilityData)
-            }
-
         }
         init()
     }, [refreshKey, router])
-
+    
+    // ローディング
+    if (isLoading) return <Loading />
 
     //施設名を取得
     const getFacilityName = (facilityId: number | null) => {

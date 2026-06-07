@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 // プロフィールのロール
 import { CARD, ROLE } from "@/lib/constants"
+import Loading from "@/components/Loading"
 
 export default function Settings() {
     
@@ -19,41 +20,51 @@ export default function Settings() {
     const FIXED_MODULE_IDS = ['M-CORE', 'M-USER', 'M-FACILITY']
     // 多重送信防止
     const [isSubmitting, setIsSubmitting] = useState(false)
+    // ロード
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         // 初期処理
         const init = async () => {
-            // ログインチェック
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) {
-                router.push('/')
-                return
-            }
 
-            // developer権限チェック
-            const { data: profileData } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single()
-            if (profileData?.role !== ROLE.DEVELOPER) {
-                router.push('/dashboard')
-                return
-            } else {
-                // モジュール設定一覧をロード
-                const { data: moduleData, error: moduleError } = await supabase
-                    .from('module_settings')
-                    .select('*')
-                    .order('id', { ascending: true })
-                if (moduleError) {
-                    alert('モジュール設定値欄の取得に失敗しました')
-                } else {
-                    setModuleSettings(moduleData)
+            try {
+                // ログインチェック
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) {
+                    router.push('/')
+                    return
                 }
+    
+                // developer権限チェック
+                const { data: profileData } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .single()
+                if (profileData?.role !== ROLE.DEVELOPER) {
+                    router.push('/dashboard')
+                    return
+                } else {
+                    // モジュール設定一覧をロード
+                    const { data: moduleData, error: moduleError } = await supabase
+                        .from('module_settings')
+                        .select('*')
+                        .order('id', { ascending: true })
+                    if (moduleError) {
+                        alert('モジュール設定値欄の取得に失敗しました')
+                    } else {
+                        setModuleSettings(moduleData)
+                    }
+                }
+            } finally {
+                setIsLoading(false)
             }
         }
         init()
     }, [refreshKey, router])
+    
+    // ローディング
+    if (isLoading) return <Loading />
 
     const handleUpdateToggle = async (id: number, currentValue: boolean) => {
         setIsSubmitting(true)

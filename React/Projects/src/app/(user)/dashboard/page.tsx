@@ -9,6 +9,7 @@ import { Facility, Reservation } from "@/lib/types"
 // 予約のステータス
 import { BUTTON_PRIMARY, RESERVATION_STATUS, STAT_NUMBER } from "@/lib/constants"
 import Link from "next/link"
+import Loading from "@/components/Loading"
 
 export default function Dashboard() {
 
@@ -25,51 +26,62 @@ export default function Dashboard() {
         const today = new Date()
         return today.toLocaleDateString('sv-SE')
     })
+    // ロード
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         // 初期処理
         const init = async () => {
-            // ログインチェック
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) {
-                return
-            }
-            
-            // プロフィールをロード
-            const { data: profileData, error: profileError } = await supabase
+
+            try {
+                // ログインチェック
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) {
+                    return
+                }
+                
+                // プロフィールをロード
+                const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', session.user.id)
                 .single()
-            if (profileError) {
-                alert('プロフィールの取得に失敗しました')
-            } else {
-                setDisplayName(profileData.display_name)
-            }
-
-            // 予約一覧をロード
-            const { data: reservationData, error: reservationError } = await supabase
+                if (profileError) {
+                    alert('プロフィールの取得に失敗しました')
+                } else {
+                    setDisplayName(profileData.display_name)
+                }
+                
+                // 予約一覧をロード
+                const { data: reservationData, error: reservationError } = await supabase
                 .from('reservations')
                 .select('*')
                 .eq('status', RESERVATION_STATUS.CONFIRMED)
-            if (reservationError) {
-                alert('予約一覧の取得に失敗しました')
-            } else {
-                setReservations(reservationData)
-            }
-
-            // 施設一覧をロード
-            const { data: facilityData, error: facilityError } = await supabase
+                if (reservationError) {
+                    alert('予約一覧の取得に失敗しました')
+                } else {
+                    setReservations(reservationData)
+                }
+                
+                // 施設一覧をロード
+                const { data: facilityData, error: facilityError } = await supabase
                 .from('facilities')
                 .select('*')
-            if (facilityError) {
-                alert('施設一覧の取得に失敗しました')
-            } else {
-                setFacilities(facilityData)
+                if (facilityError) {
+                    alert('施設一覧の取得に失敗しました')
+                } else {
+                    setFacilities(facilityData)
+                }
+            } finally {
+                // ロード終了
+                setIsLoading(false)
             }
         }
         init()
     }, [router])
+
+    // ローディング
+    if (isLoading) return <Loading />
 
     return (
         <>

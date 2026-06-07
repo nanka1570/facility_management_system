@@ -13,6 +13,7 @@ import { Facility, Reservation } from "@/lib/types"
 import { RESERVATION_STATUS } from "@/lib/constants"
 // バリデーション
 import { isNonEmpty, isPositiveInt } from "@/lib/validation"
+import Loading from "@/components/Loading"
 
 export default function Reservations() {
     // 画面遷移
@@ -55,38 +56,45 @@ export default function Reservations() {
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null)
     // 多重送信防止
     const [isSubmitting, setIsSubmitting] = useState(false)
+    // ロード
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         // 初期処理
         const init = async () => {
-            // ログインチェック
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) {
-                return
-            }
-
-            // UUIDをユーザーIDとしてセット
-            setUserId(session.user.id)
             
-            // 予約一覧をロード
-            const { data: reservationData, error: reservationError } = await supabase
-                .from('reservations')
-                .select('*')
-                .order('id', { ascending: true })
-            if (reservationError) {
-                alert('予約一覧の取得に失敗しました')
-            } else {
-                setReservations(reservationData)
-            }
-
-            // 施設一覧をロード
-            const { data: facilityData, error: facilityError } = await supabase
-                .from('facilities')
-                .select('*')
-            if (facilityError) {
-                alert('施設一覧の取得に失敗しました')
-            } else {
-                setFacilities(facilityData)
+            try {
+                // ログインチェック
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) {
+                    return
+                }
+    
+                // UUIDをユーザーIDとしてセット
+                setUserId(session.user.id)
+                
+                // 予約一覧をロード
+                const { data: reservationData, error: reservationError } = await supabase
+                    .from('reservations')
+                    .select('*')
+                    .order('id', { ascending: true })
+                if (reservationError) {
+                    alert('予約一覧の取得に失敗しました')
+                } else {
+                    setReservations(reservationData)
+                }
+    
+                // 施設一覧をロード
+                const { data: facilityData, error: facilityError } = await supabase
+                    .from('facilities')
+                    .select('*')
+                if (facilityError) {
+                    alert('施設一覧の取得に失敗しました')
+                } else {
+                    setFacilities(facilityData)
+                }
+            } finally {
+                setIsLoading(false)
             }
         }
         init()
@@ -163,6 +171,9 @@ export default function Reservations() {
             setIsSubmitting(false)
         }
     }
+    
+    // ローディング
+    if (isLoading) return <Loading />
 
     // 更新処理
     const handleUpdateReservation = async () => {

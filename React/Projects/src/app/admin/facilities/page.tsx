@@ -13,6 +13,7 @@ import { RESERVATION_STATUS } from "@/lib/constants"
 import { toggleId } from "@/lib/selection"
 // バリデーション
 import { isNonEmpty, isPositiveInt } from "@/lib/validation"
+import Loading from "@/components/Loading"
 
 export default function Facilities() {
 
@@ -46,42 +47,52 @@ export default function Facilities() {
     const [isSubmitting, setIsSubmitting] = useState(false)
     // フィルター
     const [filterCategoryId, setFilterCategoryId] = useState<number | null>(null)
+    // ロード
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         // 初期処理
         const init = async () => {
-            //ログインチェック
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) {
-                router.push('/')
-                return
-            }
-
-            //施設一覧をロード
-            const { data: facilityData, error: facilityError } = await supabase
-                .from('facilities')
-                .select('*')
-                .order('id', { ascending: true })
-
-            if (facilityError) {
-                alert('施設一覧の取得に失敗しました')
-            } else {
-                setFacilities(facilityData)
-            }
-
-            //カテゴリ一覧をロード
-            const { data: categoryData, error: categoryError } = await supabase
-                .from('categories')
-                .select('*')
-
-            if (categoryError) {
-                alert('カテゴリ一覧の取得に失敗しました')
-            } else {
-                setCategories(categoryData)
+            
+            try {
+                //ログインチェック
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) {
+                    router.push('/')
+                    return
+                }
+    
+                //施設一覧をロード
+                const { data: facilityData, error: facilityError } = await supabase
+                    .from('facilities')
+                    .select('*')
+                    .order('id', { ascending: true })
+    
+                if (facilityError) {
+                    alert('施設一覧の取得に失敗しました')
+                } else {
+                    setFacilities(facilityData)
+                }
+    
+                //カテゴリ一覧をロード
+                const { data: categoryData, error: categoryError } = await supabase
+                    .from('categories')
+                    .select('*')
+    
+                if (categoryError) {
+                    alert('カテゴリ一覧の取得に失敗しました')
+                } else {
+                    setCategories(categoryData)
+                }
+            } finally {
+                setIsLoading(false)
             }
         }
         init()
     }, [refreshKey, router])
+    
+    // ローディング
+    if (isLoading) return <Loading />
 
     //カテゴリ名を取得
     const getCategoryName = (categoryId: number | null) => {

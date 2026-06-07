@@ -12,6 +12,7 @@ import { Facility, Profile, Reservation } from "@/lib/types"
 // バリデーション
 import { isNonEmpty } from "@/lib/validation"
 import StatusBadge from "@/components/StatusBadge"
+import Loading from "@/components/Loading"
 
 export default function Mypage() {
     
@@ -35,55 +36,66 @@ export default function Mypage() {
     const [updateDisplayName, setUpdateDisplayName] = useState('')
     // 多重送信防止
     const [isSubmitting, setIsSubmitting] = useState(false)
+    // ロード
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         // 初期処理
         const init = async () => {
-            // ログインチェック
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) {
-                return
-            }
 
-            // UUIDをユーザーIDとしてセット
-            setUserId(session.user.id)
-
-            // プロフィールをロード
-            const { data: profileData, error: profileError } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single()
-            if (profileError) {
-                alert('プロフィールの取得に失敗しました')
-            } else {
-                setProfile(profileData)
-            }
-
-            // 予約一覧をロード
-            const { data: reservationData, error: reservationError } = await supabase
-                .from('reservations')
-                .select('*')
-                .eq('user_id', session.user.id)
-                .order('start_time', { ascending: false })
-            if (reservationError) {
-                alert('予約一覧の取得に失敗しました')
-            } else {
-                setReservations(reservationData)
-            }
-
-            // 施設一覧をロード
-            const { data, error } = await supabase
-                .from('facilities')
-                .select('*')
-            if (error) {
-                alert('施設一覧の取得に失敗しました')
-            } else {
-                setFacilities(data)
+            try {
+                // ログインチェック
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) {
+                    return
+                }
+    
+                // UUIDをユーザーIDとしてセット
+                setUserId(session.user.id)
+    
+                // プロフィールをロード
+                const { data: profileData, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .single()
+                if (profileError) {
+                    alert('プロフィールの取得に失敗しました')
+                } else {
+                    setProfile(profileData)
+                }
+    
+                // 予約一覧をロード
+                const { data: reservationData, error: reservationError } = await supabase
+                    .from('reservations')
+                    .select('*')
+                    .eq('user_id', session.user.id)
+                    .order('start_time', { ascending: false })
+                if (reservationError) {
+                    alert('予約一覧の取得に失敗しました')
+                } else {
+                    setReservations(reservationData)
+                }
+    
+                // 施設一覧をロード
+                const { data, error } = await supabase
+                    .from('facilities')
+                    .select('*')
+                if (error) {
+                    alert('施設一覧の取得に失敗しました')
+                } else {
+                    setFacilities(data)
+                }
+            } finally {
+                // ロード終了
+                setIsLoading(false)
             }
         }
         init()
     }, [refreshKey, router])
+
+    // ローディング
+    if (isLoading) return <Loading />
 
     // 編集
     const handleUpdateProfile = async () => {
