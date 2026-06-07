@@ -9,6 +9,7 @@ import { Facility, Reservation, Profile } from "@/lib/types"
 // 予約のステータス
 import { CARD, RESERVATION_STATUS, STAT_NUMBER } from "@/lib/constants"
 import Loading from "@/components/Loading"
+import { formatTime } from "@/lib/utils"
 
 export default function Dashboard() {
 
@@ -163,7 +164,7 @@ export default function Dashboard() {
                                                 (r) => (
                                                     <tr key={r.id} className="border-t hover:bg-gray-50">
                                                         <td className="px-4 py-3">
-                                                            {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
+                                                            {formatTime(r.start_time)} - {formatTime(r.end_time)}
                                                         </td>
                                                         <td className="px-4 py-3">
                                                             {facilities.find((f) => f.id === r.facility_id)?.name ?? '未設定'}

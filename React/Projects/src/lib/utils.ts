@@ -13,6 +13,13 @@ export const formatDateTime = (dateString: string) => {
         })
     }
 
+// 時間をフォーマットする関数
+export const formatTime = (dateString: string) =>
+    new Date(dateString).toLocaleDateString('ja-JP', { 
+        hour: '2-digit',
+        minute: '2-digit'
+    })
+
 // timeをdatetime-localに変換する関数
 export const formatDateTimeLocal = (time: string) => {
         const timeLocal = new Date(time)

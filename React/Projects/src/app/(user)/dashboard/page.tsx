@@ -10,6 +10,7 @@ import { Facility, Reservation } from "@/lib/types"
 import { BUTTON_PRIMARY, RESERVATION_STATUS, STAT_NUMBER } from "@/lib/constants"
 import Link from "next/link"
 import Loading from "@/components/Loading"
+import { formatTime } from "@/lib/utils"
 
 export default function Dashboard() {
 
@@ -106,7 +107,7 @@ export default function Dashboard() {
                                 (r) => (
                                     <p key={r.id} className="text-gray-600 py-1">
                                         {facilities.find(f => f.id === r.facility_id)?.name ?? '未設定'}
-                                        {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
+                                        {formatTime(r.start_time)} - {formatTime(r.end_time)}
                                     </p>
                                 )
                             )
