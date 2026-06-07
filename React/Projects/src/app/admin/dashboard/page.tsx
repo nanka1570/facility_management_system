@@ -7,8 +7,7 @@ import { CalendarX } from "lucide-react"
 // 施設・予約のtypes
 import { Facility, Reservation, Profile } from "@/lib/types"
 // 予約のステータス
-import { BUTTON_PRIMARY, CARD, RESERVATION_STATUS, STAT_NUMBER } from "@/lib/constants"
-import Link from "next/link"
+import { CARD, RESERVATION_STATUS, STAT_NUMBER } from "@/lib/constants"
 
 export default function Dashboard() {
 
@@ -82,44 +81,18 @@ export default function Dashboard() {
                 こんにちは、{displayName}さん
             </p>
             <div className="space-y-4">
-
-                <div className="flex gap-4">
-                    <div className={`${CARD} flex-1 p-4`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div className={`${CARD} p-6`}>
                         <h2 
                             className="text-lg font-semibold text-gray-700 mb-2"
                         >
-                            今日の予約
+                            今日の予約数
                         </h2>
-                        {( () => {
-                            const todayReservations = reservations.filter(
-                                (r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate
-                            )
-                            return todayReservations.length > 0 ? (
-                                todayReservations.map(
-                                    (r) => (
-                                        <p key={r.id} className="text-gray-600 py-1">
-                                            {facilities.find(f => f.id === r.facility_id)?.name}
-                                        </p>
-                                    )
-                                )
-                            ) : (
-                                    <div>
-                                        <CalendarX size={32} className="mx-auto mb-2" />
-                                        <p
-                                            className="text-gray-400 text-center py-8"
-                                        >
-                                            予約はまだありません
-                                        </p>
-                                    </div>
-                                )
-                            }
-                        )()}
-                        <Link
-                            href={'/reservations'}
-                            className={BUTTON_PRIMARY}
-                        >
-                            予約カレンダーへ
-                        </Link>
+                        <p className={`${STAT_NUMBER} pl-2`}>
+                            {reservations.filter((r) => new Date(r.start_time).toLocaleDateString('sv-SE') === selectedDate).length}
+                        </p>
+                    </div>
+                    <div className={`${CARD} p-6`}>
                         <h2 
                             className="text-lg font-semibold text-gray-700 mb-2"
                         >
@@ -129,9 +102,7 @@ export default function Dashboard() {
                             {facilities.length}
                         </p>
                     </div>
-                </div>
-                <div>
-                    <div className={`${CARD} flex-1 p-4`}>
+                    <div className={`${CARD} p-6`}>
                         <h2 className="text-lg font-semibold text-gray-700 mb-2"
                         >
                             今月の予約数
@@ -143,6 +114,8 @@ export default function Dashboard() {
                                 .length
                             }
                         </p>
+                    </div>
+                    <div className={`${CARD} p-6`}>
                         <h2 
                             className="text-lg font-semibold text-gray-700 mb-2"
                         >
@@ -157,7 +130,7 @@ export default function Dashboard() {
                     <h2 
                         className="text-lg font-semibold text-gray-700 mb-2"
                     >
-                        本日の予約一覧
+                        今日の予約一覧
                     </h2>
                     <table className="w-full">
                         {( () => {
@@ -199,7 +172,7 @@ export default function Dashboard() {
                             ) : (
                                 <tbody>
                                     <tr>
-                                        <td colSpan={4} className="text-gray-500">
+                                        <td colSpan={4}>
                                             <div>
                                                 <CalendarX size={32} className="mx-auto mb-2" />
                                                 <p
