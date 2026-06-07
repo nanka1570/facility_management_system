@@ -102,8 +102,11 @@ export default function Categories() {
 
     //カテゴリ更新
     const handleUpdateCategories = async () => {
-        // 選択したカテゴリ
-        if (!selectedCategoryId) return
+        // 対象選択チェック
+        if (!selectedCategoryId) {
+            alert('対象を選択してください')
+            return
+        }
 
         /* バリデーションチェック */
         // カテゴリ名必須チェック
@@ -132,6 +135,12 @@ export default function Categories() {
 
     //カテゴリ削除（一括）
     const handleDeleteCategories = async () => {
+        // 対象選択チェック
+        if (selectedCheckboxCategoryId.length === 0) {
+            alert('対象を選択してください')
+            return
+        }
+
         if (!window.confirm('選択したカテゴリを削除しますか？')) return
 
         // 多重送信防止

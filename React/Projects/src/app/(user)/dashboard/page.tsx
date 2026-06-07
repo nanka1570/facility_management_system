@@ -105,7 +105,7 @@ export default function Dashboard() {
                             todayReservations.map(
                                 (r) => (
                                     <p key={r.id} className="text-gray-600 py-1">
-                                        {facilities.find(f => f.id === r.facility_id)?.name}
+                                        {facilities.find(f => f.id === r.facility_id)?.name ?? '未設定'}
                                         {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
                                     </p>
                                 )

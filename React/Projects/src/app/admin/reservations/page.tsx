@@ -109,7 +109,10 @@ export default function Reservations() {
 
     //施設名を取得
     const getFacilityName = (facilityId: number | null) => {
-        if (!facilityId) return '未設定'    //無駄にこの関数を呼び出すことを抑制（勉強のため記載）
+        // 施設IDが見つからなければ未設定
+        if (!facilityId) {
+            return '未設定'
+        }
         const facility = facilities.find((f) => f.id === facilityId)
         return facility ? facility.name : '未設定'
     }
@@ -191,8 +194,11 @@ export default function Reservations() {
 
     //更新処理
     const handleUpdateReservation = async () => {
-        // nullチェック
-        if (!selectedReservation) return
+        // 対象選択チェック
+        if (!selectedReservation) {
+            alert('対象を選択してください')
+            return
+        }
 
         /* バリデーション */
         // 施設名必須チェック
@@ -267,6 +273,12 @@ export default function Reservations() {
 
     //キャンセル処理
     const handleCancelReservation = async () => {
+        // 対象選択チェック
+        if (selectedCheckboxReservationId.length === 0) {
+            alert('対象を選択してください')
+            return
+        }
+
         // キャンセル確認
         if (!window.confirm('選択した予約をキャンセルしますか？')) return
 
@@ -292,6 +304,12 @@ export default function Reservations() {
 
     //復元処理
     const handleRestoreReservation = async () => {
+        // 対象選択チェック
+        if (selectedCheckboxReservationId.length === 0) {
+            alert('対象を選択してください')
+            return
+        }
+        
         // 多重送信防止
         setIsSubmitting(true)
         try {

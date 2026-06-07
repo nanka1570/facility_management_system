@@ -147,7 +147,11 @@ export default function Facilities() {
 
     //施設更新
     const handleUpdateFacilities = async () => {
-        if (!selectedFacilityId) return
+        // 対象選択チェック
+        if (!selectedFacilityId) {
+            alert('対象を選択してください')
+            return
+        }
         /* バリデーションチェック */
         // 施設名必須チェック
         if (!isNonEmpty(editFacilityName)) {
@@ -192,8 +196,16 @@ export default function Facilities() {
 
     //施設削除（一括）
     const handleDeleteFacilities = async () => {
+        // 対象選択チェック
+        if (selectedCheckboxFacilityId.length === 0) {
+            alert('対象を選択してください')
+            return
+        }
+
         // 削除確認
-        if (!window.confirm('選択した施設を削除しますか？')) return
+        if (!window.confirm('選択した施設を削除しますか？')) {
+            return
+        }
 
         // 削除対象の施設が予約に使われていないかチェック
         const { data: linkedReservations, error: checkError } = await supabase

@@ -201,7 +201,7 @@ export default function Mypage() {
                                             {formatDateTime(reservation.end_time)}
                                         </td>
                                         <td className="px-4 py-3">
-                                            {facilities.find(f => f.id === reservation.facility_id)?.name}
+                                            {facilities.find(f => f.id === reservation.facility_id)?.name ?? '未設定'}
                                         </td>
                                         <td className="px-4 py-3">
                                             <StatusBadge status={reservation.status} />

@@ -166,7 +166,7 @@ export default function Dashboard() {
                                                             {new Date(r.start_time).getHours()}:00 - {new Date(r.end_time).getHours()}:00
                                                         </td>
                                                         <td className="px-4 py-3">
-                                                            {facilities.find((f) => f.id === r.facility_id)?.name}
+                                                            {facilities.find((f) => f.id === r.facility_id)?.name ?? '未設定'}
                                                         </td>
                                                         <td className="px-4 py-3">
                                                             {profiles.find((p) => p.id === r.user_id)?.display_name}
