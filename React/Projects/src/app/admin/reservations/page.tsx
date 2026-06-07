@@ -15,6 +15,7 @@ import { RESERVATION_STATUS } from "@/lib/constants"
 import { toggleId } from "@/lib/selection"
 // バリデーション
 import { isNonEmpty, isPositiveInt } from "@/lib/validation"
+import StatusBadge from "@/components/StatusBadge"
 
 export default function Reservations() {
 
@@ -559,11 +560,8 @@ export default function Reservations() {
                                             <td className="px-4 py-3">{getFacilityName(reservation.facility_id)}</td>
                                             <td className="px-4 py-3">{formatDateTime(reservation.start_time)}</td>
                                             <td className="px-4 py-3">{formatDateTime(reservation.end_time)}</td>
-                                            <td
-                                                className={`px-4 py-3 ${reservation.status === RESERVATION_STATUS.COMPLETED ? 'text-green-600 font-semibold' :
-                                                        reservation.status === RESERVATION_STATUS.CANCELLED ? 'text-red-400' : ''
-                                                    }`}>
-                                                {getStatusLabel(reservation.status)}
+                                            <td className="px-4 py-3">
+                                                <StatusBadge status={reservation.status} />
                                             </td>
                                             <td className="px-4 py-3">{reservation.num_people}</td>
                                             <td className="px-4 py-3">{reservation.purpose}</td>

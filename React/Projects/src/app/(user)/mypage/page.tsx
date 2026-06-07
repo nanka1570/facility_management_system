@@ -6,13 +6,12 @@ import { useEffect, useState } from "react"
 // ボタンのスタイル
 import { BUTTON_PRIMARY, BUTTON_SECONDARY, CARD, INPUT } from "@/lib/constants"
 // 日時をフォーマットする関数, ステータスを日本語に直す関数
-import { formatDateTime, getStatusLabel } from "@/lib/utils"
+import { formatDateTime } from "@/lib/utils"
 // 施設・プロフィール・予約のtypes
 import { Facility, Profile, Reservation } from "@/lib/types"
-// 予約のステータス
-import { RESERVATION_STATUS } from "@/lib/constants"
 // バリデーション
 import { isNonEmpty } from "@/lib/validation"
+import StatusBadge from "@/components/StatusBadge"
 
 export default function Mypage() {
     
@@ -192,12 +191,8 @@ export default function Mypage() {
                                         <td className="px-4 py-3">
                                             {facilities.find(f => f.id === reservation.facility_id)?.name}
                                         </td>
-                                        <td
-                                            className={`px-4 py-3
-                                            ${reservation.status === RESERVATION_STATUS.COMPLETED ? 'text-green-600 font-semibold' :
-                                            reservation.status === RESERVATION_STATUS.CANCELLED ? 'text-red-400' : ''}`}
-                                        >
-                                            {getStatusLabel(reservation.status)}
+                                        <td className="px-4 py-3">
+                                            <StatusBadge status={reservation.status} />
                                         </td>
                                     </tr>
                                 ))
