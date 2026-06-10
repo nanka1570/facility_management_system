@@ -15,3 +15,9 @@ config.php
 # OS関連
 .DS_Store
 Thumbs.db
+*:Zone.Identifier
+
+# IDE / エディタ
+.vs/
+.vscode/
+.idea/
