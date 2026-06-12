@@ -75,7 +75,8 @@ export function getDayRangeISO(dayStart: Date): { startISO: string; endISO: stri
 
 const WEEKDAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"] as const;
 
-const pad = (n: number) => String(n).padStart(2, "0");
+// 2桁ゼロ埋め（"09:00" 等の時刻・日付表記用）
+export const pad = (n: number) => String(n).padStart(2, "0");
 
 // "2026年1月9日（金）"
 export function formatJstDate(value: Date | string): string {

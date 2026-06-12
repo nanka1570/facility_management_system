@@ -170,10 +170,12 @@ export default function ReservationModal({
       </>
     ) : (
       <>
+        {/* 更新とキャンセルは同一予約への並行UPDATEを防ぐため相互に無効化する */}
         <Button
           variant="danger"
           onClick={handleCancelReservation}
           loading={cancelling}
+          disabled={saving}
           className="mr-auto"
         >
           キャンセルする
@@ -181,7 +183,7 @@ export default function ReservationModal({
         <Button variant="secondary" onClick={onClose}>
           閉じる
         </Button>
-        <Button onClick={handleSubmit} loading={saving}>
+        <Button onClick={handleSubmit} loading={saving} disabled={cancelling}>
           更新
         </Button>
       </>

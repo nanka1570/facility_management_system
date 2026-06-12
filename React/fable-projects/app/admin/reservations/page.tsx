@@ -8,14 +8,14 @@ import ReservationManager from "@/components/admin/ReservationManager";
 export default async function AdminReservationsPage() {
   const supabase = await createClient();
 
-  if (!(await isModuleEnabled(supabase, "M-RESERVE"))) {
-    redirect("/admin/dashboard");
-  }
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/");
+
+  if (!(await isModuleEnabled(supabase, "M-RESERVE"))) {
+    redirect("/admin/dashboard");
+  }
 
   return <ReservationManager currentUserId={user.id} />;
 }

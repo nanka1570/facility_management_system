@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { hasOverlap, getEffectiveStatus } from "@/lib/reservations";
+import { hasOverlap, getEffectiveStatus, overlapsRange } from "@/lib/reservations";
 import {
   formatJstDateTime,
   fromDatetimeLocal,
@@ -71,6 +71,8 @@ export default function ReservationManager({
   const fetchData = useCallback(async () => {
     const supabase = createClient();
     const [reservationsResult, facilitiesResult] = await Promise.all([
+      // 既知の制約: 全件取得+クライアント側フィルター（Phase1 の規模を前提）。
+      // 予約が数千件規模になる場合は日付フィルターのサーバー側適用やページングが必要
       supabase
         .from("reservations")
         .select("*, facilities(name), profiles(display_name)")
@@ -92,10 +94,16 @@ export default function ReservationManager({
     fetchData();
   }, [fetchData]);
 
-  const switchMode = (next: Mode) => {
-    setMode((current) => (current === next ? "normal" : next));
+  // フィルターやモードの切替で非表示・対象外になった行が
+  // 編集/キャンセル/復元の対象に残らないよう、選択状態をまとめてリセットする
+  const clearSelections = () => {
     setEditId(null);
     setSelectedIds(new Set());
+  };
+
+  const switchMode = (next: Mode) => {
+    setMode((current) => (current === next ? "normal" : next));
+    clearSelections();
   };
 
   // 行の操作可否（表示ステータス基準）
@@ -267,16 +275,32 @@ export default function ReservationManager({
     const supabase = createClient();
     try {
       // 復元対象すべてを重複検査し、1件でも重複があれば全体を中止する（画面設計書 §4.11）
+      // DB 上の confirmed に加えて、同時に復元する対象同士の重複も検査する
+      // （cancelled 同士は DB 側の検査に掛からないため、見落とすとダブルブッキングになる）
       const targets = reservations.filter((r) => selectedIds.has(r.id));
       const conflicted: ReservationWithDetails[] = [];
+      const accepted: ReservationWithDetails[] = [];
       for (const target of targets) {
-        const overlap = await hasOverlap(supabase, {
+        const overlapsDb = await hasOverlap(supabase, {
           facilityId: target.facility_id,
           startISO: target.start_time,
           endISO: target.end_time,
           excludeId: target.id,
         });
-        if (overlap) conflicted.push(target);
+        const overlapsSelected = accepted.some(
+          (other) =>
+            other.facility_id === target.facility_id &&
+            overlapsRange(
+              other,
+              new Date(target.start_time),
+              new Date(target.end_time),
+            ),
+        );
+        if (overlapsDb || overlapsSelected) {
+          conflicted.push(target);
+        } else {
+          accepted.push(target);
+        }
       }
       if (conflicted.length > 0) {
         const labels = conflicted.map(
@@ -358,7 +382,10 @@ export default function ReservationManager({
           <select
             id="facility-filter"
             value={facilityFilter}
-            onChange={(e) => setFacilityFilter(e.target.value)}
+            onChange={(e) => {
+              setFacilityFilter(e.target.value);
+              clearSelections();
+            }}
             className="rounded-md border border-gray-300 px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
           >
             <option value="all">すべて</option>
@@ -373,7 +400,10 @@ export default function ReservationManager({
             id="date-filter"
             type="date"
             value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
+            onChange={(e) => {
+              setDateFilter(e.target.value);
+              clearSelections();
+            }}
             className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
           />
         </div>

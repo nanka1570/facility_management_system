@@ -1,6 +1,7 @@
 "use client";
 
-import { getTimeSlots, getJstParts, jstDate } from "@/lib/datetime";
+import { getTimeSlots, getJstParts, jstDate, pad } from "@/lib/datetime";
+import { overlapsRange } from "@/lib/reservations";
 import type { Facility, ReservationWithDetails } from "@/types/database";
 
 // U-02 スマートフォン用 日別リスト（画面設計書 §4.4）
@@ -15,8 +16,6 @@ type Props = {
   onSlotClick: (facility: Facility, start: Date, end: Date) => void;
   onReservationClick: (reservation: ReservationWithDetails) => void;
 };
-
-const pad = (n: number) => String(n).padStart(2, "0");
 
 export default function DayList({
   facilities,
@@ -36,10 +35,7 @@ export default function DayList({
   const findReservation = (slotStart: Date, slotEnd: Date) =>
     facility
       ? reservations.find(
-          (r) =>
-            r.facility_id === facility.id &&
-            new Date(r.start_time) < slotEnd &&
-            new Date(r.end_time) > slotStart,
+          (r) => r.facility_id === facility.id && overlapsRange(r, slotStart, slotEnd),
         )
       : undefined;
 

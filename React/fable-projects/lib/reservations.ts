@@ -32,6 +32,20 @@ export async function hasOverlap(
   return (data?.length ?? 0) > 0;
 }
 
+// クライアント側でのオーバーラップ判定。
+// hasOverlap の SQL 述語と同じ半開区間 [start, end) の規約（境界接触は重複としない）。
+// 境界の扱いを変更する場合は hasOverlap と必ずセットで変更すること。
+export function overlapsRange(
+  reservation: { start_time: string; end_time: string },
+  start: Date,
+  end: Date,
+): boolean {
+  return (
+    new Date(reservation.start_time) < end &&
+    new Date(reservation.end_time) > start
+  );
+}
+
 // 表示用ステータスの導出。
 // Phase1 では completed への自動更新（バッチ）を持たないため、
 // DB 値が confirmed でも終了時刻を過ぎていれば「完了」として扱う。

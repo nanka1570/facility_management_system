@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isModuleEnabled } from "@/lib/modules";
+import { getEffectiveStatus } from "@/lib/reservations";
 import {
   formatJstMonthDay,
   formatJstTime,
@@ -129,7 +130,7 @@ export default async function DashboardPage() {
                 <span className="font-medium">
                   {r.facilities?.name ?? "（施設不明）"}
                 </span>
-                <StatusBadge status="confirmed" />
+                <StatusBadge status={getEffectiveStatus(r)} />
               </li>
             ))}
           </ul>

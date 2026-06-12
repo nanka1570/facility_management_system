@@ -72,10 +72,16 @@ export default function FacilityManager() {
     fetchData();
   }, [fetchData]);
 
-  const switchMode = (next: Mode) => {
-    setMode((current) => (current === next ? "normal" : next));
+  // フィルターやモードの切替で非表示・対象外になった行が
+  // 編集/削除の対象に残らないよう、選択状態をまとめてリセットする
+  const clearSelections = () => {
     setEditId(null);
     setDeleteIds(new Set());
+  };
+
+  const switchMode = (next: Mode) => {
+    setMode((current) => (current === next ? "normal" : next));
+    clearSelections();
   };
 
   const selectEditRow = (facility: FacilityWithCategory) => {
@@ -262,7 +268,10 @@ export default function FacilityManager() {
         <select
           id="category-filter"
           value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
+          onChange={(e) => {
+            setCategoryFilter(e.target.value);
+            clearSelections();
+          }}
           className="rounded-md border border-gray-300 px-2 py-1.5 text-sm focus:border-blue-500 focus:outline-none"
         >
           <option value="all">すべて</option>

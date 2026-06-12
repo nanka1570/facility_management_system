@@ -8,14 +8,14 @@ import ReservationCalendar from "@/components/reservations/ReservationCalendar";
 export default async function ReservationsPage() {
   const supabase = await createClient();
 
-  if (!(await isModuleEnabled(supabase, "M-RESERVE"))) {
-    redirect("/dashboard");
-  }
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/");
+
+  if (!(await isModuleEnabled(supabase, "M-RESERVE"))) {
+    redirect("/dashboard");
+  }
 
   return <ReservationCalendar currentUserId={user.id} />;
 }

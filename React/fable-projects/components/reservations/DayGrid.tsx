@@ -1,6 +1,7 @@
 "use client";
 
-import { getTimeSlots, getJstParts, jstDate } from "@/lib/datetime";
+import { getTimeSlots, getJstParts, jstDate, pad } from "@/lib/datetime";
+import { overlapsRange } from "@/lib/reservations";
 import type { Facility, ReservationWithDetails } from "@/types/database";
 
 // U-02 PC用 日別グリッド（画面設計書 §4.4）
@@ -15,8 +16,6 @@ type Props = {
   onReservationClick: (reservation: ReservationWithDetails) => void;
 };
 
-const pad = (n: number) => String(n).padStart(2, "0");
-
 export default function DayGrid({
   facilities,
   reservations,
@@ -29,13 +28,9 @@ export default function DayGrid({
   const parts = getJstParts(date);
 
   // スロット区間 [slotStart, slotEnd) とオーバーラップする confirmed 予約を探す
-  // （hasOverlap と同じ半開区間の述語）
   const findReservation = (facilityId: number, slotStart: Date, slotEnd: Date) =>
     reservations.find(
-      (r) =>
-        r.facility_id === facilityId &&
-        new Date(r.start_time) < slotEnd &&
-        new Date(r.end_time) > slotStart,
+      (r) => r.facility_id === facilityId && overlapsRange(r, slotStart, slotEnd),
     );
 
   return (
