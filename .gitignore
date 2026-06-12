@@ -6,6 +6,11 @@ config.php
 # データベース
 *.sql
 *.db
+# fable-projects のスキーマ定義はセットアップ資材としてコミット対象
+!React/fable-projects/supabase/schema.sql
+
+# テスト生成物（Playwright MCP）
+.playwright-mcp/
 
 # 一時ファイル
 *.log
