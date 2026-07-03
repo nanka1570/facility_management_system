@@ -88,7 +88,8 @@ export async function updateSession(request: NextRequest) {
     }
     if (
       (pathname.startsWith("/admin/settings") ||
-        pathname.startsWith("/admin/theme")) &&
+        pathname.startsWith("/admin/theme") ||
+        pathname.startsWith("/admin/tenants")) &&
       role !== "developer"
     ) {
       return redirectTo("/admin/dashboard");

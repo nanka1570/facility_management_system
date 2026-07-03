@@ -36,6 +36,7 @@ export default async function AdminLayout({
       itemEnabled={modules.has("M-ITEM")}
       inquiryEnabled={modules.has("M-INQUIRY")}
       themeEnabled={modules.has("M-THEME")}
+      tenantEnabled={modules.has("M-TENANT")}
       logoUrl={theme.logoUrl}
     >
       {children}

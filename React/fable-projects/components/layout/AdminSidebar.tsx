@@ -16,6 +16,7 @@ type Props = {
   itemEnabled: boolean;
   inquiryEnabled: boolean;
   themeEnabled: boolean;
+  tenantEnabled: boolean;
   collapsed: boolean;
   onToggleCollapse: () => void;
   // スマホのオーバーレイ表示用
@@ -29,6 +30,7 @@ export default function AdminSidebar({
   itemEnabled,
   inquiryEnabled,
   themeEnabled,
+  tenantEnabled,
   collapsed,
   onToggleCollapse,
   mobileOpen,
@@ -114,6 +116,12 @@ export default function AdminSidebar({
               href: "/admin/theme",
               icon: "🎨",
               label: "テーマ設定",
+            })}
+          {tenantEnabled &&
+            renderItem({
+              href: "/admin/tenants",
+              icon: "🏢",
+              label: "テナント管理",
             })}
         </>
       )}

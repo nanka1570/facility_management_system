@@ -20,6 +20,7 @@ export type Database = {
           email: string;
           display_name: string | null;
           role: UserRole;
+          tenant_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -28,6 +29,7 @@ export type Database = {
           email: string;
           display_name?: string | null;
           role?: UserRole;
+          tenant_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -36,6 +38,7 @@ export type Database = {
           email?: string;
           display_name?: string | null;
           role?: UserRole;
+          tenant_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -46,18 +49,21 @@ export type Database = {
           id: number;
           name: string;
           sort_order: number;
+          tenant_id: string | null;
           created_at: string;
         };
         Insert: {
           id?: number;
           name: string;
           sort_order?: number;
+          tenant_id?: string | null;
           created_at?: string;
         };
         Update: {
           id?: number;
           name?: string;
           sort_order?: number;
+          tenant_id?: string | null;
           created_at?: string;
         };
         Relationships: [];
@@ -72,6 +78,7 @@ export type Database = {
           time_unit: number;
           allow_extension: boolean;
           is_active: boolean;
+          tenant_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -80,6 +87,7 @@ export type Database = {
           category_id?: number | null;
           name: string;
           max_capacity?: number;
+          tenant_id?: string | null;
           equipment?: string | null;
           time_unit?: number;
           allow_extension?: boolean;
@@ -92,6 +100,7 @@ export type Database = {
           category_id?: number | null;
           name?: string;
           max_capacity?: number;
+          tenant_id?: string | null;
           equipment?: string | null;
           time_unit?: number;
           allow_extension?: boolean;
@@ -119,6 +128,7 @@ export type Database = {
           num_people: number;
           purpose: string | null;
           status: ReservationStatus;
+          tenant_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -129,6 +139,7 @@ export type Database = {
           start_time: string;
           end_time: string;
           num_people?: number;
+          tenant_id?: string | null;
           purpose?: string | null;
           status?: ReservationStatus;
           created_at?: string;
@@ -143,6 +154,7 @@ export type Database = {
           num_people?: number;
           purpose?: string | null;
           status?: ReservationStatus;
+          tenant_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -257,6 +269,7 @@ export type Database = {
           name: string;
           total_quantity: number;
           rental_price: number | null;
+          tenant_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -264,6 +277,7 @@ export type Database = {
           id?: number;
           name: string;
           total_quantity?: number;
+          tenant_id?: string | null;
           rental_price?: number | null;
           created_at?: string;
           updated_at?: string;
@@ -272,6 +286,7 @@ export type Database = {
           id?: number;
           name?: string;
           total_quantity?: number;
+          tenant_id?: string | null;
           rental_price?: number | null;
           created_at?: string;
           updated_at?: string;
@@ -325,6 +340,7 @@ export type Database = {
           id: number;
           user_id: string;
           subject: string;
+          tenant_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -332,6 +348,7 @@ export type Database = {
           id?: number;
           user_id: string;
           subject: string;
+          tenant_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -339,6 +356,7 @@ export type Database = {
           id?: number;
           user_id?: string;
           subject?: string;
+          tenant_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -394,6 +412,33 @@ export type Database = {
           },
         ];
       };
+      tenants: {
+        Row: {
+          id: string;
+          name: string;
+          subdomain: string;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          subdomain: string;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          subdomain?: string;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
@@ -413,6 +458,7 @@ export type Item = Database["public"]["Tables"]["items"]["Row"];
 export type ReservationItem = Database["public"]["Tables"]["reservation_items"]["Row"];
 export type Inquiry = Database["public"]["Tables"]["inquiries"]["Row"];
 export type InquiryMessage = Database["public"]["Tables"]["inquiry_messages"]["Row"];
+export type Tenant = Database["public"]["Tables"]["tenants"]["Row"];
 
 // 結合取得用（select("*, facilities(name)") 等に対応）
 export type FacilityWithCategory = Facility & {

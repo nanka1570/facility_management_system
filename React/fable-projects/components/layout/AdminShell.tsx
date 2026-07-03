@@ -12,6 +12,7 @@ type Props = {
   itemEnabled: boolean;
   inquiryEnabled: boolean;
   themeEnabled: boolean;
+  tenantEnabled: boolean;
   logoUrl?: string | null;
   children: ReactNode;
 };
@@ -22,6 +23,7 @@ export default function AdminShell({
   itemEnabled,
   inquiryEnabled,
   themeEnabled,
+  tenantEnabled,
   logoUrl = null,
   children,
 }: Props) {
@@ -54,6 +56,7 @@ export default function AdminShell({
           itemEnabled={itemEnabled}
           inquiryEnabled={inquiryEnabled}
           themeEnabled={themeEnabled}
+          tenantEnabled={tenantEnabled}
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed((v) => !v)}
           mobileOpen={mobileOpen}
