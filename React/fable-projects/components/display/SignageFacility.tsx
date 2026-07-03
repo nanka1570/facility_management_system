@@ -8,7 +8,8 @@ import FullscreenButton from "@/components/display/FullscreenButton";
 // D-02 サイネージ（施設別）: 特定施設の現在の利用状況（DISP-02）
 // 公共の場に表示するため予約者名・利用目的は表示しない（設計判断: README 参照）
 export default function SignageFacility({ facilityId }: { facilityId: number }) {
-  const { facilities, reservations, now, loading, error } = useSignageData();
+  const { facilities, reservations, displayConfig, now, loading, error } =
+    useSignageData();
 
   if (loading) {
     return (
@@ -73,7 +74,8 @@ export default function SignageFacility({ facilityId }: { facilityId: number }) 
             <p className="mb-2 inline-block rounded-lg bg-green-500 px-8 py-3 text-3xl font-bold">
               空き
             </p>
-            {next && (
+            {/* DISP-05: 次の予約は設定で非表示にできる */}
+            {displayConfig.showNext && next && (
               <p className="text-xl tabular-nums text-white/80">
                 次の予約: {formatJstTime(next.start_time)} -{" "}
                 {formatJstTime(next.end_time)}
@@ -83,7 +85,8 @@ export default function SignageFacility({ facilityId }: { facilityId: number }) 
         )}
       </div>
 
-      <section className="mt-6">
+      {/* DISP-05: 本日のスケジュール一覧は設定で非表示にできる */}
+      <section className={`mt-6 ${displayConfig.showSchedule ? "" : "hidden"}`}>
         <h2 className="mb-2 text-sm font-medium text-white/50">
           本日のスケジュール
         </h2>

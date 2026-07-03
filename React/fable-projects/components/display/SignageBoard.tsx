@@ -8,7 +8,8 @@ import FullscreenButton from "@/components/display/FullscreenButton";
 // D-01 サイネージ（全体表示）: 全施設の本日スケジュール（DISP-01）
 // 公共の場に表示するため予約者名・利用目的は表示しない（設計判断: README 参照）
 export default function SignageBoard() {
-  const { facilities, reservations, now, loading, error } = useSignageData();
+  const { facilities, reservations, displayConfig, now, loading, error } =
+    useSignageData();
 
   if (loading) {
     return (
@@ -60,7 +61,10 @@ export default function SignageBoard() {
                   {inUse ? "利用中" : "空き"}
                 </span>
               </div>
-              <ul className="space-y-1 text-sm">
+              {/* DISP-05: 本日の時間帯一覧は設定で非表示にできる */}
+              <ul
+                className={`space-y-1 text-sm ${displayConfig.showSchedule ? "" : "hidden"}`}
+              >
                 {todays.map((r) => {
                   const ended = new Date(r.end_time) <= now;
                   const active =
