@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { getThemeConfig, resolvePrimaryColor } from "@/lib/theme";
+import {
+  getThemeConfig,
+  resolveFontFamily,
+  resolvePrimaryColor,
+} from "@/lib/theme";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -8,8 +12,8 @@ export const metadata: Metadata = {
   description: "汎用施設管理システム（React リライト版）",
 };
 
-// M-THEME 有効時はプライマリカラーを CSS 変数として全画面に注入する。
-// 未ログイン時は RLS で module_settings が読めないためデフォルト色になる
+// M-THEME 有効時はプライマリカラー（CSS変数）とフォント（THEME-04）を
+// 全画面に注入する。未ログイン時は RLS で module_settings が読めないためデフォルト
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -22,7 +26,12 @@ export default async function RootLayout({
     <html lang="ja">
       <body
         className="min-h-screen bg-gray-100 text-gray-900 antialiased"
-        style={{ "--color-primary": resolvePrimaryColor(theme) } as React.CSSProperties}
+        style={
+          {
+            "--color-primary": resolvePrimaryColor(theme),
+            fontFamily: resolveFontFamily(theme),
+          } as React.CSSProperties
+        }
       >
         {children}
       </body>

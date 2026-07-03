@@ -184,6 +184,7 @@ export default function InquiryPanel({
                 messages={messages}
                 onSend={handleSend}
                 sending={sending}
+                viewerType="user"
               />
             </>
           )}

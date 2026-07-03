@@ -21,16 +21,40 @@ export const THEME_TEMPLATES = [
 
 export type ThemeTemplateId = (typeof THEME_TEMPLATES)[number]["id"];
 
+// フォント選択肢（THEME-04）。追加依存なしの方針に合わせ、
+// Web フォントではなく OS 標準のフォントスタックから選ぶ
+export const FONT_OPTIONS = [
+  {
+    id: "sans",
+    name: "ゴシック（標準）",
+    stack: `"Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif`,
+  },
+  {
+    id: "serif",
+    name: "明朝",
+    stack: `"Hiragino Mincho ProN", "Yu Mincho", "BIZ UDMincho", serif`,
+  },
+  {
+    id: "rounded",
+    name: "丸ゴシック",
+    stack: `"Hiragino Maru Gothic ProN", "BIZ UDGothic", "Yu Gothic", sans-serif`,
+  },
+] as const;
+
+export type ThemeFontId = (typeof FONT_OPTIONS)[number]["id"];
+
 export type ThemeConfig = {
   template: ThemeTemplateId;
   customColor: string | null;
   logoUrl: string | null;
+  font: ThemeFontId;
 };
 
 export const DEFAULT_THEME: ThemeConfig = {
   template: "blue",
   customColor: null,
   logoUrl: null,
+  font: "sans",
 };
 
 const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
@@ -50,11 +74,21 @@ export function parseThemeConfig(config: Json | null): ThemeConfig {
     typeof record.logoUrl === "string" && record.logoUrl.trim() !== ""
       ? record.logoUrl
       : null;
+  const font = FONT_OPTIONS.find((f) => f.id === record.font)?.id;
   return {
     template: template ?? DEFAULT_THEME.template,
     customColor,
     logoUrl,
+    font: font ?? DEFAULT_THEME.font,
   };
+}
+
+// 適用するフォントスタック（THEME-04）
+export function resolveFontFamily(config: ThemeConfig): string {
+  return (
+    FONT_OPTIONS.find((f) => f.id === config.font)?.stack ??
+    FONT_OPTIONS[0].stack
+  );
 }
 
 // 適用するプライマリカラー（customColor がテンプレートより優先）

@@ -145,6 +145,7 @@ export default function InquiryAdminPanel({
                 messages={messages}
                 onSend={handleSend}
                 sending={sending}
+                viewerType="admin"
               />
             </>
           )}

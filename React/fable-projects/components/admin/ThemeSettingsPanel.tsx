@@ -4,10 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
+  FONT_OPTIONS,
   THEME_TEMPLATES,
   parseThemeConfig,
+  resolveFontFamily,
   resolvePrimaryColor,
   type ThemeConfig,
+  type ThemeFontId,
   type ThemeTemplateId,
 } from "@/lib/theme";
 import Button from "@/components/ui/Button";
@@ -78,6 +81,7 @@ export default function ThemeSettingsPanel() {
           template: config.template,
           customColor: useCustom ? config.customColor : null,
           logoUrl,
+          font: config.font,
         },
       })
       .eq("module_id", "M-THEME");
@@ -173,6 +177,28 @@ export default function ThemeSettingsPanel() {
       </section>
 
       <section className="mb-6">
+        <h2 className="mb-3 text-sm font-semibold text-gray-600">
+          フォント（THEME-04）
+        </h2>
+        <select
+          value={config.font}
+          onChange={(e) =>
+            setConfig((c) =>
+              c ? { ...c, font: e.target.value as ThemeFontId } : c,
+            )
+          }
+          aria-label="フォント"
+          className="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+        >
+          {FONT_OPTIONS.map((font) => (
+            <option key={font.id} value={font.id}>
+              {font.name}
+            </option>
+          ))}
+        </select>
+      </section>
+
+      <section className="mb-6">
         <h2 className="mb-3 text-sm font-semibold text-gray-600">ロゴ設定</h2>
         <input
           value={config.logoUrl ?? ""}
@@ -187,12 +213,18 @@ export default function ThemeSettingsPanel() {
 
       <section className="mb-6">
         <h2 className="mb-3 text-sm font-semibold text-gray-600">プレビュー</h2>
-        <div className="flex items-center gap-3 rounded-lg bg-white p-4 shadow">
+        <div
+          className="flex flex-wrap items-center gap-3 rounded-lg bg-white p-4 shadow"
+          style={{ fontFamily: resolveFontFamily(config) }}
+        >
           <span
             className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-white"
             style={{ backgroundColor: previewColor }}
           >
             主要ボタン
+          </span>
+          <span className="text-sm text-gray-700">
+            施設管理システムのフォントプレビュー（あア亜Aa1）
           </span>
           <span className="text-sm tabular-nums text-gray-500">
             {previewColor}
