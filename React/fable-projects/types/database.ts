@@ -427,3 +427,11 @@ export type ReservationWithDetails = Reservation & {
   facilities: Pick<Facility, "name"> | null;
   profiles: Pick<Profile, "display_name"> | null;
 };
+
+export type InquiryWithProfile = Inquiry & {
+  profiles: Pick<Profile, "display_name" | "email"> | null;
+};
+
+export type InquiryMessageWithSender = InquiryMessage & {
+  profiles: Pick<Profile, "display_name"> | null;
+};
