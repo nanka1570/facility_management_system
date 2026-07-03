@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Button from "@/components/ui/Button";
@@ -10,7 +11,6 @@ type Tab = "login" | "signup";
 type FieldErrors = { email?: string; password?: string };
 
 // C-01 ログイン/新規登録フォーム（画面設計書 §4.1）
-// ※「パスワードを忘れた方」リンク（C-03）は Phase2 のため表示しない
 export default function AuthForm() {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("login");
@@ -162,6 +162,14 @@ export default function AuthForm() {
           {tab === "login" ? "ログイン" : "登録"}
         </Button>
       </form>
+
+      {tab === "login" && (
+        <p className="mt-4 text-center text-sm">
+          <Link href="/reset-password" className="text-blue-600 hover:underline">
+            パスワードを忘れた方
+          </Link>
+        </p>
+      )}
     </div>
   );
 }

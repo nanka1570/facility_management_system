@@ -5,10 +5,14 @@ import type { Database, UserRole } from "@/types/database";
 // セッション更新 + 認証/権限ガード（proxy.ts から呼ばれる）
 //
 // リダイレクト規則:
-//   未認証 ∧ `/` 以外                     → `/`
+//   未認証 ∧ 公開パス（`/`, `/reset-password/*`）以外 → `/`
 //   認証済 ∧ `/`                          → `/dashboard`（roleを問わない）
 //   `/admin/*` ∧ role が admin/developer 以外 → `/dashboard`
-//   `/admin/settings` ∧ role が developer 以外 → `/admin/dashboard`
+//   `/admin/settings`・`/admin/theme` ∧ role が developer 以外 → `/admin/dashboard`
+//
+// `/reset-password/update` はリカバリーリンクから遷移した時点では
+// まだセッションが無い（クライアント側で code 交換後に確立する）ため、
+// 未認証でも通す必要がある
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -57,8 +61,11 @@ export async function updateSession(request: NextRequest) {
     return response;
   };
 
+  const isPublicPath =
+    pathname === "/" || pathname.startsWith("/reset-password");
+
   if (!user) {
-    if (pathname !== "/") {
+    if (!isPublicPath) {
       return redirectTo("/");
     }
     return supabaseResponse;
@@ -79,7 +86,11 @@ export async function updateSession(request: NextRequest) {
     if (role !== "admin" && role !== "developer") {
       return redirectTo("/dashboard");
     }
-    if (pathname.startsWith("/admin/settings") && role !== "developer") {
+    if (
+      (pathname.startsWith("/admin/settings") ||
+        pathname.startsWith("/admin/theme")) &&
+      role !== "developer"
+    ) {
       return redirectTo("/admin/dashboard");
     }
   }
