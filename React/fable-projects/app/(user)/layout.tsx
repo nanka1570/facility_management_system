@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { isModuleEnabled } from "@/lib/modules";
+import { getThemeConfig } from "@/lib/theme";
 import Header from "@/components/layout/Header";
 import UserSidebar from "@/components/layout/UserSidebar";
 
@@ -24,11 +25,18 @@ export default async function UserLayout({
     isAdminUser = profile?.role === "admin" || profile?.role === "developer";
   }
 
-  const reserveEnabled = await isModuleEnabled(supabase, "M-RESERVE");
+  const [reserveEnabled, theme] = await Promise.all([
+    isModuleEnabled(supabase, "M-RESERVE"),
+    getThemeConfig(supabase),
+  ]);
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header isAdminUser={isAdminUser} reserveEnabled={reserveEnabled} />
+      <Header
+        isAdminUser={isAdminUser}
+        reserveEnabled={reserveEnabled}
+        logoUrl={theme.logoUrl}
+      />
       <div className="flex flex-1">
         <UserSidebar reserveEnabled={reserveEnabled} />
         <main className="min-w-0 flex-1 p-4 md:p-6">{children}</main>

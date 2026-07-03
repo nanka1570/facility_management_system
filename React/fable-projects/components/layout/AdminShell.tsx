@@ -9,10 +9,16 @@ import AdminSidebar from "@/components/layout/AdminSidebar";
 type Props = {
   isDeveloper: boolean;
   reserveEnabled: boolean;
+  logoUrl?: string | null;
   children: ReactNode;
 };
 
-export default function AdminShell({ isDeveloper, reserveEnabled, children }: Props) {
+export default function AdminShell({
+  isDeveloper,
+  reserveEnabled,
+  logoUrl = null,
+  children,
+}: Props) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -32,6 +38,7 @@ export default function AdminShell({ isDeveloper, reserveEnabled, children }: Pr
       <Header
         isAdminUser
         reserveEnabled={reserveEnabled}
+        logoUrl={logoUrl}
         onMenuClick={() => setMobileOpen(true)}
       />
       <div className="flex flex-1">

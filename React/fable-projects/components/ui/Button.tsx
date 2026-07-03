@@ -1,8 +1,9 @@
 import type { ButtonHTMLAttributes } from "react";
 
 // 画面設計書 §3.3 のボタン4種
+// primary は M-THEME のプライマリカラー（CSS変数）に追従する（hover は明度で表現）
 const VARIANT_CLASSES = {
-  primary: "bg-blue-500 text-white hover:bg-blue-600",
+  primary: "bg-[var(--color-primary)] text-white hover:brightness-90",
   secondary: "bg-gray-200 text-gray-700 hover:bg-gray-300",
   danger: "bg-red-500 text-white hover:bg-red-600",
   success: "bg-green-500 text-white hover:bg-green-600",

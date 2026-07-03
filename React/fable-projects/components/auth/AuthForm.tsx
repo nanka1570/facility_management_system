@@ -88,7 +88,7 @@ export default function AuthForm() {
   const tabClass = (target: Tab) =>
     `flex-1 rounded-md py-2 text-sm font-medium transition-colors ${
       tab === target
-        ? "bg-blue-500 text-white"
+        ? "bg-[var(--color-primary)] text-white"
         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
     }`;
 

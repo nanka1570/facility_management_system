@@ -6,7 +6,7 @@ export default function Loading() {
       role="status"
       aria-label="読み込み中"
     >
-      <span className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      <span className="h-10 w-10 animate-spin rounded-full border-4 border-[var(--color-primary)] border-t-transparent" />
     </div>
   );
 }

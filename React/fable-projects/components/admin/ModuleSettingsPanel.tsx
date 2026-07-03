@@ -103,7 +103,7 @@ export default function ModuleSettingsPanel() {
                           disabled={updatingId === module.id}
                           onClick={() => handleToggle(module.id)}
                           className={`relative h-6 w-11 rounded-full transition-colors disabled:opacity-50 ${
-                            enabled ? "bg-blue-500" : "bg-gray-300"
+                            enabled ? "bg-[var(--color-primary)]" : "bg-gray-300"
                           }`}
                         >
                           <span

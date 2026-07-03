@@ -11,10 +11,17 @@ import { createClient } from "@/lib/supabase/client";
 type Props = {
   isAdminUser: boolean;
   reserveEnabled: boolean;
+  // M-THEME 有効かつロゴ設定時のみ渡される（THEME-03）
+  logoUrl?: string | null;
   onMenuClick?: () => void;
 };
 
-export default function Header({ isAdminUser, reserveEnabled, onMenuClick }: Props) {
+export default function Header({
+  isAdminUser,
+  reserveEnabled,
+  logoUrl = null,
+  onMenuClick,
+}: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const isAdminArea = pathname.startsWith("/admin");
@@ -44,8 +51,19 @@ export default function Header({ isAdminUser, reserveEnabled, onMenuClick }: Pro
               ☰
             </button>
           )}
-          <Link href={homeHref} className="truncate text-base font-bold sm:text-lg">
-            🏢 施設管理システム
+          <Link
+            href={homeHref}
+            className="flex min-w-0 items-center gap-2 truncate text-base font-bold sm:text-lg"
+          >
+            {logoUrl ? (
+              // 任意の外部URLを管理者が設定するため next/image の許可リスト管理は
+              // 行わず <img> を使用する（THEME-03。README 参照）
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="ロゴ" className="h-8 w-auto" />
+            ) : (
+              <span aria-hidden="true">🏢</span>
+            )}
+            <span className="truncate">施設管理システム</span>
           </Link>
         </div>
 

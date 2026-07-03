@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isModuleEnabled } from "@/lib/modules";
+import { getThemeConfig } from "@/lib/theme";
 import AdminShell from "@/components/layout/AdminShell";
 
 // 管理エリア共通レイアウト
@@ -23,10 +24,17 @@ export default async function AdminLayout({
   const role = profile?.role;
   if (role !== "admin" && role !== "developer") redirect("/dashboard");
 
-  const reserveEnabled = await isModuleEnabled(supabase, "M-RESERVE");
+  const [reserveEnabled, theme] = await Promise.all([
+    isModuleEnabled(supabase, "M-RESERVE"),
+    getThemeConfig(supabase),
+  ]);
 
   return (
-    <AdminShell isDeveloper={role === "developer"} reserveEnabled={reserveEnabled}>
+    <AdminShell
+      isDeveloper={role === "developer"}
+      reserveEnabled={reserveEnabled}
+      logoUrl={theme.logoUrl}
+    >
       {children}
     </AdminShell>
   );
