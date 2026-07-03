@@ -10,8 +10,9 @@ import Toast from "@/components/ui/Toast";
 
 // A-02 施設管理（画面設計書 §4.9）
 // モード切替式（A-03 と同パターン）+ カテゴリフィルター + 確定予約あり削除ガード
-// 新規登録モーダルは設計書どおり4フィールド（施設名/カテゴリ/最大人数/利用可否）。
-// time_unit・allow_extension・equipment は DB デフォルト値で登録される
+// Phase2: 延長可否（FAC-10/EXT-01。M-EXTEND 有効時のみ表示）と
+//         時間単価（PRICE-01。M-PRICE 有効時のみ表示、facility_prices に保存）を追加。
+// time_unit・equipment は引き続き DB デフォルト値で登録される
 type Mode = "normal" | "edit" | "delete";
 
 type EditForm = {
@@ -19,6 +20,8 @@ type EditForm = {
   categoryId: string; // "" = 未分類
   maxCapacity: string;
   isActive: boolean;
+  allowExtension: boolean;
+  pricePerUnit: string; // "" = 0円扱い（M-PRICE 有効時のみ使用）
 };
 
 const EMPTY_FORM: EditForm = {
@@ -26,11 +29,17 @@ const EMPTY_FORM: EditForm = {
   categoryId: "",
   maxCapacity: "1",
   isActive: true,
+  allowExtension: false,
+  pricePerUnit: "",
 };
 
 export default function FacilityManager() {
   const [facilities, setFacilities] = useState<FacilityWithCategory[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  // facility_id → 時間単価（facility_prices。行が無い施設は未設定=0円扱い）
+  const [prices, setPrices] = useState<Map<number, number>>(new Map());
+  const [extendEnabled, setExtendEnabled] = useState(false);
+  const [priceEnabled, setPriceEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>("normal");
@@ -50,18 +59,39 @@ export default function FacilityManager() {
   // loading は初期値 true。再取得時は旧データを表示したまま差し替える
   const fetchData = useCallback(async () => {
     const supabase = createClient();
-    const [facilitiesResult, categoriesResult] = await Promise.all([
-      supabase
-        .from("facilities")
-        .select("*, categories(name)")
-        .order("id"),
-      supabase.from("categories").select("*").order("sort_order").order("id"),
-    ]);
-    if (facilitiesResult.error || categoriesResult.error) {
+    const [facilitiesResult, categoriesResult, pricesResult, modulesResult] =
+      await Promise.all([
+        supabase
+          .from("facilities")
+          .select("*, categories(name)")
+          .order("id"),
+        supabase.from("categories").select("*").order("sort_order").order("id"),
+        supabase.from("facility_prices").select("facility_id, price_per_unit"),
+        supabase
+          .from("module_settings")
+          .select("module_id, is_enabled")
+          .in("module_id", ["M-EXTEND", "M-PRICE"]),
+      ]);
+    if (
+      facilitiesResult.error ||
+      categoriesResult.error ||
+      pricesResult.error ||
+      modulesResult.error
+    ) {
       setError("施設の取得に失敗しました");
     } else {
       setFacilities(facilitiesResult.data ?? []);
       setCategories(categoriesResult.data ?? []);
+      setPrices(
+        new Map(
+          (pricesResult.data ?? []).map((p) => [p.facility_id, p.price_per_unit]),
+        ),
+      );
+      const enabled = new Map(
+        (modulesResult.data ?? []).map((m) => [m.module_id, m.is_enabled]),
+      );
+      setExtendEnabled(enabled.get("M-EXTEND") ?? false);
+      setPriceEnabled(enabled.get("M-PRICE") ?? false);
     }
     setLoading(false);
   }, []);
@@ -86,11 +116,14 @@ export default function FacilityManager() {
 
   const selectEditRow = (facility: FacilityWithCategory) => {
     setEditId(facility.id);
+    const price = prices.get(facility.id);
     setEditForm({
       name: facility.name,
       categoryId: facility.category_id === null ? "" : String(facility.category_id),
       maxCapacity: String(facility.max_capacity),
       isActive: facility.is_active,
+      allowExtension: facility.allow_extension,
+      pricePerUnit: price === undefined ? "" : String(price),
     });
   };
 
@@ -107,7 +140,9 @@ export default function FacilityManager() {
   };
 
   // 入力値の共通検証（新規・編集兼用）
-  const validateForm = (form: EditForm): { name: string; capacity: number } | null => {
+  const validateForm = (
+    form: EditForm,
+  ): { name: string; capacity: number; price: number } | null => {
     const name = form.name.trim();
     if (!name) {
       alert("施設名を入力してください");
@@ -118,7 +153,29 @@ export default function FacilityManager() {
       alert("最大人数は1以上の整数で入力してください");
       return null;
     }
-    return { name, capacity };
+    // 料金は M-PRICE 有効時のみ検証。空欄は 0円（未設定）扱い
+    let price = 0;
+    if (priceEnabled && form.pricePerUnit !== "") {
+      price = Number(form.pricePerUnit);
+      if (!Number.isInteger(price) || price < 0) {
+        alert("料金は0以上の整数で入力してください");
+        return null;
+      }
+    }
+    return { name, capacity, price };
+  };
+
+  // facility_prices は施設と別テーブルのため、施設保存後に upsert する
+  const savePrice = async (facilityId: number, price: number) => {
+    if (!priceEnabled) return null;
+    const supabase = createClient();
+    const { error: priceError } = await supabase
+      .from("facility_prices")
+      .upsert(
+        { facility_id: facilityId, price_per_unit: price },
+        { onConflict: "facility_id" },
+      );
+    return priceError;
   };
 
   const handleCreate = async () => {
@@ -126,16 +183,26 @@ export default function FacilityManager() {
     if (!valid) return;
     setSaving(true);
     const supabase = createClient();
-    const { error: insertError } = await supabase.from("facilities").insert({
-      name: valid.name,
-      category_id: createForm.categoryId === "" ? null : Number(createForm.categoryId),
-      max_capacity: valid.capacity,
-      is_active: createForm.isActive,
-    });
-    setSaving(false);
-    if (insertError) {
+    const { data: inserted, error: insertError } = await supabase
+      .from("facilities")
+      .insert({
+        name: valid.name,
+        category_id: createForm.categoryId === "" ? null : Number(createForm.categoryId),
+        max_capacity: valid.capacity,
+        is_active: createForm.isActive,
+        allow_extension: createForm.allowExtension,
+      })
+      .select("id")
+      .single();
+    if (insertError || !inserted) {
+      setSaving(false);
       setError("施設の登録に失敗しました");
       return;
+    }
+    const priceError = await savePrice(inserted.id, valid.price);
+    setSaving(false);
+    if (priceError) {
+      setError("施設は登録しましたが、料金の保存に失敗しました");
     }
     setCreateOpen(false);
     setCreateForm(EMPTY_FORM);
@@ -158,12 +225,18 @@ export default function FacilityManager() {
         category_id: editForm.categoryId === "" ? null : Number(editForm.categoryId),
         max_capacity: valid.capacity,
         is_active: editForm.isActive,
+        allow_extension: editForm.allowExtension,
       })
       .eq("id", editId);
-    setSaving(false);
     if (updateError) {
+      setSaving(false);
       setError("施設の更新に失敗しました");
       return;
+    }
+    const priceError = await savePrice(editId, valid.price);
+    setSaving(false);
+    if (priceError) {
+      setError("施設は更新しましたが、料金の保存に失敗しました");
     }
     switchMode("normal");
     await fetchData();
@@ -223,7 +296,8 @@ export default function FacilityManager() {
       ? facilities
       : facilities.filter((f) => String(f.category_id ?? "") === categoryFilter);
 
-  const columnCount = mode === "normal" ? 5 : 6;
+  const columnCount =
+    (mode === "normal" ? 5 : 6) + (extendEnabled ? 1 : 0) + (priceEnabled ? 1 : 0);
   const inputClass =
     "w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none";
 
@@ -297,6 +371,8 @@ export default function FacilityManager() {
                   <th className="px-4 py-3">カテゴリ</th>
                   <th className="px-4 py-3">定員</th>
                   <th className="px-4 py-3">利用可否</th>
+                  {extendEnabled && <th className="px-4 py-3">延長可否</th>}
+                  {priceEnabled && <th className="px-4 py-3">料金（円/時間単位）</th>}
                 </tr>
               </thead>
               <tbody>
@@ -399,6 +475,50 @@ export default function FacilityManager() {
                           <span className="text-red-500">利用停止中</span>
                         )}
                       </td>
+                      {extendEnabled && (
+                        <td className="px-4 py-3">
+                          {isEditing ? (
+                            <label className="flex items-center gap-1.5 text-sm">
+                              <input
+                                type="checkbox"
+                                checked={editForm.allowExtension}
+                                onChange={(e) =>
+                                  setEditForm((f) => ({
+                                    ...f,
+                                    allowExtension: e.target.checked,
+                                  }))
+                                }
+                              />
+                              延長可
+                            </label>
+                          ) : facility.allow_extension ? (
+                            "延長可"
+                          ) : (
+                            <span className="text-gray-400">延長不可</span>
+                          )}
+                        </td>
+                      )}
+                      {priceEnabled && (
+                        <td className="px-4 py-3">
+                          {isEditing ? (
+                            <input
+                              type="number"
+                              min={0}
+                              value={editForm.pricePerUnit}
+                              onChange={(e) =>
+                                setEditForm((f) => ({
+                                  ...f,
+                                  pricePerUnit: e.target.value,
+                                }))
+                              }
+                              placeholder="0"
+                              className={`${inputClass} max-w-24`}
+                            />
+                          ) : (
+                            `${(prices.get(facility.id) ?? 0).toLocaleString()}円`
+                          )}
+                        </td>
+                      )}
                     </tr>
                   );
                 })}
@@ -502,16 +622,54 @@ export default function FacilityManager() {
             className={inputClass}
           />
         </div>
-        <label className="flex items-center gap-2 text-sm font-medium">
-          <input
-            type="checkbox"
-            checked={createForm.isActive}
-            onChange={(e) =>
-              setCreateForm((f) => ({ ...f, isActive: e.target.checked }))
-            }
-          />
-          利用可否
-        </label>
+        {priceEnabled && (
+          <div className="mb-4">
+            <label
+              htmlFor="facility-price"
+              className="mb-1 block text-sm font-medium"
+            >
+              料金（円/時間単位）
+            </label>
+            <input
+              id="facility-price"
+              type="number"
+              min={0}
+              value={createForm.pricePerUnit}
+              onChange={(e) =>
+                setCreateForm((f) => ({ ...f, pricePerUnit: e.target.value }))
+              }
+              placeholder="例：1000（空欄は0円）"
+              className={inputClass}
+            />
+          </div>
+        )}
+        <div className="flex items-center gap-6">
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              checked={createForm.isActive}
+              onChange={(e) =>
+                setCreateForm((f) => ({ ...f, isActive: e.target.checked }))
+              }
+            />
+            利用可否
+          </label>
+          {extendEnabled && (
+            <label className="flex items-center gap-2 text-sm font-medium">
+              <input
+                type="checkbox"
+                checked={createForm.allowExtension}
+                onChange={(e) =>
+                  setCreateForm((f) => ({
+                    ...f,
+                    allowExtension: e.target.checked,
+                  }))
+                }
+              />
+              時間延長を許可
+            </label>
+          )}
+        </div>
       </Modal>
     </div>
   );
