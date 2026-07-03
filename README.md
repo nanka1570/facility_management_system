@@ -6,6 +6,26 @@
 
 企業の会議室、レンタルスペース、カラオケ店の部屋など、さまざまな「施設」の予約を管理するシステムです。モジュール設計により、顧客ごとに必要な機能のみをON/OFFして提供できます。
 
+## リポジトリ構成と開発ワークフロー
+
+このリポジトリには、同一の設計書から作られた複数の実装が併存します。
+
+| パス | 役割 |
+|------|------|
+| `PHP/` | 卒業制作のPHP版（リライト元。参照用） |
+| `React/documents/` | 設計書3点（要件定義・DB設計・画面設計）と比較評価レポート |
+| `React/Projects/` | **自作版** — 学習の主体。本README以下の説明はこの実装のもの |
+| `React/fable-projects/` | **見本（完成形）** — Claude Fable 5 が設計書のみを入力に実装 |
+
+### 学習ワークフロー
+
+1. 設計書（`React/documents/`）を基に、まず**自分で実装する**（`React/Projects/`）
+2. Claude Fable 5 が同じ設計書から**見本（完成形）を実装する**（`React/fable-projects/`。自作版のコードは参照しない）
+3. **見本と自作版の両方を fable に比較評価してもらう**（結果: `React/documents/04_比較評価レポート_v1.2.md`）
+4. 評価で見つかった差分を、見本コードのコピーではなく**自分の手で自作版に反映する**
+
+見本はあくまで参照用（解答例）であり、自作版へのコード転記は行わない。学習効果とポートフォリオとしての価値が失われるため。
+
 ## 技術スタック
 
 | 層 | 技術 |
@@ -34,7 +54,7 @@
 ### 認証
 
 - **ログイン / 新規登録（C-01）** — メール・パスワード認証
-- **パスワードリセット（C-03）**
+  - パスワードリセット（C-03）はPhase 2で対応予定
 
 ### データ整合性
 
@@ -64,26 +84,24 @@
 ## ディレクトリ構成
 
 ```
-src/
+React/Projects/src/
 ├── app/
+│   ├── layout.tsx                  # ルートレイアウト
 │   ├── page.tsx                    # ログイン / 新規登録（C-01）
-│   ├── reservations/
-│   │   └── page.tsx                # 予約カレンダー（U-02）
-│   ├── mypage/
-│   │   └── page.tsx                # マイページ（U-04）
-│   └── admin/
-│       ├── categories/
-│       │   └── page.tsx            # カテゴリ管理（A-03）
-│       ├── facilities/
-│       │   └── page.tsx            # 施設管理（A-02）
-│       ├── reservations/
-│       │   └── page.tsx            # 予約管理（A-04）
-│       └── settings/
-│           └── page.tsx            # システム設定（A-08）
-├── components/
-│   └── Header.tsx                  # 共通ヘッダー
-└── lib/
-    └── supabase.ts                 # Supabaseクライアント
+│   ├── (user)/                     # 一般ユーザー画面（認証ガード付きレイアウト）
+│   │   ├── layout.tsx
+│   │   ├── dashboard/page.tsx      # ダッシュボード（U-01）
+│   │   ├── reservations/page.tsx   # 予約カレンダー（U-02）
+│   │   └── mypage/page.tsx         # マイページ（U-04）
+│   └── admin/                      # 管理者画面（admin/developerガード付きレイアウト）
+│       ├── layout.tsx
+│       ├── dashboard/page.tsx      # 管理者ダッシュボード（A-01）
+│       ├── facilities/page.tsx     # 施設管理（A-02）
+│       ├── categories/page.tsx     # カテゴリ管理（A-03）
+│       ├── reservations/page.tsx   # 予約管理（A-04）
+│       └── settings/page.tsx       # モジュール設定（A-08）
+├── components/                     # Header / AdminSidebar / UserSidebar / StatusBadge / Loading / Auth
+└── lib/                            # supabase / types / constants / validation / utils / selection
 ```
 
 ## データベース
@@ -137,9 +155,10 @@ npm run dev
 
 | ドキュメント | 内容 |
 |------------|------|
-| `documents/01_要件定義書_v2.3.md` | 要件定義、モジュール構成、技術スタック |
-| `documents/02_DB設計書_v1.0.md` | テーブル定義、ER図、RLS設定 |
-| `documents/03_画面設計書_v1.5.md` | 画面一覧、ワイヤーフレーム、仕様 |
+| `React/documents/01_要件定義書_v2.3.md` | 要件定義、モジュール構成、技術スタック |
+| `React/documents/02_DB設計書_v1.0.md` | テーブル定義、ER図、RLS設定 |
+| `React/documents/03_画面設計書_v2.0.md` | 画面一覧、ワイヤーフレーム、仕様 |
+| `React/documents/04_比較評価レポート_v1.2.md` | 自作版とfable見本の比較評価（must要件充足・観点別スコア・設計書準拠） |
 
 ## 開発期間
 
