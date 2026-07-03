@@ -135,7 +135,24 @@ export default function ThemeSettingsPanel() {
             <input
               type="checkbox"
               checked={useCustom}
-              onChange={(e) => setUseCustom(e.target.checked)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setUseCustom(checked);
+                // ON にした時点で現在のテンプレート色を初期値に確定させる
+                // （null のままだと「プレビュー≠保存結果」の食い違いが起きる）
+                if (checked) {
+                  setConfig((c) =>
+                    c && c.customColor === null
+                      ? {
+                          ...c,
+                          customColor:
+                            THEME_TEMPLATES.find((t) => t.id === c.template)
+                              ?.primary ?? "#3b82f6",
+                        }
+                      : c,
+                  );
+                }
+              }}
             />
             カスタムカラーを使う（テンプレートより優先）
           </label>

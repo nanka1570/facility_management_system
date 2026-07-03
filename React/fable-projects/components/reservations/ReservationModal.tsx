@@ -68,6 +68,9 @@ export default function ReservationModal({
   const [formError, setFormError] = useState<string | null>(null);
 
   // Phase2: モジュール状態と付帯データ（モーダル自身が取得し、親は関知しない）
+  // extrasLoaded が false の間は保存操作を禁止する。
+  // 既存備品の読込完了前に更新すると空の選択で総入れ替え（=備品全削除）になるため
+  const [extrasLoaded, setExtrasLoaded] = useState(false);
   const [priceEnabled, setPriceEnabled] = useState(false);
   const [itemEnabled, setItemEnabled] = useState(false);
   const [extendEnabled, setExtendEnabled] = useState(false);
@@ -122,6 +125,7 @@ export default function ReservationModal({
         );
         setRecordedSubtotal(subtotalResult.data?.subtotal ?? null);
       }
+      setExtrasLoaded(true);
     };
     load();
     // reservation は state から導出される固定値のため facility.id のみ依存に含める
@@ -236,6 +240,9 @@ export default function ReservationModal({
 
     setSaving(true);
     const supabase = createClient();
+
+    // 1) 予約本体の保存
+    let savedId: number;
     try {
       // 重複チェック（画面設計書 §4.5・§4.6。編集時は自分自身を除外）
       const overlap = await hasOverlap(supabase, {
@@ -263,7 +270,7 @@ export default function ReservationModal({
           .select("id")
           .single();
         if (error || !inserted) throw error ?? new Error("insert failed");
-        await saveExtras(supabase, inserted.id, startDate, endDate);
+        savedId = inserted.id;
       } else {
         const { error } = await supabase
           .from("reservations")
@@ -275,14 +282,29 @@ export default function ReservationModal({
           })
           .eq("id", state.reservation.id);
         if (error) throw error;
-        await saveExtras(supabase, state.reservation.id, startDate, endDate);
+        savedId = state.reservation.id;
       }
-      onSaved();
     } catch {
       setFormError(isCreate ? "予約に失敗しました" : "更新に失敗しました");
+      setSaving(false);
+      return;
+    }
+
+    // 2) 付帯情報（備品・料金）の保存。
+    //    予約本体は既に保存済みのため、ここで失敗しても「予約失敗」とは
+    //    表示しない（再試行による二重予約を防ぐ）。警告して閉じる
+    try {
+      await saveExtras(supabase, savedId, startDate, endDate);
+    } catch {
+      alert(
+        isCreate
+          ? "予約は登録しましたが、料金・備品の保存に失敗しました"
+          : "予約は更新しましたが、料金・備品の保存に失敗しました",
+      );
     } finally {
       setSaving(false);
     }
+    onSaved();
   };
 
   // U-06 時間延長申請（EXT-02〜05）。利用中の自分の予約の終了時刻を延ばす
@@ -366,7 +388,8 @@ export default function ReservationModal({
         <Button variant="secondary" onClick={onClose}>
           キャンセル
         </Button>
-        <Button onClick={handleSubmit} loading={saving}>
+        {/* extrasLoaded 前はモジュール状態が未確定のため保存を禁止する */}
+        <Button onClick={handleSubmit} loading={saving} disabled={!extrasLoaded}>
           予約する
         </Button>
       </>
@@ -385,7 +408,12 @@ export default function ReservationModal({
         <Button variant="secondary" onClick={onClose}>
           閉じる
         </Button>
-        <Button onClick={handleSubmit} loading={saving} disabled={cancelling}>
+        {/* extrasLoaded 前に更新すると既存備品を空の選択で総入れ替えしてしまう */}
+        <Button
+          onClick={handleSubmit}
+          loading={saving}
+          disabled={cancelling || !extrasLoaded}
+        >
           更新
         </Button>
       </>

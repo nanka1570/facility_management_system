@@ -165,7 +165,7 @@ update public.profiles set role = 'developer' where email = '自分のメール�
 ### Phase2 での補正・逸脱
 
 10. **Phase2 テーブルの RLS・インデックスを補完**: DB設計書 §4 は Phase1 テーブルのみのため、同じ方針（参照は authenticated、マスタ更新は admin、予約付随は本人+admin、問い合わせは本人+admin のみ参照可）で `schema_phase2.sql` に定義した。
-11. **A-05 用の `profiles_update_admin` を追加**: admin は他ユーザーの role を user/admin にのみ変更でき、developer 行は変更不可（画面設計書 §4.12）。RLS は列単位の制限ができないため role 以外の列も更新可能になる点は既知の制約。UI では自分自身の行も変更不可にした（自己降格による管理不能を防ぐ）。
+11. **A-05 用の `profiles_update_admin` を追加**: admin は他ユーザーの role を user/admin にのみ変更でき、developer 行は変更不可（画面設計書 §4.12）。RLS は列単位の制限ができないため role 以外の列も更新可能になる点は既知の制約。UI では自分自身の行も変更不可にした（自己降格による管理不能を防ぐ）。なお一覧の ID 列は、`profiles` の PK が UUID（ワイヤーフレームの連番と異なる）のため表示していない。
 12. **新パスワード設定画面（`/reset-password/update`）を追加**: 画面設計書 §4.2 はメール送信画面のみのため、リカバリーリンクの着地画面を補完した。
 13. **テーマの保存先は `module_settings.config`**: DB設計書にテーマ用テーブルが無いため、M-THEME 行の config（JSONB）に `{template, customColor, logoUrl}` を保存する。ロゴはURL指定のみ（アップロードは Supabase Storage 導入が必要なため未対応）。
 14. **料金は時間単位で切り上げ**: 施設料金 = ceil(利用分数 / time_unit) × 単価。`reservation_prices.subtotal` には施設料金+備品料金の合計を予約確定・変更・延長のたびに再計算して記録する。
@@ -182,3 +182,5 @@ update public.profiles set role = 'developer' where email = '自分のメール�
 - **備品の在庫競合チェックは未実装**（ITEM-04 在庫管理 = Phase3）。同一時間帯に複数予約が同じ備品を選ぶと総数を超え得る。上限は「備品の総数」のみ。
 - **料金の履歴は持たない**（PRICE-03 = Phase3）。`reservation_prices.subtotal` は予約変更・延長のたびに上書きされる。
 - **キャンセル時の料金・備品は削除しない**: キャンセルは status 変更のみ（論理削除）のため、記録された料金・備品はそのまま残る。復元時にも再利用される。
+- **備品選択の保存は非原子的**（削除→挿入の2段階）。削除成功後に挿入が失敗すると選択が失われる（画面には警告を表示）。確実性が必要なら RPC（ストアドファンクション）でのトランザクション化が必要。
+- **料金・備品の記録は U-03（ユーザーの予約モーダル）経由の操作でのみ更新される**。A-04（管理者の予約管理）のインライン編集で日時を変えても `reservation_prices` は再計算されない（A-04 は Phase1 実装のままのため。料金運用と管理者編集を併用する場合は A-04 への連携追加が必要）。

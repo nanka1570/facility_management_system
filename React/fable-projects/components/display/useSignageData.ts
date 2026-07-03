@@ -21,12 +21,15 @@ export function useSignageData() {
     const { startISO, endISO } = getDayRangeISO(jstToday());
     const [facilitiesResult, reservationsResult] = await Promise.all([
       supabase.from("facilities").select("*").eq("is_active", true).order("id"),
+      // 「本日と重なる予約」を半開区間 [start, end) で取得する（hasOverlap と同じ規約）。
+      // start_time だけで絞ると前日から続く日跨ぎ予約が漏れ、
+      // 利用中の施設が「空き」と誤表示される
       supabase
         .from("reservations")
         .select("*")
         .eq("status", "confirmed")
-        .gte("start_time", startISO)
         .lt("start_time", endISO)
+        .gt("end_time", startISO)
         .order("start_time"),
     ]);
     if (facilitiesResult.error || reservationsResult.error) {

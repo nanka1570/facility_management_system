@@ -89,7 +89,7 @@ export default function InquiryPanel({
         .insert({ user_id: currentUserId, subject: trimmedSubject })
         .select("id")
         .single();
-      if (inquiryError || !inserted) throw inquiryError;
+      if (inquiryError || !inserted) throw inquiryError ?? new Error("insert failed");
       const { error: messageError } = await supabase
         .from("inquiry_messages")
         .insert({
