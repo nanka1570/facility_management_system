@@ -3,11 +3,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { hasOverlap, getEffectiveStatus, overlapsRange } from "@/lib/reservations";
+import { downloadCsv } from "@/lib/csv";
 import {
   formatJstDateTime,
   fromDatetimeLocal,
   fromDateInput,
   getDayRangeISO,
+  toDateInput,
   toDatetimeLocal,
 } from "@/lib/datetime";
 import type { Facility, ReservationWithDetails } from "@/types/database";
@@ -341,6 +343,29 @@ export default function ReservationManager({
     return true;
   });
 
+  // RES-08 予約履歴エクスポート: 現在のフィルター適用後の一覧を CSV 出力する
+  const handleExportCsv = () => {
+    const statusLabels = {
+      confirmed: "確定",
+      cancelled: "キャンセル",
+      completed: "完了",
+    } as const;
+    downloadCsv(
+      `reservations_${toDateInput(new Date())}.csv`,
+      ["ID", "施設名", "予約者", "開始日時", "終了日時", "ステータス", "人数", "目的"],
+      visibleReservations.map((r) => [
+        r.id,
+        r.facilities?.name ?? "-",
+        r.profiles?.display_name ?? "-",
+        formatJstDateTime(r.start_time),
+        formatJstDateTime(r.end_time),
+        statusLabels[getEffectiveStatus(r)],
+        r.num_people,
+        r.purpose ?? "",
+      ]),
+    );
+  };
+
   const columnCount = mode === "normal" ? 7 : 8;
   const inputClass =
     "w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none";
@@ -407,6 +432,13 @@ export default function ReservationManager({
             className="rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
           />
         </div>
+        <Button
+          variant="secondary"
+          onClick={handleExportCsv}
+          disabled={visibleReservations.length === 0}
+        >
+          CSVエクスポート
+        </Button>
       </div>
 
       {loading ? (

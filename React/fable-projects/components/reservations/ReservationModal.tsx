@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { hasOverlap, getEffectiveStatus } from "@/lib/reservations";
+import { findItemShortages } from "@/lib/items";
 import { calcFacilityCharge, calcItemsCharge } from "@/lib/pricing";
 import {
   formatJstDate,
@@ -253,7 +254,24 @@ export default function ReservationModal({
       });
       if (overlap) {
         alert("指定の時間帯は既に予約されています");
+        setSaving(false);
         return;
+      }
+
+      // ITEM-04 在庫チェック: 同一時間帯の貸出合計が総数を超えないか
+      if (itemEnabled && itemQty.size > 0) {
+        const shortages = await findItemShortages(supabase, {
+          requests: itemQty,
+          items,
+          startISO: startDate.toISOString(),
+          endISO: endDate.toISOString(),
+          excludeReservationId: isEdit && reservation ? reservation.id : undefined,
+        });
+        if (shortages.length > 0) {
+          alert(`備品の在庫が不足しています: ${shortages.join("、")}`);
+          setSaving(false);
+          return;
+        }
       }
 
       if (state.mode === "create") {

@@ -9,12 +9,19 @@ import StatusBadge from "@/components/ui/StatusBadge";
 
 // U-04 予約履歴（画面設計書 §4.7）
 // 全ステータスを新しい順に表示。デフォルト直近5件 ⇔ 全件をトグルで切替
+// M-PRICE 有効時は記録済み料金（reservation_prices.subtotal）を表示（PRICE-03）
 const DEFAULT_COUNT = 5;
+
+type HistoryRow = ReservationWithFacility & {
+  reservation_prices: { subtotal: number } | null;
+};
 
 export default function ReservationHistory({
   reservations,
+  priceEnabled = false,
 }: {
-  reservations: ReservationWithFacility[];
+  reservations: HistoryRow[];
+  priceEnabled?: boolean;
 }) {
   const [showAll, setShowAll] = useState(false);
 
@@ -41,6 +48,7 @@ export default function ReservationHistory({
                 <th className="px-4 py-3">日付</th>
                 <th className="px-4 py-3">時間</th>
                 <th className="px-4 py-3">施設</th>
+                {priceEnabled && <th className="px-4 py-3">料金</th>}
                 <th className="px-4 py-3">ステータス</th>
               </tr>
             </thead>
@@ -54,6 +62,13 @@ export default function ReservationHistory({
                   <td className="px-4 py-3">
                     {r.facilities?.name ?? "（施設不明）"}
                   </td>
+                  {priceEnabled && (
+                    <td className="px-4 py-3 tabular-nums">
+                      {r.reservation_prices
+                        ? `${r.reservation_prices.subtotal.toLocaleString()}円`
+                        : "-"}
+                    </td>
+                  )}
                   <td className="px-4 py-3">
                     <StatusBadge status={getEffectiveStatus(r)} />
                   </td>

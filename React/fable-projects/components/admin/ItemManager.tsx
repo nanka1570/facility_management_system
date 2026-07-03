@@ -23,6 +23,8 @@ const EMPTY_FORM: EditForm = { name: "", totalQuantity: "1", rentalPrice: "" };
 
 export default function ItemManager() {
   const [items, setItems] = useState<Item[]>([]);
+  // item_id → 現在時刻に貸出中の数量合計（ITEM-04 在庫状況確認）
+  const [inUse, setInUse] = useState<Map<number, number>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>("normal");
@@ -39,19 +41,32 @@ export default function ItemManager() {
 
   const fetchData = useCallback(async () => {
     const supabase = createClient();
-    const [itemsResult, moduleResult] = await Promise.all([
+    const nowISO = new Date().toISOString();
+    const [itemsResult, moduleResult, inUseResult] = await Promise.all([
       supabase.from("items").select("*").order("id"),
       supabase
         .from("module_settings")
         .select("is_enabled")
         .eq("module_id", "M-PRICE")
         .single(),
+      // 現在時刻に利用中（confirmed かつ start <= now < end）の予約に紐づく貸出数
+      supabase
+        .from("reservation_items")
+        .select("item_id, quantity, reservations!inner(status, start_time, end_time)")
+        .eq("reservations.status", "confirmed")
+        .lte("reservations.start_time", nowISO)
+        .gt("reservations.end_time", nowISO),
     ]);
     if (itemsResult.error) {
       setError("備品の取得に失敗しました");
     } else {
       setItems(itemsResult.data ?? []);
       setPriceEnabled(moduleResult.data?.is_enabled ?? false);
+      const counts = new Map<number, number>();
+      for (const row of inUseResult.data ?? []) {
+        counts.set(row.item_id, (counts.get(row.item_id) ?? 0) + row.quantity);
+      }
+      setInUse(counts);
     }
     setLoading(false);
   }, []);
@@ -209,7 +224,7 @@ export default function ItemManager() {
     await fetchData();
   };
 
-  const columnCount = (mode === "normal" ? 3 : 4) + (priceEnabled ? 1 : 0);
+  const columnCount = (mode === "normal" ? 4 : 5) + (priceEnabled ? 1 : 0);
   const inputClass =
     "w-full rounded-md border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none";
 
@@ -248,6 +263,7 @@ export default function ItemManager() {
                   <th className="px-4 py-3">ID</th>
                   <th className="px-4 py-3">備品名</th>
                   <th className="px-4 py-3">総数</th>
+                  <th className="px-4 py-3">貸出中（現在）</th>
                   {priceEnabled && <th className="px-4 py-3">貸出単価</th>}
                 </tr>
               </thead>
@@ -311,6 +327,9 @@ export default function ItemManager() {
                         ) : (
                           item.total_quantity
                         )}
+                      </td>
+                      <td className="px-4 py-3 tabular-nums">
+                        {inUse.get(item.id) ?? 0} / {item.total_quantity}
                       </td>
                       {priceEnabled && (
                         <td className="px-4 py-3">
