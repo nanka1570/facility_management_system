@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { hasOverlap, getEffectiveStatus, overlapsRange } from "@/lib/reservations";
+import { notify } from "@/lib/notify";
 import { downloadCsv } from "@/lib/csv";
 import {
   formatJstDateTime,
@@ -255,14 +256,19 @@ export default function ReservationManager({
     }
     setSaving(true);
     const supabase = createClient();
+    const cancelledIds = Array.from(selectedIds);
     const { error: updateError } = await supabase
       .from("reservations")
       .update({ status: "cancelled" })
-      .in("id", Array.from(selectedIds));
+      .in("id", cancelledIds);
     setSaving(false);
     if (updateError) {
       setError("予約のキャンセルに失敗しました");
       return;
+    }
+    // NOTIF-03 キャンセル通知（管理者都合のキャンセルを予約者へ通知）
+    for (const id of cancelledIds) {
+      void notify(supabase, { type: "reservation_cancelled", reservationId: id });
     }
     switchMode("normal");
     await fetchData();

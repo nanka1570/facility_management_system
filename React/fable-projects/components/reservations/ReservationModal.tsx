@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { hasOverlap, getEffectiveStatus } from "@/lib/reservations";
 import { findItemShortages } from "@/lib/items";
+import { notify } from "@/lib/notify";
 import { calcFacilityCharge, calcItemsCharge } from "@/lib/pricing";
 import {
   formatJstDate,
@@ -289,6 +290,11 @@ export default function ReservationModal({
           .single();
         if (error || !inserted) throw error ?? new Error("insert failed");
         savedId = inserted.id;
+        // NOTIF-01 予約完了メール（M-NOTIFY 有効時のみ。失敗しても本処理は継続）
+        void notify(supabase, {
+          type: "reservation_created",
+          reservationId: inserted.id,
+        });
       } else {
         const { error } = await supabase
           .from("reservations")
@@ -390,6 +396,11 @@ export default function ReservationModal({
       setFormError("キャンセルに失敗しました");
       return;
     }
+    // NOTIF-03 キャンセル通知
+    void notify(supabase, {
+      type: "reservation_cancelled",
+      reservationId: reservation.id,
+    });
     onSaved();
   };
 

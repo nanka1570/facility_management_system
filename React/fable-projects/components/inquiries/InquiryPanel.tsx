@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { notify } from "@/lib/notify";
 import { formatJstDate } from "@/lib/datetime";
 import type { Inquiry, InquiryMessageWithSender } from "@/types/database";
 import Button from "@/components/ui/Button";
@@ -99,6 +100,8 @@ export default function InquiryPanel({
           message: trimmedBody,
         });
       if (messageError) throw messageError;
+      // NOTIF-04 問い合わせ通知（管理者へ。M-NOTIFY 有効時のみ）
+      void notify(supabase, { type: "inquiry_created", inquiryId: inserted.id });
       setCreateOpen(false);
       setSubject("");
       setBody("");
