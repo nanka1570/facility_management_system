@@ -2,7 +2,7 @@
 
 専門学校卒業制作の PHP 版「汎用施設管理システム」を、`React/documents/` の設計書3点（要件定義書 v2.3 / DB設計書 v1.0 / 画面設計書 v2.0）に従って Next.js でリライトしたものです。**Claude Code（Fable 5）が設計書のみを情報源として実装**しています（既存実装 `React/Projects/` は参照していません）。
 
-実装スコープは **Phase1（コア機能）+ Phase2（拡張機能）** です。Phase3（メール通知・マルチテナント等）は未実装です。
+実装スコープは **Phase1（コア機能）+ Phase2（拡張機能）+ Phase3（高度な機能）＝全フェーズ（完成形）** です。
 
 > **このプロジェクトの位置づけ**: 学習ワークフローにおける**見本（完成形）**です。進め方は「①最初にユーザー自身が `React/Projects/`（自作版）を実装 → ②fableが本見本を実装 → ③見本と自作版の両方を fable が比較評価（`React/documents/04_比較評価レポート_v1.2.md`）→ ④差分を自分の手で自作版に反映」。見本のコードを自作版へコピーすることはしません（詳細はリポジトリルートの README 参照）。
 
@@ -37,8 +37,11 @@
 | A-07 | 問い合わせ管理 | `/admin/inquiries` | admin 以上・M-INQUIRY | 2 |
 | A-08 | モジュール設定 | `/admin/settings` | developer のみ | 1 |
 | A-09 | テーマ設定 | `/admin/theme` | developer のみ・M-THEME | 2 |
-| D-01 | サイネージ（全体） | `/display` | ログイン済み・M-DISPLAY | 2 |
-| D-02 | サイネージ（施設別） | `/display/[id]` | ログイン済み・M-DISPLAY | 2 |
+| D-01 | サイネージ（全体） | `/display` | ログイン済み・M-DISPLAY | 2+3 |
+| D-02 | サイネージ（施設別） | `/display/[id]` | ログイン済み・M-DISPLAY | 2+3 |
+| - | テナント管理 | `/admin/tenants` | developer のみ・M-TENANT | 3 |
+
+Phase3 の画面を伴わない機能: RES-08 CSVエクスポート（A-04内）、PRICE-03 料金履歴（U-04内）、ITEM-04 在庫管理（U-03の予約時チェック+A-06の貸出中表示）、INQ-05 チャット形式表示（U-05/A-07内）、THEME-04 フォント選択（A-09内）、DISP-05 表示項目カスタマイズ（A-08内）、NOTIF-01〜04 メール通知（Edge Function）。
 
 ## セットアップ手順
 
@@ -56,11 +59,26 @@
 1. Supabase Dashboard → **SQL Editor** を開く
 2. [`supabase/schema.sql`](./supabase/schema.sql) の内容を全て貼り付けて **Run** する
 3. 続けて [`supabase/schema_phase2.sql`](./supabase/schema_phase2.sql) を貼り付けて **Run** する（Phase2 増分）
-4. **Table Editor** で以下を確認する
+4. 続けて [`supabase/schema_phase3.sql`](./supabase/schema_phase3.sql) を貼り付けて **Run** する（Phase3 増分: マルチテナント）
+5. **Table Editor** で以下を確認する
    - Phase1 テーブル5つ: `profiles` / `categories` / `facilities` / `reservations` / `module_settings`
    - Phase2 テーブル6つ: `facility_prices` / `reservation_prices` / `items` / `reservation_items` / `inquiries` / `inquiry_messages`
+   - Phase3 テーブル: `tenants`（+ 主要テーブルに `tenant_id` 列）
    - `module_settings` に12行（M-CORE〜M-TENANT）
    - `categories` に3行、`facilities` に4行
+
+#### （任意）メール通知（M-NOTIFY）を使う場合
+
+[Resend](https://resend.com) の API キーを取得し、Edge Function をデプロイする:
+
+```bash
+supabase functions deploy send-notification
+supabase secrets set RESEND_API_KEY=re_xxx NOTIFY_FROM="施設管理システム <onboarding@resend.dev>"
+```
+
+リマインダー（NOTIF-02）は Dashboard → Edge Functions → Schedules で
+`send-notification` を毎日1回、リクエストボディ `{"type":"reminder"}` で実行するよう設定する。
+未デプロイでも他機能には影響しない（通知は静かにスキップされる）。
 
 > Phase2 の各機能（延長・サイネージ・料金・備品・問い合わせ・テーマ）は、A-08 で対応モジュール（M-EXTEND / M-DISPLAY / M-PRICE / M-ITEM / M-INQUIRY / M-THEME）を ON にすると有効になります（初期値は OFF）。
 > パスワードリセット（C-03）のメールリンク先は Dashboard → **Authentication → URL Configuration** の Redirect URLs に `http://localhost:3000/reset-password/update` を追加してください。
@@ -148,6 +166,17 @@ update public.profiles set role = 'developer' where email = '自分のメール�
 - [ ] M-THEME ON: A-09 でテンプレート変更 → 主要ボタン・タブ・スピナーの色が変わる／ロゴURL設定で Header のロゴが替わる
 - [ ] 各モジュール OFF: 対応する画面・導線が消え、直アクセスがリダイレクトされる
 
+### Phase3 機能
+
+- [ ] A-04: CSVエクスポート → フィルター適用後の一覧がExcelで文字化けせず開ける
+- [ ] M-ITEM ON: 同一時間帯に総数を超える備品予約 → 中止されアラートが出る／A-06に貸出中数が出る
+- [ ] M-PRICE ON: U-04の予約履歴に料金列が表示される
+- [ ] M-INQUIRY ON: U-05/A-07が吹き出し形式（自分=右・テーマ色）で表示される
+- [ ] M-THEME ON: A-09でフォント変更 → 全画面のフォントが変わる
+- [ ] M-DISPLAY ON: A-08のサイネージ表示設定で「本日の時間帯一覧」をOFF → D-01/D-02から消える
+- [ ] M-NOTIFY ON（要デプロイ）: 予約確定・キャンセル・問い合わせ投稿でメールが届く
+- [ ] M-TENANT ON: テナント作成 → ユーザーを割当 → 割当ユーザーは自テナント+共有のデータのみ見える／新規作成データが自テナントに自動割当される／developerは全テナントを閲覧できる
+
 ## 設計判断メモ（設計書からの意図的な補正・逸脱）
 
 実装は設計書3点に準拠していますが、以下は設計書の不整合・不足に対する意図的な補正です。
@@ -173,6 +202,14 @@ update public.profiles set role = 'developer' where email = '自分のメール�
 16. **サイドバーへの A-06 / A-07 / U-05 の配置**: 画面設計書 §3.2 のグループ構成に無いため、備品管理は「施設・予約」、問い合わせ管理は「ユーザー」グループ、ユーザー画面の問い合わせは「予約」の下に配置した。
 17. **時間延長は編集モーダル内に設置**: U-06 は独立モーダルではなく、利用中の自分の予約の編集画面（U-03）内のセクションとした（対象条件: M-EXTEND 有効・施設が延長可・現在利用中）。
 
+### Phase3 での補正・逸脱
+
+18. **通知はIDのみを渡す設計**: Edge Function は呼び出し側から reservationId / inquiryId のみ受け取り、宛先・本文はサービスロールで DB から再構築する（宛先・本文の偽装を防ぐ）。通知は補助機能のため呼び出しは fire-and-forget とし、失敗・未デプロイでも本処理を妨げない。
+19. **テナントの分離方式**: `tenant_id = NULL` は「共有（未割当）」で全テナントから見える。行作成時は作成者の所属テナントを BEFORE INSERT トリガーで自動引き継ぎ（アプリのクエリ変更不要）。developer は運用管理のため全テナントを閲覧でき、「テナント切り替え」（TENANT-02）は新規作成データの割当先を変える操作として機能する。
+20. **ITEM-05（備品料金設定）は Phase2 で先行実装済み**（A-06 の貸出単価入力）。
+21. **料金履歴（PRICE-03）は「予約ごとの現在の記録」の一覧**: `reservation_prices` は履歴テーブルではなく予約1件につき1行（変更時上書き）のため、金額の変遷までは追えない（既知の制約参照）。
+22. **サイネージの施設名と利用中/空き表示は常時表示**（DISP-05 の設定対象外）: サイネージの主目的のため。
+
 ## 既知の制約
 
 - **重複チェックはアプリ層で実施**しており、まったく同時の送信では理論上すり抜ける可能性がある。確実に防ぎたい場合は `supabase/schema.sql` 末尾のコメントアウトされた EXCLUDE 制約を適用する。
@@ -184,3 +221,8 @@ update public.profiles set role = 'developer' where email = '自分のメール�
 - **キャンセル時の料金・備品は削除しない**: キャンセルは status 変更のみ（論理削除）のため、記録された料金・備品はそのまま残る。復元時にも再利用される。
 - **備品選択の保存は非原子的**（削除→挿入の2段階）。削除成功後に挿入が失敗すると選択が失われる（画面には警告を表示）。確実性が必要なら RPC（ストアドファンクション）でのトランザクション化が必要。
 - **料金・備品の記録は U-03（ユーザーの予約モーダル）経由の操作でのみ更新される**。A-04（管理者の予約管理）のインライン編集で日時を変えても `reservation_prices` は再計算されない（A-04 は Phase1 実装のままのため。料金運用と管理者編集を併用する場合は A-04 への連携追加が必要）。
+- **備品の在庫チェック（ITEM-04）はアプリ層のみ**: 重複予約チェックと同様、完全同時の送信では理論上すり抜けうる。
+- **サブドメインによるテナント切替（tenants.subdomain）はルーティング未対応**: DNS・ホスティング設定が必要なため、subdomain は登録のみ。テナントの切替はユーザーの所属（profiles.tenant_id）で行う。
+- **module_settings（モジュールON/OFF・テーマ等）はテナント別ではなく全体共通**（TENANT-03 の一部未対応）。
+- **メール通知は失敗を通知しない**（fire-and-forget）。到達保証が必要な場合はキュー・リトライの導入が必要。リマインダー（NOTIF-02）はスケジュール設定（毎日実行）が前提。
+- **schema_phase3.sql 適用後、既存データは「共有（tenant_id=NULL）」のまま**で全テナントから見える。テナント運用を始める場合は既存行の tenant_id を割り当てること。
