@@ -7,7 +7,8 @@ config.php
 *.sql
 *.db
 # fable-projects のスキーマ定義はセットアップ資材としてコミット対象
-!React/fable-projects/supabase/schema.sql
+# （schema.sql / schema_phase2.sql / schema_phase3.sql など全フェーズ分）
+!React/fable-projects/supabase/*.sql
 
 # テスト生成物（Playwright MCP）
 .playwright-mcp/
