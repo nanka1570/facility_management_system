@@ -9,6 +9,9 @@ import AdminSidebar from "@/components/layout/AdminSidebar";
 type Props = {
   isDeveloper: boolean;
   reserveEnabled: boolean;
+  itemEnabled: boolean;
+  inquiryEnabled: boolean;
+  themeEnabled: boolean;
   logoUrl?: string | null;
   children: ReactNode;
 };
@@ -16,6 +19,9 @@ type Props = {
 export default function AdminShell({
   isDeveloper,
   reserveEnabled,
+  itemEnabled,
+  inquiryEnabled,
+  themeEnabled,
   logoUrl = null,
   children,
 }: Props) {
@@ -45,6 +51,9 @@ export default function AdminShell({
         <AdminSidebar
           isDeveloper={isDeveloper}
           reserveEnabled={reserveEnabled}
+          itemEnabled={itemEnabled}
+          inquiryEnabled={inquiryEnabled}
+          themeEnabled={themeEnabled}
           collapsed={collapsed}
           onToggleCollapse={() => setCollapsed((v) => !v)}
           mobileOpen={mobileOpen}

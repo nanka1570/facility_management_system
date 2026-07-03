@@ -5,13 +5,17 @@ import { usePathname } from "next/navigation";
 
 // 管理画面用サイドバー（画面設計書 §3.2）
 // - グループ見出し付き。「システム」グループは developer のみ表示
-// - 「ユーザー管理」「テーマ設定」は Phase2 のため表示しない（設計書注記どおり）
 // - 折りたたみ時はアイコンのみ表示
+// - 設計書のグループ構成に無い A-06 備品管理は「施設・予約」、A-07 問い合わせ管理は
+//   「ユーザー」グループに配置した（補正: README 参照）。無効モジュールの項目は非表示
 type NavItem = { href: string; icon: string; label: string };
 
 type Props = {
   isDeveloper: boolean;
   reserveEnabled: boolean;
+  itemEnabled: boolean;
+  inquiryEnabled: boolean;
+  themeEnabled: boolean;
   collapsed: boolean;
   onToggleCollapse: () => void;
   // スマホのオーバーレイ表示用
@@ -22,6 +26,9 @@ type Props = {
 export default function AdminSidebar({
   isDeveloper,
   reserveEnabled,
+  itemEnabled,
+  inquiryEnabled,
+  themeEnabled,
   collapsed,
   onToggleCollapse,
   mobileOpen,
@@ -34,6 +41,16 @@ export default function AdminSidebar({
     { href: "/admin/categories", icon: "📁", label: "カテゴリ管理" },
     ...(reserveEnabled
       ? [{ href: "/admin/reservations", icon: "📅", label: "予約管理" }]
+      : []),
+    ...(itemEnabled
+      ? [{ href: "/admin/items", icon: "📦", label: "備品管理" }]
+      : []),
+  ];
+
+  const userItems: NavItem[] = [
+    { href: "/admin/users", icon: "👥", label: "ユーザー管理" },
+    ...(inquiryEnabled
+      ? [{ href: "/admin/inquiries", icon: "💬", label: "問い合わせ管理" }]
       : []),
   ];
 
@@ -79,6 +96,10 @@ export default function AdminSidebar({
       {collapsed && <div className="my-2 border-t border-gray-200" />}
       {facilityItems.map(renderItem)}
 
+      {groupLabel("ユーザー")}
+      {collapsed && <div className="my-2 border-t border-gray-200" />}
+      {userItems.map(renderItem)}
+
       {isDeveloper && (
         <>
           {groupLabel("システム")}
@@ -88,6 +109,12 @@ export default function AdminSidebar({
             icon: "⚙️",
             label: "モジュール設定",
           })}
+          {themeEnabled &&
+            renderItem({
+              href: "/admin/theme",
+              icon: "🎨",
+              label: "テーマ設定",
+            })}
         </>
       )}
     </nav>

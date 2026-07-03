@@ -2,7 +2,7 @@
 
 専門学校卒業制作の PHP 版「汎用施設管理システム」を、`React/documents/` の設計書3点（要件定義書 v2.3 / DB設計書 v1.0 / 画面設計書 v2.0）に従って Next.js でリライトしたものです。**Claude Code（Fable 5）が設計書のみを情報源として実装**しています（既存実装 `React/Projects/` は参照していません）。
 
-実装スコープは **Phase1（コア機能）** です。
+実装スコープは **Phase1（コア機能）+ Phase2（拡張機能）** です。Phase3（メール通知・マルチテナント等）は未実装です。
 
 > **このプロジェクトの位置づけ**: 学習ワークフローにおける**見本（完成形）**です。進め方は「①最初にユーザー自身が `React/Projects/`（自作版）を実装 → ②fableが本見本を実装 → ③見本と自作版の両方を fable が比較評価（`React/documents/04_比較評価レポート_v1.2.md`）→ ④差分を自分の手で自作版に反映」。見本のコードを自作版へコピーすることはしません（詳細はリポジトリルートの README 参照）。
 
@@ -16,20 +16,29 @@
 | バックエンド | Supabase（PostgreSQL + Auth） |
 | 追加パッケージ | `@supabase/supabase-js` / `@supabase/ssr` のみ |
 
-## 画面一覧（Phase1）
+## 画面一覧
 
-| 画面ID | 画面名 | URL | 権限 |
-|--------|--------|-----|------|
-| C-01 | ログイン / 新規登録 | `/` | 不要 |
-| U-01 | ダッシュボード | `/dashboard` | ログイン済み |
-| U-02 | 予約カレンダー（日別） | `/reservations` | ログイン済み |
-| U-03 | 予約モーダル（新規/編集/閲覧） | （モーダル） | ログイン済み |
-| U-04 | マイページ | `/mypage` | ログイン済み |
-| A-01 | 管理者ダッシュボード | `/admin/dashboard` | admin 以上 |
-| A-02 | 施設管理 | `/admin/facilities` | admin 以上 |
-| A-03 | カテゴリ管理 | `/admin/categories` | admin 以上 |
-| A-04 | 予約管理 | `/admin/reservations` | admin 以上 |
-| A-08 | モジュール設定 | `/admin/settings` | developer のみ |
+| 画面ID | 画面名 | URL | 権限 | Phase |
+|--------|--------|-----|------|-------|
+| C-01 | ログイン / 新規登録 | `/` | 不要 | 1 |
+| C-03 | パスワードリセット | `/reset-password`（+ `/update`） | 不要 | 2 |
+| U-01 | ダッシュボード | `/dashboard` | ログイン済み | 1 |
+| U-02 | 予約カレンダー（日別） | `/reservations` | ログイン済み | 1 |
+| U-03 | 予約モーダル（新規/編集/閲覧 + 料金/備品/延長） | （モーダル） | ログイン済み | 1+2 |
+| U-04 | マイページ | `/mypage` | ログイン済み | 1 |
+| U-05 | 問い合わせ | `/inquiry` | ログイン済み・M-INQUIRY | 2 |
+| U-06 | 時間延長申請 | （U-03内） | ログイン済み・M-EXTEND | 2 |
+| A-01 | 管理者ダッシュボード | `/admin/dashboard` | admin 以上 | 1 |
+| A-02 | 施設管理（+延長可否/料金） | `/admin/facilities` | admin 以上 | 1+2 |
+| A-03 | カテゴリ管理 | `/admin/categories` | admin 以上 | 1 |
+| A-04 | 予約管理 | `/admin/reservations` | admin 以上 | 1 |
+| A-05 | ユーザー管理 | `/admin/users` | admin 以上 | 2 |
+| A-06 | 備品管理 | `/admin/items` | admin 以上・M-ITEM | 2 |
+| A-07 | 問い合わせ管理 | `/admin/inquiries` | admin 以上・M-INQUIRY | 2 |
+| A-08 | モジュール設定 | `/admin/settings` | developer のみ | 1 |
+| A-09 | テーマ設定 | `/admin/theme` | developer のみ・M-THEME | 2 |
+| D-01 | サイネージ（全体） | `/display` | ログイン済み・M-DISPLAY | 2 |
+| D-02 | サイネージ（施設別） | `/display/[id]` | ログイン済み・M-DISPLAY | 2 |
 
 ## セットアップ手順
 
@@ -46,10 +55,15 @@
 
 1. Supabase Dashboard → **SQL Editor** を開く
 2. [`supabase/schema.sql`](./supabase/schema.sql) の内容を全て貼り付けて **Run** する
-3. **Table Editor** で以下を確認する
-   - テーブル5つ: `profiles` / `categories` / `facilities` / `reservations` / `module_settings`
+3. 続けて [`supabase/schema_phase2.sql`](./supabase/schema_phase2.sql) を貼り付けて **Run** する（Phase2 増分）
+4. **Table Editor** で以下を確認する
+   - Phase1 テーブル5つ: `profiles` / `categories` / `facilities` / `reservations` / `module_settings`
+   - Phase2 テーブル6つ: `facility_prices` / `reservation_prices` / `items` / `reservation_items` / `inquiries` / `inquiry_messages`
    - `module_settings` に12行（M-CORE〜M-TENANT）
    - `categories` に3行、`facilities` に4行
+
+> Phase2 の各機能（延長・サイネージ・料金・備品・問い合わせ・テーマ）は、A-08 で対応モジュール（M-EXTEND / M-DISPLAY / M-PRICE / M-ITEM / M-INQUIRY / M-THEME）を ON にすると有効になります（初期値は OFF）。
+> パスワードリセット（C-03）のメールリンク先は Dashboard → **Authentication → URL Configuration** の Redirect URLs に `http://localhost:3000/reset-password/update` を追加してください。
 
 ### 3.（推奨）メール確認を無効化する
 
@@ -122,6 +136,18 @@ update public.profiles set role = 'developer' where email = '自分のメール�
 - [ ] スマホ幅（767px以下）: U-02 が「施設選択 + リスト表示」に切り替わる
 - [ ] スマホ幅: 管理画面サイドバーがハンバーガーメニューになる
 
+### Phase2 機能（各モジュールを ON にして確認）
+
+- [ ] C-03: リセットメール送信 → リンクから新パスワード設定 → 新パスワードでログインできる
+- [ ] A-05: 一般ユーザーの権限を admin に変更できる／developer 行と自分の行は変更不可
+- [ ] M-PRICE ON: A-02 に料金列が出る → 施設に単価設定 → U-03 に見積りが表示され、予約後に `reservation_prices` に記録される
+- [ ] M-ITEM ON: A-06 で備品登録 → U-03 で備品を選択して予約 → `reservation_items` に貸出時点の単価で記録される／使用中備品は A-06 で削除できない
+- [ ] M-EXTEND ON: A-02 で施設を延長可に → 利用中の自分の予約で延長（15/30/45/60分）→ 延長帯に他予約があると中止される
+- [ ] M-INQUIRY ON: U-05 から問い合わせ送信 → A-07 で返信 → U-05 に返信が表示される／他人の問い合わせは見えない（RLS）
+- [ ] M-DISPLAY ON: `/display` が30秒間隔で自動更新され、フルスクリーン切替できる／`/display/[id]` に利用中/空きが出る
+- [ ] M-THEME ON: A-09 でテンプレート変更 → 主要ボタン・タブ・スピナーの色が変わる／ロゴURL設定で Header のロゴが替わる
+- [ ] 各モジュール OFF: 対応する画面・導線が消え、直アクセスがリダイレクトされる
+
 ## 設計判断メモ（設計書からの意図的な補正・逸脱）
 
 実装は設計書3点に準拠していますが、以下は設計書の不整合・不足に対する意図的な補正です。
@@ -136,9 +162,23 @@ update public.profiles set role = 'developer' where email = '自分のメール�
 8. **A-04 の新規予約は管理者自身の名義で登録**: 画面設計書 §4.11 の新規予約モーダルに予約者の選択欄がないため。
 9. **カレンダーは自作の日別グリッド**: 要件 §8.1 に react-big-calendar とあるが、Phase1 は日別ビューのみ（週/月表示は将来対応）のため追加依存なしの自作グリッドとした。
 
+### Phase2 での補正・逸脱
+
+10. **Phase2 テーブルの RLS・インデックスを補完**: DB設計書 §4 は Phase1 テーブルのみのため、同じ方針（参照は authenticated、マスタ更新は admin、予約付随は本人+admin、問い合わせは本人+admin のみ参照可）で `schema_phase2.sql` に定義した。
+11. **A-05 用の `profiles_update_admin` を追加**: admin は他ユーザーの role を user/admin にのみ変更でき、developer 行は変更不可（画面設計書 §4.12）。RLS は列単位の制限ができないため role 以外の列も更新可能になる点は既知の制約。UI では自分自身の行も変更不可にした（自己降格による管理不能を防ぐ）。
+12. **新パスワード設定画面（`/reset-password/update`）を追加**: 画面設計書 §4.2 はメール送信画面のみのため、リカバリーリンクの着地画面を補完した。
+13. **テーマの保存先は `module_settings.config`**: DB設計書にテーマ用テーブルが無いため、M-THEME 行の config（JSONB）に `{template, customColor, logoUrl}` を保存する。ロゴはURL指定のみ（アップロードは Supabase Storage 導入が必要なため未対応）。
+14. **料金は時間単位で切り上げ**: 施設料金 = ceil(利用分数 / time_unit) × 単価。`reservation_prices.subtotal` には施設料金+備品料金の合計を予約確定・変更・延長のたびに再計算して記録する。
+15. **サイネージは要ログイン・個人情報非表示**: RLS が authenticated 前提のため、サイネージ端末は表示用アカウントでログインして運用する。公共の場に表示するため予約者名・利用目的は表示しない。
+16. **サイドバーへの A-06 / A-07 / U-05 の配置**: 画面設計書 §3.2 のグループ構成に無いため、備品管理は「施設・予約」、問い合わせ管理は「ユーザー」グループ、ユーザー画面の問い合わせは「予約」の下に配置した。
+17. **時間延長は編集モーダル内に設置**: U-06 は独立モーダルではなく、利用中の自分の予約の編集画面（U-03）内のセクションとした（対象条件: M-EXTEND 有効・施設が延長可・現在利用中）。
+
 ## 既知の制約
 
 - **重複チェックはアプリ層で実施**しており、まったく同時の送信では理論上すり抜ける可能性がある。確実に防ぎたい場合は `supabase/schema.sql` 末尾のコメントアウトされた EXCLUDE 制約を適用する。
 - **施設の削除は物理削除**で、紐づく予約（過去の履歴含む）も `ON DELETE CASCADE` で削除される。削除ガードは「確定済み予約あり」のみ（設計書どおり）。
-- `facilities.time_unit`（予約単位）は Phase1 では未使用（カレンダーは1時間スロット固定）。
+- `facilities.time_unit`（予約単位）はカレンダーのスロットには未使用（1時間スロット固定）。**料金計算（M-PRICE）でのみ使用**している。
 - **A-04 予約管理は予約を全件取得**し、施設・日付フィルターはクライアント側で絞り込む（Phase1 の規模を前提）。予約が数千件規模になる場合は、日付フィルターのサーバー側適用やページングの導入が必要。
+- **備品の在庫競合チェックは未実装**（ITEM-04 在庫管理 = Phase3）。同一時間帯に複数予約が同じ備品を選ぶと総数を超え得る。上限は「備品の総数」のみ。
+- **料金の履歴は持たない**（PRICE-03 = Phase3）。`reservation_prices.subtotal` は予約変更・延長のたびに上書きされる。
+- **キャンセル時の料金・備品は削除しない**: キャンセルは status 変更のみ（論理削除）のため、記録された料金・備品はそのまま残る。復元時にも再利用される。

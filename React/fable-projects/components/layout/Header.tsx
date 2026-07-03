@@ -11,6 +11,8 @@ import { createClient } from "@/lib/supabase/client";
 type Props = {
   isAdminUser: boolean;
   reserveEnabled: boolean;
+  // スマホ用の問い合わせ導線（UserSidebar が隠れるため。M-INQUIRY 有効時のみ）
+  inquiryEnabled?: boolean;
   // M-THEME 有効かつロゴ設定時のみ渡される（THEME-03）
   logoUrl?: string | null;
   onMenuClick?: () => void;
@@ -19,6 +21,7 @@ type Props = {
 export default function Header({
   isAdminUser,
   reserveEnabled,
+  inquiryEnabled = false,
   logoUrl = null,
   onMenuClick,
 }: Props) {
@@ -71,6 +74,11 @@ export default function Header({
           {!isAdminArea && reserveEnabled && (
             <Link href="/reservations" className={mobileNavClass}>
               予約
+            </Link>
+          )}
+          {!isAdminArea && inquiryEnabled && (
+            <Link href="/inquiry" className={mobileNavClass}>
+              問い合わせ
             </Link>
           )}
           {!isAdminArea && (

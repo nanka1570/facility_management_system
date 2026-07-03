@@ -5,10 +5,13 @@ import { usePathname } from "next/navigation";
 
 // ユーザー画面用サイドバー（画面設計書 §3.2）
 // PC（md以上）のみ表示。スマホのナビは Header のボタンで代替する
+// 問い合わせ（U-05）は設計書のサイドバー構成に無いため予約の下に追加（補正: README 参照）
 export default function UserSidebar({
   reserveEnabled,
+  inquiryEnabled,
 }: {
   reserveEnabled: boolean;
+  inquiryEnabled: boolean;
 }) {
   const pathname = usePathname();
 
@@ -28,6 +31,11 @@ export default function UserSidebar({
         {reserveEnabled && (
           <Link href="/reservations" className={itemClass("/reservations")}>
             📅 予約
+          </Link>
+        )}
+        {inquiryEnabled && (
+          <Link href="/inquiry" className={itemClass("/inquiry")}>
+            💬 問い合わせ
           </Link>
         )}
         <Link href="/mypage" className={`${itemClass("/mypage")} mt-auto`}>

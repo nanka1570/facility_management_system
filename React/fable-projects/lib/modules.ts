@@ -31,3 +31,17 @@ export async function isModuleEnabled(
     .single();
   return data?.is_enabled ?? false;
 }
+
+// 有効モジュールの一括取得（レイアウト等、複数モジュールを見る箇所用。クエリ1回）
+export async function getEnabledModules(
+  supabase: SupabaseClient<Database>,
+): Promise<Set<ModuleId>> {
+  const { data } = await supabase
+    .from("module_settings")
+    .select("module_id, is_enabled");
+  return new Set(
+    (data ?? [])
+      .filter((m) => m.is_enabled)
+      .map((m) => m.module_id as ModuleId),
+  );
+}
