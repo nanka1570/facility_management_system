@@ -26,6 +26,8 @@ export default function TenantManager({
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [savingProfileId, setSavingProfileId] = useState<string | null>(null);
+  // 有効/無効・削除の処理中テナント（連打による二重実行を防ぐ）
+  const [busyTenantId, setBusyTenantId] = useState<string | null>(null);
 
   const [newName, setNewName] = useState("");
   const [newSubdomain, setNewSubdomain] = useState("");
@@ -80,11 +82,13 @@ export default function TenantManager({
 
   // TENANT-03 テナント別設定（有効/無効）
   const handleToggleActive = async (tenant: Tenant) => {
+    setBusyTenantId(tenant.id);
     const supabase = createClient();
     const { error: updateError } = await supabase
       .from("tenants")
       .update({ is_active: !tenant.is_active })
       .eq("id", tenant.id);
+    setBusyTenantId(null);
     if (updateError) {
       setError("テナントの更新に失敗しました");
       return;
@@ -100,11 +104,13 @@ export default function TenantManager({
     ) {
       return;
     }
+    setBusyTenantId(tenant.id);
     const supabase = createClient();
     const { error: deleteError } = await supabase
       .from("tenants")
       .delete()
       .eq("id", tenant.id);
+    setBusyTenantId(null);
     if (deleteError) {
       setError("テナントの削除に失敗しました");
       return;
@@ -203,10 +209,15 @@ export default function TenantManager({
                     <Button
                       variant="secondary"
                       onClick={() => handleToggleActive(tenant)}
+                      loading={busyTenantId === tenant.id}
                     >
                       {tenant.is_active ? "無効にする" : "有効にする"}
                     </Button>
-                    <Button variant="danger" onClick={() => handleDelete(tenant)}>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDelete(tenant)}
+                      disabled={busyTenantId === tenant.id}
+                    >
                       削除
                     </Button>
                   </div>

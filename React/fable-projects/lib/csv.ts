@@ -15,7 +15,9 @@ export function downloadCsv(
   const content = [header, ...rows]
     .map((row) => row.map(escapeCsvValue).join(","))
     .join("\r\n");
-  const blob = new Blob(["﻿" + content], {
+  // BOM は不可視文字のリテラルではなく必ずエスケープで書く
+  // （リテラルだとフォーマッタ・コピペで無言に消え、Excel の文字化けが再発する）
+  const blob = new Blob(["\uFEFF" + content], {
     type: "text/csv;charset=utf-8",
   });
   const url = URL.createObjectURL(blob);

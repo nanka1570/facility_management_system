@@ -353,6 +353,24 @@ export default function ReservationModal({
         setFormError("延長する時間帯に他の予約が入っています");
         return;
       }
+
+      // ITEM-04: 延長後の全時間帯で借りている備品の在庫が足りるか確認
+      // （延長分の時間帯で他の予約が同じ備品を借りていると総数を超えうる）
+      if (itemEnabled && itemQty.size > 0) {
+        const shortages = await findItemShortages(supabase, {
+          requests: itemQty,
+          items,
+          startISO: reservation.start_time,
+          endISO: newEnd.toISOString(),
+          excludeReservationId: reservation.id,
+        });
+        if (shortages.length > 0) {
+          setFormError(
+            `延長する時間帯で備品の在庫が不足しています: ${shortages.join("、")}`,
+          );
+          return;
+        }
+      }
       const { error } = await supabase
         .from("reservations")
         .update({ end_time: newEnd.toISOString() })

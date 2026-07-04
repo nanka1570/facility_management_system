@@ -95,9 +95,30 @@ begin
 end;
 $$;
 
+-- 予約のテナントは「作成者」ではなく「施設」から継承する。
+-- 作成者由来にすると、共有施設（tenant_id=NULL）への予約が作成者のテナントに
+-- 割り当てられて他テナントから見えなくなり、hasOverlap がすり抜けて
+-- テナントを跨いだ二重予約が成立してしまう。
+-- 施設由来なら: 共有施設の予約=共有（全員に見え重複チェックが効く）、
+--               テナント施設の予約=そのテナント（分離が効く）
+create or replace function public.set_reservation_tenant()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if new.tenant_id is null then
+    select tenant_id into new.tenant_id
+      from public.facilities where id = new.facility_id;
+  end if;
+  return new;
+end;
+$$;
+
 create trigger trg_categories_tenant   before insert on public.categories   for each row execute function public.set_tenant_id();
 create trigger trg_facilities_tenant   before insert on public.facilities   for each row execute function public.set_tenant_id();
-create trigger trg_reservations_tenant before insert on public.reservations for each row execute function public.set_tenant_id();
+create trigger trg_reservations_tenant before insert on public.reservations for each row execute function public.set_reservation_tenant();
 create trigger trg_items_tenant        before insert on public.items        for each row execute function public.set_tenant_id();
 create trigger trg_inquiries_tenant    before insert on public.inquiries    for each row execute function public.set_tenant_id();
 -- profiles は handle_new_user で作成されるため対象外（登録直後は未割当）
