@@ -81,6 +81,8 @@ supabase secrets set RESEND_API_KEY=re_xxx NOTIFY_FROM="施設管理システム
 未デプロイでも他機能には影響しない（通知は静かにスキップされる）。
 
 > Phase2 の各機能（延長・サイネージ・料金・備品・問い合わせ・テーマ）は、A-08 で対応モジュール（M-EXTEND / M-DISPLAY / M-PRICE / M-ITEM / M-INQUIRY / M-THEME）を ON にすると有効になります（初期値は OFF）。
+>
+> **ローカルスタック（`supabase start`）で動かす場合**: スキーマ適用後に [`supabase/grant_local.sql`](./supabase/grant_local.sql) も実行すること。クラウドと異なりデフォルト権限が付与されず、REST が permission denied になる（E2Eテストで発見。クラウドでは不要）。
 > パスワードリセット（C-03）のメールリンク先は Dashboard → **Authentication → URL Configuration** の Redirect URLs に `http://localhost:3000/reset-password/update` を追加してください。
 
 ### 3.（推奨）メール確認を無効化する
